@@ -1,0 +1,126 @@
+openapi: 3.0.3
+info:
+  title: WASAchat
+  description: WASAchat backend REST API
+  version: 0.0.1
+servers:
+- url: http://localhost:5500
+components:
+  schemas:
+    user:
+      title: User
+      description: "app user"
+      type: object
+      properties:
+        id: 
+          description: Unique identifier of a user in the app
+          type: integer
+          example: 1
+          minimum: 0
+          readOnly: true
+        username: 
+          description: Name choose by the user that can represent him in the app
+          type: string
+          example: samupgn
+        profileImage:
+          description: Image that represent the user
+          type: string
+          example: https://www.istockphoto.com/illustrations/placeholder-image
+        realName:
+          description: Real name of the user
+          type: string
+          example: Samuele
+        realSurname:
+          description: Real surname of the user
+          type: string
+          example: Pagnotta
+    message:
+      title: Message
+      description: Text or image data sent from a user to another
+      type: object
+      properties:
+        id: 
+          description: Unique identifier of a message in the chat
+          type: integer
+          example: 1 
+          readOnly: true
+        messageType:
+          description: Identifier of the type of the message
+          type: string
+          enum: ["image", "text"]
+          example: text
+        content: 
+          description: Content of the message
+          type: string
+          example: |
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, 
+            sed do eiusmod tempor incididunt ut labore et dolore magna aliqua
+        previewContent: 
+          description: content
+          type: string
+          example: Lorem ipsum dolor sit amet, consectetur adipiscing elit
+        sender:
+          description: username of the user that have sent the message
+          type: string
+          example: samupgn
+        timestamp:
+          description: Unix timestamp of the time when the user sent the message
+          type: string
+          example: 1731086574
+        status: 
+          description: Show if the user have received the message or not
+          type: string
+          enum: [sent, received, not_sent]
+          example: sent
+        replyTo:
+          description: id of the message who this message reply
+          type: integer
+          minimum: 0
+          example: 0
+    chat:
+      title: Chat
+      description: Conversations between 2 or more users
+      type: object
+      properties:
+        id: 
+          description: Unique identifier of the chat from an user
+          type: integer
+          minimum: 0
+          example: 1
+        messageList:
+          description: Message list in the chat
+          type: array
+          items:
+            $ref: '#/components/schemas/message'
+        partecipantsId:
+          description: list of users who take part of the chat
+          type: array
+          items:
+            type: integer
+            minimum: 0
+          example: [0, 1]
+    group:
+      title: GroupsChat
+      description: Conversations between more partcipants
+      type: object
+      properties:
+        id: 
+          description: Unique identifier of the GroupChat from an user
+          type: integer
+          minimum: 0
+          example: 1
+        messageList:
+          description: Message list in the chat
+          type: array
+          items:
+            $ref: '#/components/schemas/message'
+        partecipantsId:
+          description: list of users who take part of the chat
+          type: array
+          items:
+            type: integer
+            minimum: 0
+          example: [0, 1, 2, 3]
+paths: 
+    
+  
