@@ -91,7 +91,7 @@ components:
           description: Message list in the chat
           type: array
           items:
-            $ref: '#/components/schemas/message'
+            $ref: '#/components/schemas/Message'
         partecipantsId:
           description: list of users who take part of the chat
           type: array
@@ -216,7 +216,7 @@ paths:
           in: path
           description: The ID of the conversation to retrieve
           schema:
-            type: string
+            type: integer
           required: true
       responses:
         '200':
@@ -231,4 +231,41 @@ paths:
           description: User does not have access rights to the content
         "404":
           description: Conversation not found
-          
+  /conversations/{conversationId}/sendMessage:
+    post:
+      tags: ["Conversation Based"]
+      summary: Send a message in a conversation
+      description: Send a new message to a specific conversation identified by conversationId
+      operationId: sendMessage
+      parameters:
+        - name: conversationId
+          in: path
+          description: The ID of the conversation to send the message to
+          schema:
+            type: integer
+          required: true
+      requestBody:
+        description: The message details to send
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Message'
+      responses:
+        '201':
+          description: Message sent successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        "400":
+          description: Invalid input
+        "401":
+          description: User has to authenticate to send the message
+        "403":
+          description: User does not have access rights to the content
+        "404":
+          description: Conversation not found
+
+
+       
