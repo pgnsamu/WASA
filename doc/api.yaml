@@ -93,34 +93,16 @@ components:
           items:
             $ref: '#/components/schemas/Message'
         partecipantsId:
-          description: list of users who take part of the chat
+          description: list of users ID who take part of the chat
           type: array
           items:
             type: integer
             minimum: 0
           example: [0, 1]
-    Group:
-      title: GroupsChat
-      description: Conversations between more partcipants
-      type: object
-      properties:
-        id: 
-          description: Unique identifier of the GroupChat from an user
-          type: integer
-          minimum: 0
-          example: 1
-        messageList:
-          description: Message list in the chat
-          type: array
-          items:
-            $ref: '#/components/schemas/Message'
-        partecipantsId:
-          description: list of users who take part of the chat
-          type: array
-          items:
-            type: integer
-            minimum: 0
-          example: [0, 1, 2, 3]
+        photo: 
+          description: Photo of the chat if is a group
+          type: string
+          example: "https://.."
 paths:
   /session:
     post:
@@ -266,6 +248,56 @@ paths:
           description: User does not have access rights to the content
         "404":
           description: Conversation not found
+  /conversations/{sourceConversationId}/messages/{messageId}/forward:
+    post:
+      tags: ["Conversation Based"]
+      summary: Forward a message to a different conversation
+      description: Forward an existing message to the specified conversation
+      operationId: forwardMessage
+      parameters:
+        - name: sourceConversationId
+          in: path
+          description: The ID of the conversation where you already have the message
+          schema:
+            type: integer
+          required: true
+        - name: messageId
+          in: path
+          description: The ID of the message to forward
+          schema:
+            type: integer
+          required: true
+      requestBody:
+        description: Target conversation and additional details for forwarding the message
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                targetConversationId:
+                  type: integer
+                  description: The ID of the target conversation to which the message is being forwarded
+                customContent:
+                  type: string
+                  description: Optional additional content added when forwarding the message
+              required:
+                - targetConversationId
+      responses:
+        '201':
+          description: Message forwarded successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        "400":
+          description: Invalid input
+        "401":
+          description: User has to authenticate to forward the message
+        "403":
+          description: User does not have access rights to the content
+        "404":
+          description: Conversation or message not found
 
 
-       
+      
