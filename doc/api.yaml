@@ -161,7 +161,7 @@ paths:
       tags: ["User Setting"]
       summary: Change username
       description: Update of the username for this service
-      operationId: updateUsername
+      operationId: setMyUserName
       requestBody:
         description: User new username over the last one
         content:
@@ -188,12 +188,12 @@ paths:
           description: User have to Auth itself to change username
         "403": 
           description: Username already in use
-  /getMyConversations:
+  /conversations/:
     get:
       tags: ["Conversation Based"]
       summary: Retrieve the list of all the user Conversations
       description: Retrieve chronologically reversed all the conversation connected with the user
-      operationId: conversationList
+      operationId: getMyConversations
       responses:
         '200':
           description: list of Conversations
@@ -205,5 +205,30 @@ paths:
                   $ref: '#/components/schemas/Chat'
         "401":
           description: User have to Auth itself to see the Conversations
-      
+  /conversations/{conversationId}:
+    get:
+      tags: ["Conversation Based"]
+      summary: Retrieve a single conversation by ID
+      description: Retrieve a specific conversation connected with the user by its ID
+      operationId: getConversation
+      parameters:
+        - name: conversationId
+          in: path
+          description: The ID of the conversation to retrieve
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Single conversation details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Chat'
+        "401":
+          description: User has to authenticate to view the conversation
+        "403":
+          description: User does not have access rights to the content
+        "404":
+          description: Conversation not found
           
