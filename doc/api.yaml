@@ -487,19 +487,19 @@ paths:
           type: integer
         required: true
       requestBody:
-        description: The comment as a Chat
+        description: The comment as a Message
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Chat'
+              $ref: '#/components/schemas/Message'
       responses:
         '201':
           description: Comment added successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Chat'
+                $ref: '#/components/schemas/Message'
         "400":
           description: Invalid input
         "401":
