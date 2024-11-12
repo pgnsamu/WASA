@@ -164,12 +164,12 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/User" }
-        "404": 
-          description: User not found
+        "400":
+          description: Invalid input (e.g. username already used)
         "401":
           description: User have to Auth itself to change username
-        "403": 
-          description: Username already in use
+        "404": 
+          description: User not found
   /conversations/:
     get:
       tags: ["Conversation Based"]
@@ -431,11 +431,35 @@ paths:
               schema:
                 $ref: '#/components/schemas/User'
         "400":
-          description: Invalid input (e.g., invalid user ID)
+          description: Invalid input (e.g. invalid user ID)
         "401":
           description: User must authenticate to add someone to a group
         "403":
           description: User does not have permission to add users to this group
         "404":
           description: group chat or user not found
+  /conversations/{conversationId}/leave:
+    delete:
+      tags: ["Groupchat Management"]
+      summary: Leave a group chat (conversation)
+      description: Allows a user to leave an existing group chat (conversation).
+      operationId: leaveGroup
+      parameters:
+        - name: conversationId
+          in: path
+          description: The ID of the group chat (conversation) the user is leaving
+          schema:
+            type: integer
+          required: true
+      responses:
+        '200':
+          description: User successfully left the group chat
+        "400":
+          description: Invalid input (e.g. user not part of the conversation)
+        "401":
+          description: User must authenticate to leave the group
+        #"403": non so se metterla
+        #  description: User is not authorized to leave the group
+        "404":
+          description: Conversation not found or user is not a participant
           
