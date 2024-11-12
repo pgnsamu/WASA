@@ -399,3 +399,42 @@ paths:
           description: User is not authorized to delete this message
         "404":
           description: Conversation or message not found
+  /conversations/{conversationId}/addUser:
+    post:
+      tags: ["Conversation Based"]
+      summary: Add a user to a group chat (conversation)
+      description: Adds a user to an existing group chat, which is a conversation with isGroup set to true
+      operationId: addToGroup
+      parameters:
+        - name: conversationId
+          in: path
+          description: The ID of the group chat (conversation) to add the user to
+          schema:
+            type: string
+          required: true
+      requestBody:
+        description: The user details to add to the group chat
+        content:
+          application/json: 
+            schema:
+              type: object
+              properties:
+                userId: 
+                  type: integer
+                  description: The ID of the user to add to the group chat
+        required: true
+      responses:
+        '200':
+          description: User successfully added to the group chat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        "400":
+          description: Invalid input (e.g., invalid user ID)
+        "401":
+          description: User must authenticate to add someone to a group
+        "403":
+          description: User does not have permission to add users to this group
+        "404":
+          description: group chat or user not found
