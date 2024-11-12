@@ -24,8 +24,8 @@ components:
           example: samupgn
         profileImage:
           description: Image that represent the user
+          format: binary
           type: string
-          example: https://www.istockphoto.com/illustrations/placeholder-image
         realName:
           description: Real name of the user
           type: string
@@ -102,7 +102,7 @@ components:
         photo: 
           description: Photo of the chat if is a group
           type: string
-          example: "https://.."
+          format: binary
 paths:
   /session:
     post:
@@ -139,7 +139,7 @@ paths:
                     type: string
                     example: "abcdef012345"
   /setUserName:
-    post: 
+    put: 
       tags: ["User Management"]
       summary: Change username
       description: Update of the username for this service
@@ -170,6 +170,38 @@ paths:
           description: User have to Auth itself to change username
         "404": 
           description: User not found
+  /setPhoto:
+    post: 
+      tags: ["User Management"]
+      summary: Change Photo
+      description: Update of the Photo of the user for this service
+      operationId: setMyPhoto
+      requestBody:
+        description: User new Photo over the last one
+        content:
+          application/json: 
+            schema:
+              type: object
+              properties:
+                photo:
+                  type: string
+                  format: binary
+                  description: The photo file to upload (image)
+        required: true
+      responses:
+        "200":
+          description: photo updated successfully
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/User" }
+        "400":
+          description: Invalid input
+        "401":
+          description: User have to Auth itself to set a photo
+        "404": 
+          description: User not found
+
+
   /conversations/:
     get:
       tags: ["Conversation Based"]
@@ -465,7 +497,7 @@ paths:
   /conversations/{conversationId}/setGroupName:
     post: 
       tags: ["Groupchat Management"]
-      summary: Change group name
+      summary: Setting up or Change group name
       description: Update or setting up the username for this GroupChat (conversation)
       operationId: setGroupName
       parameters:
