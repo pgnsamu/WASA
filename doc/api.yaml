@@ -339,3 +339,33 @@ paths:
           description: User does not have access rights to the content
         "404":
           description: Conversation or message not found
+  /conversations/{conversationId}/messages/{messageId}/uncomment:
+    delete:
+      tags: ["Conversation Based"]
+      summary: Delete a comment from a message
+      description: Deletes a specific comment on a message within a conversation
+      operationId: uncommentMessage
+      parameters:
+      - name: conversationId
+        in: path
+        description: The ID of the conversation containing the message
+        schema:
+          type: integer
+        required: true
+      - name: messageId
+        in: path
+        description: The ID of the message who is a comment
+        schema:
+          type: integer
+        required: true
+      responses:
+        '204':
+          description: Comment deleted successfully
+        "400":
+          description: Invalid input
+        "401":
+          description: User must authenticate to delete the comment
+        "403":
+          description: User is not authorized to delete this comment
+        "404":
+          description: Conversation or comment not found
