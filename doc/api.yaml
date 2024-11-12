@@ -298,6 +298,44 @@ paths:
           description: User does not have access rights to the content
         "404":
           description: Conversation or message not found
-
-
-      
+  /conversations/{conversationId}/messages/{messageId}/comment:
+    post:
+      tags: ["Conversation Based"]
+      summary: Add a comment to a message
+      description: Adds a comment to a specific message within a conversation
+      operationId: commentMessage
+      parameters:
+      - name: conversationId
+        in: path
+        description: The ID of the conversation containing the message to comment on
+        schema:
+          type: string
+        required: true
+      - name: messageId
+        in: path
+        description: The ID of the message to comment on
+        schema:
+          type: string
+        required: true
+      requestBody:
+        description: The comment as a Chat
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Chat'
+      responses:
+        '201':
+          description: Comment added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Chat'
+        "400":
+          description: Invalid input
+        "401":
+          description: User must authenticate to add a comment
+        "403":
+          description: User does not have access rights to the content
+        "404":
+          description: Conversation or message not found
