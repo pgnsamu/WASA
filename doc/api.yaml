@@ -302,7 +302,7 @@ paths:
           description: User have to Auth itself to change a Group name
         "404": 
           description: Group (Chat) not found       
-  /conversations/{conversationId}/setPhoto:
+  /conversations/{conversationId}/setGroupPhoto:
     post: 
       tags: ["Groupchat Management"]
       summary: Change GroupChat (Chat) Photo
