@@ -173,7 +173,7 @@ paths:
   /conversations/:
     get:
       tags: ["Conversation Based"]
-      summary: Retrieve the list of all the user Conversations
+      summary: Retrieve the list of all the user conversations
       description: Retrieve chronologically reversed all the conversation connected with the user
       operationId: getMyConversations
       responses:
@@ -369,3 +369,33 @@ paths:
           description: User is not authorized to delete this comment
         "404":
           description: Conversation or comment not found
+  /conversations/{conversationId}/messages/{messageId}/delMessage:
+    delete:
+      tags: ["Conversation Based"]
+      summary: Delete a message from the conversation
+      description: Deletes a specific message within a conversation
+      operationId: deleteMessage
+      parameters:
+      - name: conversationId
+        in: path
+        description: The ID of the conversation containing the message
+        schema:
+          type: integer
+        required: true
+      - name: messageId
+        in: path
+        description: The ID of the message that will be deleted
+        schema:
+          type: integer
+        required: true
+      responses:
+        '204':
+          description: message deleted successfully
+        "400":
+          description: Invalid input
+        "401":
+          description: User must authenticate to delete the message
+        "403":
+          description: User is not authorized to delete this message
+        "404":
+          description: Conversation or message not found
