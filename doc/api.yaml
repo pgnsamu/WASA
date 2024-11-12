@@ -106,7 +106,7 @@ components:
 paths:
   /session:
     post:
-      tags: ["User Setting"]
+      tags: ["User Management"]
       summary: Logs in the user
       description: |-
         If the user does not exist, it will be created,
@@ -138,9 +138,9 @@ paths:
                   identifier:
                     type: string
                     example: "abcdef012345"
-  /setMyUserName:
+  /setUserName:
     post: 
-      tags: ["User Setting"]
+      tags: ["User Management"]
       summary: Change username
       description: Update of the username for this service
       operationId: setMyUserName
@@ -160,7 +160,7 @@ paths:
         required: true
       responses:
         "200":
-          description: Fountain updated successfully
+          description: Username updated successfully
           content:
             application/json:
               schema: { $ref: "#/components/schemas/User" }
@@ -462,4 +462,42 @@ paths:
         #  description: User is not authorized to leave the group
         "404":
           description: Conversation not found or user is not a participant
-          
+  /conversations/{conversationId}/setGroupName:
+    post: 
+      tags: ["Groupchat Management"]
+      summary: Change group name
+      description: Update or setting up the username for this GroupChat (conversation)
+      operationId: setGroupName
+      parameters:
+        - name: conversationId
+          in: path
+          description: The ID of the group chat (conversation) the user is leaving
+          schema:
+            type: integer
+          required: true
+      requestBody:
+        description: New GroupChat name 
+        content:
+          application/json: 
+            schema:
+              type: object
+              properties:
+                newName: 
+                  type: string
+                  example: Informatica
+                  pattern: 'ˆ.*?$'
+                  minLength: 3
+                  maxLength: 16
+        required: true
+      responses:
+        "200":
+          description: Group name updated successfully
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/User" }
+        "400":
+          description: Invalid input (e.g. Group name already used)
+        "401":
+          description: User have to Auth itself to change a Group name
+        "404": 
+          description: Group (conversation) not found       
