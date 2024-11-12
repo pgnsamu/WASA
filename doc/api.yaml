@@ -7,7 +7,7 @@ servers:
 - url: http://localhost:5500
 components:
   schemas:
-    user:
+    User:
       title: User
       description: "app user"
       type: object
@@ -34,7 +34,7 @@ components:
           description: Real surname of the user
           type: string
           example: Pagnotta
-    message:
+    Message:
       title: Message
       description: Text or image data sent from a user to another
       type: object
@@ -77,7 +77,7 @@ components:
           type: integer
           minimum: 0
           example: 0
-    chat:
+    Chat:
       title: Chat
       description: Conversations between 2 or more users
       type: object
@@ -99,7 +99,7 @@ components:
             type: integer
             minimum: 0
           example: [0, 1]
-    group:
+    Group:
       title: GroupsChat
       description: Conversations between more partcipants
       type: object
@@ -113,7 +113,7 @@ components:
           description: Message list in the chat
           type: array
           items:
-            $ref: '#/components/schemas/message'
+            $ref: '#/components/schemas/Message'
         partecipantsId:
           description: list of users who take part of the chat
           type: array
@@ -181,10 +181,29 @@ paths:
           description: Fountain updated successfully
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/user" }
+              schema: { $ref: "#/components/schemas/User" }
         "404": 
           description: User not found
         "401":
           description: User have to Auth itself to change username
         "403": 
           description: Username already in use
+  /getMyConversations:
+    get:
+      tags: ["Conversation Based"]
+      summary: Retrieve the list of all the user Conversations
+      description: Retrieve chronologically reversed all the conversation connected with the user
+      operationId: conversationList
+      responses:
+        '200':
+          description: list of Conversations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Chat'
+        "401":
+          description: User have to Auth itself to see the Conversations
+      
+          
