@@ -121,6 +121,70 @@ components:
             type: integer
             minimum: 0
           example: [0, 1, 2, 3]
-paths: 
-    
-  
+paths:
+  /session:
+    post:
+      tags: ["User Setting"]
+      summary: Logs in the user
+      description: |-
+        If the user does not exist, it will be created,
+        and an identifier is returned.
+        If the user exists, the user identifier is returned.
+      operationId: doLogin
+      requestBody:
+        description: User details
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Maria
+                  pattern: 'ˆ.*?$'
+                  minLength: 3
+                  maxLength: 16
+        required: true
+      responses:
+        '201':
+          description: User log-in action successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  identifier:
+                    type: string
+                    example: "abcdef012345"
+  /setMyUserName:
+    post: 
+      tags: ["User Setting"]
+      summary: Change username
+      description: Update of the username for this service
+      operationId: updateUsername
+      requestBody:
+        description: User new username over the last one
+        content:
+          application/json: 
+            schema:
+              type: object
+              properties:
+                newName: 
+                  type: string
+                  example: Samuele
+                  pattern: 'ˆ.*?$'
+                  minLength: 3
+                  maxLength: 16
+        required: true
+      responses:
+        "200":
+          description: Fountain updated successfully
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/user" }
+        "404": 
+          description: User not found
+        "401":
+          description: User have to Auth itself to change username
+        "403": 
+          description: Username already in use
