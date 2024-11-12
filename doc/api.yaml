@@ -309,13 +309,13 @@ paths:
         in: path
         description: The ID of the conversation containing the message to comment on
         schema:
-          type: string
+          type: integer
         required: true
       - name: messageId
         in: path
         description: The ID of the message to comment on
         schema:
-          type: string
+          type: integer
         required: true
       requestBody:
         description: The comment as a Chat
