@@ -138,7 +138,7 @@ paths:
                   identifier:
                     type: integer
                     example: 0
-  /setUserName:
+  /user/setUserName:
     put: 
       tags: ["User Management"]
       summary: Change username
@@ -170,7 +170,7 @@ paths:
           description: User have to Auth itself to change username
         "404": 
           description: User not found
-  /setPhoto:
+  /user/setPhoto:
     post: 
       tags: ["User Management"]
       summary: Change Photo
