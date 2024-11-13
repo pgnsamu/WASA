@@ -136,8 +136,8 @@ paths:
                 type: object
                 properties:
                   identifier:
-                    type: string
-                    example: "abcdef012345"
+                    type: integer
+                    example: 0
   /setUserName:
     put: 
       tags: ["User Management"]
