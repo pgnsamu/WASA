@@ -103,6 +103,11 @@ components:
           description: Photo of the chat if is a group
           type: string
           format: binary
+  securitySchemes:
+    BearerAuth: 
+      type: http 
+      scheme: bearer 
+      bearerFormat: JWT
 tags:
   - name: "User Management"
     description: "Operations related to managing users"
@@ -110,6 +115,8 @@ tags:
     description: "Operations related to managing group chats"
   - name: "Conversation Based"
     description: "Operations for handling conversations and messages"
+security:
+  - BearerAuth: []
 paths:
   /session:
     post:
@@ -134,6 +141,8 @@ paths:
                   minLength: 3
                   maxLength: 16
         required: true
+      security:
+        - BearerAuth: []
       responses:
         '201':
           description: User log-in action successful
