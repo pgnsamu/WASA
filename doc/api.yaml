@@ -103,6 +103,13 @@ components:
           description: Photo of the chat if is a group
           type: string
           format: binary
+tags:
+  - name: "User Management"
+    description: "Operations related to managing users"
+  - name: "Groupchat Management"
+    description: "Operations related to managing group chats"
+  - name: "Conversation Based"
+    description: "Operations for handling conversations and messages"
 paths:
   /session:
     post:
