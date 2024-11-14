@@ -58,7 +58,7 @@ components:
         status: 
           description: Show if the user have received the message or not
           type: string
-          enum: [sent, received, not_sent]
+          enum: ["sent", "received", "not_sent"]
         replyTo:
           description: id of the message who this message reply
           type: integer
@@ -81,6 +81,7 @@ components:
           description: list of users ID who take part of the chat
           type: array
           items:
+            description: user id
             type: integer
             minimum: 0
         photo: 
