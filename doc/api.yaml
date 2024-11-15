@@ -20,6 +20,7 @@ components:
         username: 
           description: Name choose by the user that can represent him in the app
           type: string
+          pattern: "^[a-zA-Z0-9_.]+$"
         profileImage:
           description: Image that represent the user
           format: binary
@@ -27,9 +28,11 @@ components:
         realName:
           description: Real name of the user
           type: string
+          pattern: "^[a-zA-Z]+$"
         realSurname:
           description: Real surname of the user
           type: string
+          pattern: "^[a-zA-Z]+$"
     Message:
       title: Message
       description: Text or image data sent from a user to another
@@ -46,15 +49,19 @@ components:
         content: 
           description: Content of the message
           type: string
+          pattern: ".*"
         previewContent: 
           description: content
           type: string
+          pattern: ".*"
         sender:
           description: username of the user that have sent the message
           type: string
+          pattern: "^[a-zA-Z0-9_.]+$"
         timestamp:
           description: Unix timestamp of the time when the user sent the message
           type: string
+          format: date-time
         status: 
           description: Show if the user have received the message or not
           type: string
@@ -122,7 +129,7 @@ paths:
                 name:
                   type: string
                   example: "Maria"
-                  pattern: 'ˆ.*?$'
+                  pattern: "^[a-zA-Z0-9_.]+$"
                   minLength: 3
                   maxLength: 16
         required: true
@@ -154,7 +161,7 @@ paths:
               properties:
                 newName: 
                   type: string
-                  pattern: 'ˆ.*?$'
+                  pattern: "^[a-zA-Z0-9_.]+$"
                   minLength: 3
                   maxLength: 16
         required: true
@@ -285,7 +292,7 @@ paths:
               properties:
                 newName: 
                   type: string
-                  pattern: 'ˆ.*?$'
+                  pattern: "^[a-zA-Z0-9_.]+$"
                   minLength: 3
                   maxLength: 16
         required: true
@@ -449,6 +456,7 @@ paths:
                 customContent:
                   type: string
                   description: Optional additional content added when forwarding the message
+                  pattern: ".*"
               required:
                 - targetConversationId
       responses:
