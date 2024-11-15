@@ -21,6 +21,8 @@ components:
           description: Name choose by the user that can represent him in the app
           type: string
           pattern: "^[a-zA-Z0-9_.]+$"
+          minLength: 3
+          maxLength: 16
         profileImage:
           description: Image that represent the user
           format: binary
@@ -29,10 +31,14 @@ components:
           description: Real name of the user
           type: string
           pattern: "^[a-zA-Z]+$"
+          minLength: 3
+          maxLength: 16
         realSurname:
           description: Real surname of the user
           type: string
           pattern: "^[a-zA-Z]+$"
+          minLength: 3
+          maxLength: 16
     Message:
       title: Message
       description: Text or image data sent from a user to another
@@ -50,14 +56,20 @@ components:
           description: Content of the message
           type: string
           pattern: ".*"
+          minLength: 1
+          maxLength: 8000
         previewContent: 
           description: content
           type: string
           pattern: ".*"
+          minLength: 1
+          maxLength: 32
         sender:
           description: username of the user that have sent the message
           type: string
           pattern: "^[a-zA-Z0-9_.]+$"
+          minLength: 3
+          maxLength: 16
         timestamp:
           description: Unix timestamp of the time when the user sent the message
           type: string
@@ -457,6 +469,8 @@ paths:
                   type: string
                   description: Optional additional content added when forwarding the message
                   pattern: ".*"
+                  minLength: 3
+                  maxLength: 800
               required:
                 - targetConversationId
       responses:
