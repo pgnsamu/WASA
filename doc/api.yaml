@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: WASAchat
   description: WASAchat backend REST API
-  version: 0.0.1
+  version: 0.0.2
 servers:
 - url: http://localhost:5500
 components:
