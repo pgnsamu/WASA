@@ -163,12 +163,21 @@ paths:
                   identifier:
                     type: integer
                     minimum: 0
-  /user/setUserName:
+  /user/{username}/profile:
     put: 
       tags: ["User Management"]
       summary: Change username
       description: Update of the username for this service
       operationId: setMyUserName
+      parameters:
+      - name: username
+        in: path
+        description: The username of the user who you want to change username
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 16
+        required: true
       requestBody:
         description: User new username over the last one
         content:
@@ -207,12 +216,21 @@ paths:
                     maxLength: 30
         "404":
           description: User not found
-  /user/setPhoto:
+  /user/{username}/photo:
     post: 
       tags: ["User Management"]
-      summary: Change Photo
-      description: Update of the Photo of the user for this service
+      summary: Add or Change Photo
+      description: Add or Update of the Photo of the user for this service
       operationId: setMyPhoto
+      parameters:
+      - name: username
+        in: path
+        description: The username of the user who you want to change or add photo
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 16
+        required: true
       requestBody:
         description: User new Photo over the last one
         content:
@@ -239,7 +257,7 @@ paths:
           description: User have to Auth itself to set a photo
         "404": 
           description: User not found
-  /conversations/{conversationId}/addUser:
+  /conversations/{conversationId}/users:
     post:
       tags: ["Groupchat Management"]
       summary: Add a user to a group chat (Chat)
@@ -279,7 +297,6 @@ paths:
           description: User does not have permission to add users to this group
         "404":
           description: group chat or user not found
-  /conversations/{conversationId}/leave:
     delete:
       tags: ["Groupchat Management"]
       summary: Leave a group chat (Chat)
@@ -303,7 +320,7 @@ paths:
         #  description: User is not authorized to leave the group
         "404":
           description: Conversation not found or user is not a participant
-  /conversations/{conversationId}/setGroupName:
+  /conversations/{conversationId}/group:
     post: 
       tags: ["Groupchat Management"]
       summary: Setting up or Change group name
@@ -343,7 +360,7 @@ paths:
           description: User have to Auth itself to change a Group name
         "404": 
           description: Group (Chat) not found       
-  /conversations/{conversationId}/setGroupPhoto:
+  /conversations/{conversationId}/groupPhoto:
     post: 
       tags: ["Groupchat Management"]
       summary: Change GroupChat (Chat) Photo
@@ -429,7 +446,7 @@ paths:
           description: User does not have access rights to the content
         "404":
           description: Conversation not found
-  /conversations/{conversationId}/sendMessage:
+  /conversations/{conversationId}/messagges:
     post:
       tags: ["Conversation Based"]
       summary: Send a message in a conversation
@@ -466,7 +483,7 @@ paths:
           description: User does not have access rights to the content
         "404":
           description: Conversation not found
-  /conversations/{sourceConversationId}/messages/{messageId}/forward:
+  /conversations/{sourceConversationId}/messages/{messageId}:
     post:
       tags: ["Conversation Based"]
       summary: Forward a message to a different conversation
@@ -520,7 +537,36 @@ paths:
           description: User does not have access rights to the content
         "404":
           description: Conversation or message not found
-  /conversations/{conversationId}/messages/{messageId}/comment:
+    delete:
+      tags: ["Conversation Based"]
+      summary: Delete a message from the conversation
+      description: Deletes a specific message within a conversation
+      operationId: deleteMessage
+      parameters:
+      - name: conversationId
+        in: path
+        description: The ID of the conversation containing the message
+        schema:
+          type: integer
+        required: true
+      - name: messageId
+        in: path
+        description: The ID of the message that will be deleted
+        schema:
+          type: integer
+        required: true
+      responses:
+        '204':
+          description: message deleted successfully
+        "400":
+          description: Invalid input
+        "401":
+          description: User must authenticate to delete the message
+        "403":
+          description: User is not authorized to delete this message
+        "404":
+          description: Conversation or message not found
+  /conversations/{conversationId}/messages/{messageId}/comments:
     post:
       tags: ["Conversation Based"]
       summary: Add a comment to a message
@@ -563,7 +609,6 @@ paths:
           description: User does not have access rights to the content
         "404":
           description: Conversation or message not found
-  /conversations/{conversationId}/messages/{messageId}/uncomment:
     delete:
       tags: ["Conversation Based"]
       summary: Delete a comment from a message
@@ -593,33 +638,3 @@ paths:
           description: User is not authorized to delete this comment
         "404":
           description: Conversation or comment not found
-  /conversations/{conversationId}/messages/{messageId}/delMessage:
-    delete:
-      tags: ["Conversation Based"]
-      summary: Delete a message from the conversation
-      description: Deletes a specific message within a conversation
-      operationId: deleteMessage
-      parameters:
-      - name: conversationId
-        in: path
-        description: The ID of the conversation containing the message
-        schema:
-          type: integer
-        required: true
-      - name: messageId
-        in: path
-        description: The ID of the message that will be deleted
-        schema:
-          type: integer
-        required: true
-      responses:
-        '204':
-          description: message deleted successfully
-        "400":
-          description: Invalid input
-        "401":
-          description: User must authenticate to delete the message
-        "403":
-          description: User is not authorized to delete this message
-        "404":
-          description: Conversation or message not found
