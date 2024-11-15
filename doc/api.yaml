@@ -162,7 +162,7 @@ paths:
                 properties:
                   identifier:
                     type: integer
-                    example: "0"
+                    minimum: 0
   /user/setUserName:
     put: 
       tags: ["User Management"]
@@ -193,8 +193,19 @@ paths:
         "400":
           description: Invalid input (e.g. username already used)
         "401":
-          description: User have to Auth itself to change username
-        "404": 
+          description: User has to authenticate to change the username
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message
+                    example: "Authentication required."
+                    minLength: 0
+                    maxLength: 30
+        "404":
           description: User not found
   /user/setPhoto:
     post: 
@@ -282,7 +293,7 @@ paths:
             type: integer
           required: true
       responses:
-        '200':
+        '204':
           description: User successfully left the group chat
         "400":
           description: Invalid input (e.g. user not part of the conversation)
@@ -433,12 +444,12 @@ paths:
           required: true
       requestBody:
         description: The message details to send
-        required: true
         content:
           application/json:
             schema:
               description: message to send
               $ref: '#/components/schemas/Message'
+        required: true
       responses:
         '201':
           description: Message sent successfully
@@ -476,7 +487,6 @@ paths:
           required: true
       requestBody:
         description: Target conversation and additional details for forwarding the message
-        required: true
         content:
           application/json:
             schema:
@@ -493,6 +503,7 @@ paths:
                   maxLength: 800
               required:
                 - targetConversationId
+        required: true
       responses:
         '201':
           description: Message forwarded successfully
@@ -530,12 +541,12 @@ paths:
         required: true
       requestBody:
         description: The comment as a Message
-        required: true
         content:
           application/json:
             schema:
               description: comment to add
               $ref: '#/components/schemas/Message'
+        required: true
       responses:
         '201':
           description: Comment added successfully
