@@ -96,6 +96,8 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Message'
+          minItems: 1
+          maxItems: 1000000
         partecipantsId:
           description: list of users ID who take part of the chat
           type: array
@@ -103,6 +105,8 @@ components:
             description: user id
             type: integer
             minimum: 0
+          minItems: 2
+          maxItems: 100
         photo: 
           description: Photo of the chat if is a group
           type: string
@@ -372,6 +376,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Chat'
+                minItems: 0
+                maxItems: 1000000
         "401":
           description: User have to Auth itself to see the Conversations
   /conversations/{conversationId}:
