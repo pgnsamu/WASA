@@ -257,13 +257,21 @@ paths:
           description: User have to Auth itself to set a photo
         "404": 
           description: User not found
-  /conversations/{conversationId}/users:
+  /user/{username}/conversations/{conversationId}/users:
     post:
       tags: ["Groupchat Management"]
       summary: Add a user to a group chat (Chat)
       description: Adds a user to an existing group chat, which is a conversation with isGroup set to true
       operationId: addToGroup
       parameters:
+        - name: username
+          in: path
+          description: The username of the user who you want to change username
+          schema:
+            type: string
+            minLength: 3
+            maxLength: 16
+          required: true
         - name: conversationId
           in: path
           description: The ID of the group chat (Chat) to add the user to
@@ -303,6 +311,14 @@ paths:
       description: Allows a user to leave an existing group chat (Chat).
       operationId: leaveGroup
       parameters:
+        - name: username
+          in: path
+          description: The username of the user who you want to change username
+          schema:
+            type: string
+            minLength: 3
+            maxLength: 16
+          required: true
         - name: conversationId
           in: path
           description: The ID of the group chat (Chat) the user is leaving
@@ -320,13 +336,21 @@ paths:
         #  description: User is not authorized to leave the group
         "404":
           description: Conversation not found or user is not a participant
-  /conversations/{conversationId}/group:
+  /user/{username}/conversations/{conversationId}/group:
     post: 
       tags: ["Groupchat Management"]
       summary: Setting up or Change group name
       description: Update or setting up the username for this GroupChat (Chat)
       operationId: setGroupName
       parameters:
+        - name: username
+          in: path
+          description: The username of the user who you want to change username
+          schema:
+            type: string
+            minLength: 3
+            maxLength: 16
+          required: true
         - name: conversationId
           in: path
           description: The ID of the group chat (Chat) the user is leaving
@@ -360,13 +384,21 @@ paths:
           description: User have to Auth itself to change a Group name
         "404": 
           description: Group (Chat) not found       
-  /conversations/{conversationId}/groupPhoto:
+  /user/{username}/conversations/{conversationId}/groupPhoto:
     post: 
       tags: ["Groupchat Management"]
       summary: Change GroupChat (Chat) Photo
       description: Update of the Photo of the GroupChat (Chat) selected
       operationId: setGroupPhoto
       parameters:
+        - name: username
+          in: path
+          description: The username of the user who you want to change username
+          schema:
+            type: string
+            minLength: 3
+            maxLength: 16
+          required: true
         - name: conversationId
           in: path
           description: The ID of the group chat (Chat) the user is leaving
@@ -399,12 +431,21 @@ paths:
           description: User have to Auth itself to set a photo
         "404": 
           description: User not found
-  /conversations/:
+  /user/{username}/conversations/:
     get:
       tags: ["Conversation Based"]
       summary: Retrieve the list of all the user conversations
       description: Retrieve chronologically reversed all the conversation connected with the user
       operationId: getMyConversations
+      parameters:
+      - name: username
+        in: path
+        description: The username of the user who you want to change username
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 16
+        required: true
       responses:
         '200':
           description: list of Conversations
@@ -419,13 +460,21 @@ paths:
                 maxItems: 1000000
         "401":
           description: User have to Auth itself to see the Conversations
-  /conversations/{conversationId}:
+  /user/{username}/conversations/{conversationId}:
     get:
       tags: ["Conversation Based"]
       summary: Retrieve a single conversation by ID
       description: Retrieve a specific conversation connected with the user by its ID
       operationId: getConversation
       parameters:
+        - name: username
+          in: path
+          description: The username of the user who you want to change username
+          schema:
+            type: string
+            minLength: 3
+            maxLength: 16
+          required: true
         - name: conversationId
           in: path
           description: The ID of the conversation to retrieve
@@ -446,13 +495,21 @@ paths:
           description: User does not have access rights to the content
         "404":
           description: Conversation not found
-  /conversations/{conversationId}/messagges:
+  /user/{username}/conversations/{conversationId}/messagges:
     post:
       tags: ["Conversation Based"]
       summary: Send a message in a conversation
       description: Send a new message to a specific conversation identified by conversationId
       operationId: sendMessage
       parameters:
+        - name: username
+          in: path
+          description: The username of the user who you want to change username
+          schema:
+            type: string
+            minLength: 3
+            maxLength: 16
+          required: true
         - name: conversationId
           in: path
           description: The ID of the conversation to send the message to
@@ -483,13 +540,21 @@ paths:
           description: User does not have access rights to the content
         "404":
           description: Conversation not found
-  /conversations/{sourceConversationId}/messages/{messageId}:
+  /user/{username}/conversations/{sourceConversationId}/messages/{messageId}:
     post:
       tags: ["Conversation Based"]
       summary: Forward a message to a different conversation
       description: Forward an existing message to the specified conversation
       operationId: forwardMessage
       parameters:
+        - name: username
+          in: path
+          description: The username of the user who you want to change username
+          schema:
+            type: string
+            minLength: 3
+            maxLength: 16
+          required: true
         - name: sourceConversationId
           in: path
           description: The ID of the conversation where you already have the message
@@ -543,7 +608,15 @@ paths:
       description: Deletes a specific message within a conversation
       operationId: deleteMessage
       parameters:
-      - name: conversationId
+      - name: username
+        in: path
+        description: The username of the user who you want to change username
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 16
+        required: true
+      - name: sourceConversationId
         in: path
         description: The ID of the conversation containing the message
         schema:
@@ -566,13 +639,21 @@ paths:
           description: User is not authorized to delete this message
         "404":
           description: Conversation or message not found
-  /conversations/{conversationId}/messages/{messageId}/comments:
+  /user/{username}/conversations/{conversationId}/messages/{messageId}/comments:
     post:
       tags: ["Conversation Based"]
       summary: Add a comment to a message
       description: Adds a comment to a specific message within a conversation
       operationId: commentMessage
       parameters:
+      - name: username
+        in: path
+        description: The username of the user who you want to change username
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 16
+        required: true
       - name: conversationId
         in: path
         description: The ID of the conversation containing the message to comment on
@@ -615,6 +696,14 @@ paths:
       description: Deletes a specific comment on a message within a conversation
       operationId: uncommentMessage
       parameters:
+      - name: username
+        in: path
+        description: The username of the user who you want to change username
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 16
+        required: true
       - name: conversationId
         in: path
         description: The ID of the conversation containing the message
