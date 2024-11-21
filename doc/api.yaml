@@ -171,22 +171,20 @@ paths:
                     description: user identifier
                     type: integer
                     minimum: 0
-  /user/{username}/profile:
+  /user/{id}/profile:
     put: 
       tags: ["User Management"]
       summary: Change username
       description: Update of the username for this service
       operationId: setMyUserName
       parameters:
-      - name: username
+      - name: id
         in: path
-        description: The username of the user who you want to change username
+        description: The ID of the user who you want to change username
         schema:
-          description: Unique id of the user
-          type: string
-          pattern: "^[a-zA-Z]+$"
-          minLength: 3
-          maxLength: 16
+          description: Unique ID of the user
+          type: integer
+          minimum: 0
         required: true
       requestBody:
         description: User new username over the last one
@@ -214,20 +212,17 @@ paths:
           description: Invalid input (e.g. username already used)
         "401":
           description: User has to authenticate to change the username
-          #2 (1+1)
         "404":
           description: User not found
-  /user/{username}/photo:
+  /user/{id}/photo:
     parameters:
-        - name: username
+        - name: id
           in: path
-          description: The username of the user who you want to change or add photo
+          description: The ID of the user who you want to change or add photo
           schema:
-            description: A string representing the username of the user who you want to change or add photo
-            pattern: "^[a-zA-Z]+$"
-            type: string
-            minLength: 3
-            maxLength: 16
+            description: An integer representing the ID of the user who you want to change or add photo
+            type: integer
+            minimum: 0
           required: true
     post: 
       tags: ["User Management"]
@@ -260,17 +255,15 @@ paths:
           description: User have to Auth itself to set a photo
         "404": 
           description: User not found
-  /user/{username}/conversations/{conversationId}/users:
+  /user/{id}/conversations/{conversationId}/users:
     parameters:
-          - name: username
+          - name: id
             in: path
-            description: The username of the user
+            description: The ID of the user
             schema:
-              description: A string representing the username of the user 
-              pattern: "^[a-zA-Z]+$"
-              type: string
-              minLength: 3
-              maxLength: 16
+              description: A string representing the ID of the user 
+              type: integer
+              minimum: 0
             required: true
           - name: conversationId
             in: path
@@ -327,22 +320,20 @@ paths:
         #  description: User is not authorized to leave the group
         "404":
           description: Conversation not found or user is not a participant
-  /user/{username}/conversations/{conversationId}/group:
+  /user/{id}/conversations/{conversationId}/group:
     post: 
       tags: ["Groupchat Management"]
       summary: Setting up or Change group name
       description: Update or setting up the username for this GroupChat (Chat)
       operationId: setGroupName
       parameters:
-        - name: username
+        - name: id
           in: path
-          description: The username of the user
+          description: The ID of the user
           schema:
-            description: A string representing the username of the user 
-            pattern: "^[a-zA-Z]+$"
-            type: string
-            minLength: 3
-            maxLength: 16
+            description: An integer representing the ID of the user 
+            type: integer
+            minimum: 0
           required: true
         - name: conversationId
           in: path
@@ -379,22 +370,20 @@ paths:
           description: User have to Auth itself to change a Group name
         "404": 
           description: Group (Chat) not found       
-  /user/{username}/conversations/{conversationId}/groupPhoto:
+  /user/{id}/conversations/{conversationId}/groupPhoto:
     post: 
       tags: ["Groupchat Management"]
       summary: Change GroupChat (Chat) Photo
       description: Update of the Photo of the GroupChat (Chat) selected
       operationId: setGroupPhoto
       parameters:
-        - name: username
+        - name: id
           in: path
-          description: The username of the user 
+          description: The ID of the user 
           schema:
-            description: A string representing the username of the user
-            pattern: "^[a-zA-Z]+$"
-            type: string
-            minLength: 3
-            maxLength: 16
+            description: A string representing the ID of the user
+            type: integer
+            minimum: 0
           required: true
         - name: conversationId
           in: path
@@ -429,22 +418,20 @@ paths:
           description: User have to Auth itself to set a photo
         "404": 
           description: User not found
-  /user/{username}/conversations/:
+  /user/{id}/conversations/:
     get:
       tags: ["Conversation Based"]
       summary: Retrieve the list of all the user conversations
       description: Retrieve chronologically reversed all the conversation connected with the user
       operationId: getMyConversations
       parameters:
-      - name: username
+      - name: id
         in: path
-        description: The username of the user 
+        description: The ID of the user 
         schema:
-          description: The username of the user
-          pattern: "^[a-zA-Z]+$"
-          type: string
-          minLength: 3
-          maxLength: 16
+          description: The ID of the user
+          type: integer
+          minimum: 0
         required: true
       responses:
         '200':
@@ -460,22 +447,20 @@ paths:
                 maxItems: 1000000
         "401":
           description: User have to Auth itself to see the Conversations
-  /user/{username}/conversations/{conversationId}:
+  /user/{id}/conversations/{conversationId}:
     get:
       tags: ["Conversation Based"]
       summary: Retrieve a single conversation by ID
       description: Retrieve a specific conversation connected with the user by its ID
       operationId: getConversation
       parameters:
-        - name: username
+        - name: id
           in: path
-          description: The username of the user
+          description: The ID of the user
           schema:
-            description: The username of the user
-            pattern: "^[a-zA-Z]+$"
-            type: string
-            minLength: 3
-            maxLength: 16
+            description: The ID of the user
+            type: integer
+            minimum: 0
           required: true
         - name: conversationId
           in: path
@@ -497,22 +482,20 @@ paths:
           description: User does not have access rights to the content
         "404":
           description: Conversation not found
-  /user/{username}/conversations/{conversationId}/messagges:
+  /user/{id}/conversations/{conversationId}/messagges:
     post:
       tags: ["Conversation Based"]
       summary: Send a message in a conversation
       description: Send a new message to a specific conversation identified by conversationId
       operationId: sendMessage
       parameters:
-        - name: username
+        - name: id
           in: path
-          description: The username of the user 
+          description: The ID of the user 
           schema:
-            description: The username of the user 
-            pattern: "^[a-zA-Z]+$"
-            type: string
-            minLength: 3
-            maxLength: 16
+            description: The ID of the user 
+            type: integer
+            minimum: 0
           required: true
         - name: conversationId
           in: path
@@ -543,17 +526,15 @@ paths:
           description: User does not have access rights to the content
         "404":
           description: Conversation not found
-  /user/{username}/conversations/{sourceConversationId}/messages/{messageId}:
+  /user/{id}/conversations/{sourceConversationId}/messages/{messageId}:
     parameters:
-          - name: username
+          - name: id
             in: path
-            description: The username of the user
+            description: The ID of the user
             schema:
-              description: The username of the user
-              pattern: "^[a-zA-Z]+$"
-              type: string
-              minLength: 3
-              maxLength: 16
+              description: The ID of the user
+              type: integer
+              minimum: 0
             required: true
           - name: sourceConversationId
             in: path
@@ -625,17 +606,15 @@ paths:
           description: User is not authorized to delete this message
         "404":
           description: Conversation or message not found
-  /user/{username}/conversations/{conversationId}/messages/{messageId}/comments:
+  /user/{id}/conversations/{conversationId}/messages/{messageId}/comments:
     parameters:
-      - name: username
+      - name: id
         in: path
-        description: The username of the user 
+        description: The ID of the user 
         schema:
-          description: The username of the user 
-          type: string
-          pattern: "^[a-zA-Z]+$"
-          minLength: 3
-          maxLength: 16
+          description: The ID of the user 
+          type: integer
+          minimum: 0
         required: true
       - name: conversationId
         in: path
