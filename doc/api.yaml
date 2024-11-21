@@ -217,20 +217,21 @@ paths:
         "404":
           description: User not found
   /user/{username}/photo:
+    parameters:
+        - name: username
+          in: path
+          description: The username of the user who you want to change or add photo
+          schema:
+            type: string
+            minLength: 3
+            maxLength: 16
+          required: true
     post: 
       tags: ["User Management"]
       summary: Add or Change Photo
       description: Add or Update of the Photo of the user for this service
       operationId: setMyPhoto
-      parameters:
-      - name: username
-        in: path
-        description: The username of the user who you want to change or add photo
-        schema:
-          type: string
-          minLength: 3
-          maxLength: 16
-        required: true
+      
       requestBody:
         description: User new Photo over the last one
         content:
@@ -258,26 +259,26 @@ paths:
         "404": 
           description: User not found
   /user/{username}/conversations/{conversationId}/users:
+    parameters:
+          - name: username
+            in: path
+            description: The username of the user who you want to change username
+            schema:
+              type: string
+              minLength: 3
+              maxLength: 16
+            required: true
+          - name: conversationId
+            in: path
+            description: The ID of the group chat (Chat) to add the user to
+            schema:
+              type: integer
+            required: true
     post:
       tags: ["Groupchat Management"]
       summary: Add a user to a group chat (Chat)
       description: Adds a user to an existing group chat, which is a conversation with isGroup set to true
       operationId: addToGroup
-      parameters:
-        - name: username
-          in: path
-          description: The username of the user who you want to change username
-          schema:
-            type: string
-            minLength: 3
-            maxLength: 16
-          required: true
-        - name: conversationId
-          in: path
-          description: The ID of the group chat (Chat) to add the user to
-          schema:
-            type: integer
-          required: true
       requestBody:
         description: The user details to add to the group chat
         content:
@@ -310,21 +311,6 @@ paths:
       summary: Leave a group chat (Chat)
       description: Allows a user to leave an existing group chat (Chat).
       operationId: leaveGroup
-      parameters:
-        - name: username
-          in: path
-          description: The username of the user who you want to change username
-          schema:
-            type: string
-            minLength: 3
-            maxLength: 16
-          required: true
-        - name: conversationId
-          in: path
-          description: The ID of the group chat (Chat) the user is leaving
-          schema:
-            type: integer
-          required: true
       responses:
         '204':
           description: User successfully left the group chat
@@ -541,32 +527,32 @@ paths:
         "404":
           description: Conversation not found
   /user/{username}/conversations/{sourceConversationId}/messages/{messageId}:
+    parameters:
+          - name: username
+            in: path
+            description: The username of the user who you want to change username
+            schema:
+              type: string
+              minLength: 3
+              maxLength: 16
+            required: true
+          - name: sourceConversationId
+            in: path
+            description: The ID of the conversation where you already have the message
+            schema:
+              type: integer
+            required: true
+          - name: messageId
+            in: path
+            description: The ID of the message to forward
+            schema:
+              type: integer
+            required: true
     post:
       tags: ["Conversation Based"]
       summary: Forward a message to a different conversation
       description: Forward an existing message to the specified conversation
       operationId: forwardMessage
-      parameters:
-        - name: username
-          in: path
-          description: The username of the user who you want to change username
-          schema:
-            type: string
-            minLength: 3
-            maxLength: 16
-          required: true
-        - name: sourceConversationId
-          in: path
-          description: The ID of the conversation where you already have the message
-          schema:
-            type: integer
-          required: true
-        - name: messageId
-          in: path
-          description: The ID of the message to forward
-          schema:
-            type: integer
-          required: true
       requestBody:
         description: Target conversation and additional details for forwarding the message
         content:
@@ -607,27 +593,6 @@ paths:
       summary: Delete a message from the conversation
       description: Deletes a specific message within a conversation
       operationId: deleteMessage
-      parameters:
-      - name: username
-        in: path
-        description: The username of the user who you want to change username
-        schema:
-          type: string
-          minLength: 3
-          maxLength: 16
-        required: true
-      - name: sourceConversationId
-        in: path
-        description: The ID of the conversation containing the message
-        schema:
-          type: integer
-        required: true
-      - name: messageId
-        in: path
-        description: The ID of the message that will be deleted
-        schema:
-          type: integer
-        required: true
       responses:
         '204':
           description: message deleted successfully
@@ -640,12 +605,7 @@ paths:
         "404":
           description: Conversation or message not found
   /user/{username}/conversations/{conversationId}/messages/{messageId}/comments:
-    post:
-      tags: ["Conversation Based"]
-      summary: Add a comment to a message
-      description: Adds a comment to a specific message within a conversation
-      operationId: commentMessage
-      parameters:
+    parameters:
       - name: username
         in: path
         description: The username of the user who you want to change username
@@ -666,6 +626,11 @@ paths:
         schema:
           type: integer
         required: true
+    post:
+      tags: ["Conversation Based"]
+      summary: Add a comment to a message
+      description: Adds a comment to a specific message within a conversation
+      operationId: commentMessage
       requestBody:
         description: The comment as a Message
         content:
@@ -695,27 +660,6 @@ paths:
       summary: Delete a comment from a message
       description: Deletes a specific comment on a message within a conversation
       operationId: uncommentMessage
-      parameters:
-      - name: username
-        in: path
-        description: The username of the user who you want to change username
-        schema:
-          type: string
-          minLength: 3
-          maxLength: 16
-        required: true
-      - name: conversationId
-        in: path
-        description: The ID of the conversation containing the message
-        schema:
-          type: integer
-        required: true
-      - name: messageId
-        in: path
-        description: The ID of the message who is a comment
-        schema:
-          type: integer
-        required: true
       responses:
         '204':
           description: Comment deleted successfully
