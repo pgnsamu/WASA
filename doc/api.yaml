@@ -51,6 +51,7 @@ components:
         messageType:
           description: Identifier of the type of the message
           type: string
+          pattern: "^[a-zA-Z]+$"
           enum: ["image", "text"]
           minLength: 4
           maxLength: 5
@@ -78,6 +79,7 @@ components:
         status: 
           description: Show if the user have received the message or not
           type: string
+          pattern: "^[a-zA-Z]+$"
           enum: ["sent", "received", "not_sent"]
           minLength: 4
           maxLength: 8
@@ -182,6 +184,7 @@ paths:
         schema:
           description: Unique id of the user
           type: string
+          pattern: "^[a-zA-Z]+$"
           minLength: 3
           maxLength: 16
         required: true
@@ -221,6 +224,7 @@ paths:
           description: The username of the user who you want to change or add photo
           schema:
             description: A string representing the username of the user who you want to change or add photo
+            pattern: "^[a-zA-Z]+$"
             type: string
             minLength: 3
             maxLength: 16
@@ -263,6 +267,7 @@ paths:
             description: The username of the user
             schema:
               description: A string representing the username of the user 
+              pattern: "^[a-zA-Z]+$"
               type: string
               minLength: 3
               maxLength: 16
@@ -334,6 +339,7 @@ paths:
           description: The username of the user
           schema:
             description: A string representing the username of the user 
+            pattern: "^[a-zA-Z]+$"
             type: string
             minLength: 3
             maxLength: 16
@@ -385,6 +391,7 @@ paths:
           description: The username of the user 
           schema:
             description: A string representing the username of the user
+            pattern: "^[a-zA-Z]+$"
             type: string
             minLength: 3
             maxLength: 16
@@ -434,6 +441,7 @@ paths:
         description: The username of the user 
         schema:
           description: The username of the user
+          pattern: "^[a-zA-Z]+$"
           type: string
           minLength: 3
           maxLength: 16
@@ -464,6 +472,7 @@ paths:
           description: The username of the user
           schema:
             description: The username of the user
+            pattern: "^[a-zA-Z]+$"
             type: string
             minLength: 3
             maxLength: 16
@@ -500,6 +509,7 @@ paths:
           description: The username of the user 
           schema:
             description: The username of the user 
+            pattern: "^[a-zA-Z]+$"
             type: string
             minLength: 3
             maxLength: 16
@@ -540,6 +550,7 @@ paths:
             description: The username of the user
             schema:
               description: The username of the user
+              pattern: "^[a-zA-Z]+$"
               type: string
               minLength: 3
               maxLength: 16
@@ -622,6 +633,7 @@ paths:
         schema:
           description: The username of the user 
           type: string
+          pattern: "^[a-zA-Z]+$"
           minLength: 3
           maxLength: 16
         required: true
