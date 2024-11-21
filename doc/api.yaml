@@ -143,9 +143,11 @@ paths:
         content:
           application/json:
             schema:
+              description: username of the user
               type: object
               properties:
                 name:
+                  description: string representing the username
                   type: string
                   example: "Maria"
                   pattern: "^[a-zA-Z0-9_.]+$"
@@ -160,9 +162,11 @@ paths:
           content:
             application/json:
               schema:
+                description: User identifier object
                 type: object
                 properties:
                   identifier:
+                    description: user identifier
                     type: integer
                     minimum: 0
   /user/{username}/profile:
@@ -176,6 +180,7 @@ paths:
         in: path
         description: The username of the user who you want to change username
         schema:
+          description: Unique id of the user
           type: string
           minLength: 3
           maxLength: 16
@@ -185,9 +190,11 @@ paths:
         content:
           application/json: 
             schema:
+              description: the new username object
               type: object
               properties:
                 newName: 
+                  description: string representing the new username of the user
                   type: string
                   pattern: "^[a-zA-Z0-9_.]+$"
                   minLength: 3
@@ -204,17 +211,7 @@ paths:
           description: Invalid input (e.g. username already used)
         "401":
           description: User has to authenticate to change the username
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: Error message
-                    example: "Authentication required."
-                    minLength: 0
-                    maxLength: 30
+          #2 (1+1)
         "404":
           description: User not found
   /user/{username}/photo:
@@ -223,6 +220,7 @@ paths:
           in: path
           description: The username of the user who you want to change or add photo
           schema:
+            description: A string representing the username of the user who you want to change or add photo
             type: string
             minLength: 3
             maxLength: 16
@@ -232,12 +230,12 @@ paths:
       summary: Add or Change Photo
       description: Add or Update of the Photo of the user for this service
       operationId: setMyPhoto
-      
       requestBody:
         description: User new Photo over the last one
         content:
           application/json: 
             schema:
+              description: User new Photo over the last one
               type: object
               properties:
                 photo:
@@ -262,8 +260,9 @@ paths:
     parameters:
           - name: username
             in: path
-            description: The username of the user who you want to change username
+            description: The username of the user
             schema:
+              description: A string representing the username of the user 
               type: string
               minLength: 3
               maxLength: 16
@@ -272,6 +271,7 @@ paths:
             in: path
             description: The ID of the group chat (Chat) to add the user to
             schema:
+              description: ID of the chat
               type: integer
             required: true
     post:
@@ -284,6 +284,7 @@ paths:
         content:
           application/json: 
             schema:
+              description: Object of the user to add or remove from the group chat
               type: object
               properties:
                 userId: 
@@ -330,8 +331,9 @@ paths:
       parameters:
         - name: username
           in: path
-          description: The username of the user who you want to change username
+          description: The username of the user
           schema:
+            description: A string representing the username of the user 
             type: string
             minLength: 3
             maxLength: 16
@@ -340,6 +342,7 @@ paths:
           in: path
           description: The ID of the group chat (Chat) the user is leaving
           schema:
+            description: ID of the GroupChat
             type: integer
           required: true
       requestBody:
@@ -348,8 +351,10 @@ paths:
           application/json: 
             schema:
               type: object
+              description: New GroupChat name 
               properties:
                 newName: 
+                  description: String representing the new GroupChat name
                   type: string
                   pattern: "^[a-zA-Z0-9_.]+$"
                   minLength: 3
@@ -377,8 +382,9 @@ paths:
       parameters:
         - name: username
           in: path
-          description: The username of the user who you want to change username
+          description: The username of the user 
           schema:
+            description: A string representing the username of the user
             type: string
             minLength: 3
             maxLength: 16
@@ -387,6 +393,7 @@ paths:
           in: path
           description: The ID of the group chat (Chat) the user is leaving
           schema:
+            description: The ID of the group chat (Chat)
             type: integer
           required: true
       requestBody:
@@ -394,6 +401,7 @@ paths:
         content:
           application/json: 
             schema:
+              description: New Photo 
               type: object
               properties:
                 photo:
@@ -423,8 +431,9 @@ paths:
       parameters:
       - name: username
         in: path
-        description: The username of the user who you want to change username
+        description: The username of the user 
         schema:
+          description: The username of the user
           type: string
           minLength: 3
           maxLength: 16
@@ -436,6 +445,7 @@ paths:
             application/json:
               schema:
                 type: array
+                description: Array of the conversation retrieved for the user sent
                 items:
                   $ref: '#/components/schemas/Chat'
                 minItems: 0
@@ -451,8 +461,9 @@ paths:
       parameters:
         - name: username
           in: path
-          description: The username of the user who you want to change username
+          description: The username of the user
           schema:
+            description: The username of the user
             type: string
             minLength: 3
             maxLength: 16
@@ -461,6 +472,7 @@ paths:
           in: path
           description: The ID of the conversation to retrieve
           schema:
+            description: ID of the conversation
             type: integer
           required: true
       responses:
@@ -485,8 +497,9 @@ paths:
       parameters:
         - name: username
           in: path
-          description: The username of the user who you want to change username
+          description: The username of the user 
           schema:
+            description: The username of the user 
             type: string
             minLength: 3
             maxLength: 16
@@ -495,6 +508,7 @@ paths:
           in: path
           description: The ID of the conversation to send the message to
           schema:
+            description: ID of the conversation
             type: integer
           required: true
       requestBody:
@@ -523,8 +537,9 @@ paths:
     parameters:
           - name: username
             in: path
-            description: The username of the user who you want to change username
+            description: The username of the user
             schema:
+              description: The username of the user
               type: string
               minLength: 3
               maxLength: 16
@@ -533,12 +548,14 @@ paths:
             in: path
             description: The ID of the conversation where you already have the message
             schema:
+              description: ID of the conversation
               type: integer
             required: true
           - name: messageId
             in: path
             description: The ID of the message to forward
             schema:
+              description: ID of the message
               type: integer
             required: true
     post:
@@ -551,6 +568,7 @@ paths:
         content:
           application/json:
             schema:
+              description: Containing conversation and forwarding details
               type: object
               properties:
                 targetConversationId:
@@ -600,8 +618,9 @@ paths:
     parameters:
       - name: username
         in: path
-        description: The username of the user who you want to change username
+        description: The username of the user 
         schema:
+          description: The username of the user 
           type: string
           minLength: 3
           maxLength: 16
@@ -610,12 +629,14 @@ paths:
         in: path
         description: The ID of the conversation containing the message to comment on
         schema:
+          description: The ID of the conversation
           type: integer
         required: true
       - name: messageId
         in: path
         description: The ID of the message to comment on
         schema:
+          description: The ID of the message
           type: integer
         required: true
     post:
