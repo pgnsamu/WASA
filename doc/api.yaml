@@ -52,6 +52,8 @@ components:
           description: Identifier of the type of the message
           type: string
           enum: ["image", "text"]
+          minLength: 4
+          maxLength: 5
         content: 
           description: Content of the message
           type: string
@@ -72,12 +74,13 @@ components:
           maxLength: 16
         timestamp:
           description: Unix timestamp of the time when the user sent the message
-          type: string
-          format: date-time
+          type: integer
         status: 
           description: Show if the user have received the message or not
           type: string
           enum: ["sent", "received", "not_sent"]
+          minLength: 4
+          maxLength: 8
         replyTo:
           description: id of the message who this message reply
           type: integer
