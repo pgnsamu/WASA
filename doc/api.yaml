@@ -171,7 +171,7 @@ paths:
                     description: user identifier
                     type: integer
                     minimum: 0
-  /user/{id}/profile:
+  /users/{id}/profile:
     put: 
       tags: ["User Management"]
       summary: Change username
@@ -214,7 +214,7 @@ paths:
           description: User has to authenticate to change the username
         "404":
           description: User not found
-  /user/{id}/photo:
+  /users/{id}/photo:
     parameters:
         - name: id
           in: path
@@ -255,7 +255,7 @@ paths:
           description: User have to Auth itself to set a photo
         "404": 
           description: User not found
-  /user/{id}/conversations/{conversationId}/users:
+  /users/{id}/conversations/{conversationId}/users:
     parameters:
           - name: id
             in: path
@@ -320,7 +320,7 @@ paths:
         #  description: User is not authorized to leave the group
         "404":
           description: Conversation not found or user is not a participant
-  /user/{id}/conversations/{conversationId}/group:
+  /users/{id}/conversations/{conversationId}/group:
     post: 
       tags: ["Groupchat Management"]
       summary: Setting up or Change group name
@@ -370,7 +370,7 @@ paths:
           description: User have to Auth itself to change a Group name
         "404": 
           description: Group (Chat) not found       
-  /user/{id}/conversations/{conversationId}/groupPhoto:
+  /users/{id}/conversations/{conversationId}/photo:
     post: 
       tags: ["Groupchat Management"]
       summary: Change GroupChat (Chat) Photo
@@ -418,7 +418,7 @@ paths:
           description: User have to Auth itself to set a photo
         "404": 
           description: User not found
-  /user/{id}/conversations/:
+  /users/{id}/conversations/:
     get:
       tags: ["Conversation Based"]
       summary: Retrieve the list of all the user conversations
@@ -447,7 +447,7 @@ paths:
                 maxItems: 1000000
         "401":
           description: User have to Auth itself to see the Conversations
-  /user/{id}/conversations/{conversationId}:
+  /users/{id}/conversations/{conversationId}:
     get:
       tags: ["Conversation Based"]
       summary: Retrieve a single conversation by ID
@@ -482,7 +482,7 @@ paths:
           description: User does not have access rights to the content
         "404":
           description: Conversation not found
-  /user/{id}/conversations/{conversationId}/messagges:
+  /users/{id}/conversations/{conversationId}/messagges:
     post:
       tags: ["Conversation Based"]
       summary: Send a message in a conversation
@@ -526,7 +526,7 @@ paths:
           description: User does not have access rights to the content
         "404":
           description: Conversation not found
-  /user/{id}/conversations/{sourceConversationId}/messages/{messageId}:
+  /users/{id}/conversations/{sourceConversationId}/messages/{messageId}:
     parameters:
           - name: id
             in: path
@@ -606,7 +606,7 @@ paths:
           description: User is not authorized to delete this message
         "404":
           description: Conversation or message not found
-  /user/{id}/conversations/{conversationId}/messages/{messageId}/comments:
+  /users/{id}/conversations/{conversationId}/messages/{messageId}/comments:
     parameters:
       - name: id
         in: path
