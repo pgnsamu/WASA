@@ -482,7 +482,7 @@ paths:
           description: User does not have access rights to the content
         "404":
           description: Conversation not found
-  /users/{id}/conversations/{conversationId}/messagges:
+  /users/{id}/conversations/{conversationId}/messages:
     post:
       tags: ["Conversation Based"]
       summary: Send a message in a conversation
