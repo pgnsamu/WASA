@@ -40,6 +40,7 @@ import (
 type AppDatabase interface {
 	GetName() (string, error)
 	SetName(name string) error
+	GetUsersDB() (string, error)
 
 	Ping() error
 }
