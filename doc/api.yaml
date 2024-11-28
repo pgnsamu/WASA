@@ -20,6 +20,9 @@ components:
         username: 
           description: Name choose by the user that can represent him in the app
           type: string
+          pattern: "^[a-zA-Z0-9_.]+$"
+          minLength: 3
+          maxLength: 16
         profileImage:
           description: Image that represent the user
           format: binary
@@ -27,9 +30,15 @@ components:
         realName:
           description: Real name of the user
           type: string
+          pattern: "^[a-zA-Z]+$"
+          minLength: 3
+          maxLength: 16
         realSurname:
           description: Real surname of the user
           type: string
+          pattern: "^[a-zA-Z]+$"
+          minLength: 3
+          maxLength: 16
     Message:
       title: Message
       description: Text or image data sent from a user to another
@@ -42,23 +51,38 @@ components:
         messageType:
           description: Identifier of the type of the message
           type: string
+          pattern: "^[a-zA-Z]+$"
           enum: ["image", "text"]
+          minLength: 4
+          maxLength: 5
         content: 
           description: Content of the message
           type: string
+          pattern: ".*"
+          minLength: 1
+          maxLength: 8000
         previewContent: 
           description: content
           type: string
+          pattern: ".*"
+          minLength: 1
+          maxLength: 32
         sender:
           description: username of the user that have sent the message
           type: string
+          pattern: "^[a-zA-Z0-9_.]+$"
+          minLength: 3
+          maxLength: 16
         timestamp:
           description: Unix timestamp of the time when the user sent the message
-          type: string
+          type: integer
         status: 
           description: Show if the user have received the message or not
           type: string
+          pattern: "^[a-zA-Z]+$"
           enum: ["sent", "received", "not_sent"]
+          minLength: 4
+          maxLength: 8
         replyTo:
           description: id of the message who this message reply
           type: integer
@@ -77,6 +101,8 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Message'
+          minItems: 1
+          maxItems: 1000000
         partecipantsId:
           description: list of users ID who take part of the chat
           type: array
@@ -84,6 +110,8 @@ components:
             description: user id
             type: integer
             minimum: 0
+          minItems: 2
+          maxItems: 100
         photo: 
           description: Photo of the chat if is a group
           type: string
@@ -117,12 +145,14 @@ paths:
         content:
           application/json:
             schema:
+              description: username of the user
               type: object
               properties:
                 name:
+                  description: string representing the username
                   type: string
                   example: "Maria"
-                  pattern: 'ˆ.*?$'
+                  pattern: "^[a-zA-Z0-9_.]+$"
                   minLength: 3
                   maxLength: 16
         required: true
@@ -134,27 +164,40 @@ paths:
           content:
             application/json:
               schema:
+                description: User identifier object
                 type: object
                 properties:
                   identifier:
+                    description: user identifier
                     type: integer
-                    example: "0"
-  /user/setUserName:
+                    minimum: 0
+  /users/{id}/profile:
     put: 
       tags: ["User Management"]
       summary: Change username
       description: Update of the username for this service
       operationId: setMyUserName
+      parameters:
+      - name: id
+        in: path
+        description: The ID of the user who you want to change username
+        schema:
+          description: Unique ID of the user
+          type: integer
+          minimum: 0
+        required: true
       requestBody:
         description: User new username over the last one
         content:
           application/json: 
             schema:
+              description: the new username object
               type: object
               properties:
                 newName: 
+                  description: string representing the new username of the user
                   type: string
-                  pattern: 'ˆ.*?$'
+                  pattern: "^[a-zA-Z0-9_.]+$"
                   minLength: 3
                   maxLength: 16
         required: true
@@ -163,24 +206,35 @@ paths:
           description: Username updated successfully
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/User" }
+              schema:  
+                $ref: "#/components/schemas/User" 
         "400":
           description: Invalid input (e.g. username already used)
         "401":
-          description: User have to Auth itself to change username
-        "404": 
+          description: User has to authenticate to change the username
+        "404":
           description: User not found
-  /user/setPhoto:
+  /users/{id}/photo:
+    parameters:
+        - name: id
+          in: path
+          description: The ID of the user who you want to change or add photo
+          schema:
+            description: An integer representing the ID of the user who you want to change or add photo
+            type: integer
+            minimum: 0
+          required: true
     post: 
       tags: ["User Management"]
-      summary: Change Photo
-      description: Update of the Photo of the user for this service
+      summary: Add or Change Photo
+      description: Add or Update of the Photo of the user for this service
       operationId: setMyPhoto
       requestBody:
         description: User new Photo over the last one
         content:
           application/json: 
             schema:
+              description: User new Photo over the last one
               type: object
               properties:
                 photo:
@@ -193,31 +247,42 @@ paths:
           description: photo updated successfully
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/User" }
+              schema:
+                $ref: "#/components/schemas/User"
         "400":
           description: Invalid input
         "401":
           description: User have to Auth itself to set a photo
         "404": 
           description: User not found
-  /conversations/{conversationId}/addUser:
+  /users/{id}/conversations/{conversationId}/users:
+    parameters:
+          - name: id
+            in: path
+            description: The ID of the user
+            schema:
+              description: A string representing the ID of the user 
+              type: integer
+              minimum: 0
+            required: true
+          - name: conversationId
+            in: path
+            description: The ID of the group chat (Chat) to add the user to
+            schema:
+              description: ID of the chat
+              type: integer
+            required: true
     post:
       tags: ["Groupchat Management"]
       summary: Add a user to a group chat (Chat)
       description: Adds a user to an existing group chat, which is a conversation with isGroup set to true
       operationId: addToGroup
-      parameters:
-        - name: conversationId
-          in: path
-          description: The ID of the group chat (Chat) to add the user to
-          schema:
-            type: integer
-          required: true
       requestBody:
         description: The user details to add to the group chat
         content:
           application/json: 
             schema:
+              description: Object of the user to add or remove from the group chat
               type: object
               properties:
                 userId: 
@@ -230,7 +295,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/Chat'
         "400":
           description: Invalid input (e.g. invalid user ID)
         "401":
@@ -239,21 +304,13 @@ paths:
           description: User does not have permission to add users to this group
         "404":
           description: group chat or user not found
-  /conversations/{conversationId}/leave:
     delete:
       tags: ["Groupchat Management"]
       summary: Leave a group chat (Chat)
       description: Allows a user to leave an existing group chat (Chat).
       operationId: leaveGroup
-      parameters:
-        - name: conversationId
-          in: path
-          description: The ID of the group chat (Chat) the user is leaving
-          schema:
-            type: integer
-          required: true
       responses:
-        '200':
+        '204':
           description: User successfully left the group chat
         "400":
           description: Invalid input (e.g. user not part of the conversation)
@@ -263,17 +320,26 @@ paths:
         #  description: User is not authorized to leave the group
         "404":
           description: Conversation not found or user is not a participant
-  /conversations/{conversationId}/setGroupName:
+  /users/{id}/conversations/{conversationId}/group:
     post: 
       tags: ["Groupchat Management"]
       summary: Setting up or Change group name
       description: Update or setting up the username for this GroupChat (Chat)
       operationId: setGroupName
       parameters:
+        - name: id
+          in: path
+          description: The ID of the user
+          schema:
+            description: An integer representing the ID of the user 
+            type: integer
+            minimum: 0
+          required: true
         - name: conversationId
           in: path
           description: The ID of the group chat (Chat) the user is leaving
           schema:
+            description: ID of the GroupChat
             type: integer
           required: true
       requestBody:
@@ -282,10 +348,12 @@ paths:
           application/json: 
             schema:
               type: object
+              description: New GroupChat name 
               properties:
                 newName: 
+                  description: String representing the new GroupChat name
                   type: string
-                  pattern: 'ˆ.*?$'
+                  pattern: "^[a-zA-Z0-9_.]+$"
                   minLength: 3
                   maxLength: 16
         required: true
@@ -294,24 +362,34 @@ paths:
           description: Group name updated successfully
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/User" }
+              schema: 
+                $ref: "#/components/schemas/Chat"
         "400":
           description: Invalid input (e.g. Group name already used)
         "401":
           description: User have to Auth itself to change a Group name
         "404": 
           description: Group (Chat) not found       
-  /conversations/{conversationId}/setGroupPhoto:
+  /users/{id}/conversations/{conversationId}/photo:
     post: 
       tags: ["Groupchat Management"]
       summary: Change GroupChat (Chat) Photo
       description: Update of the Photo of the GroupChat (Chat) selected
       operationId: setGroupPhoto
       parameters:
+        - name: id
+          in: path
+          description: The ID of the user 
+          schema:
+            description: A string representing the ID of the user
+            type: integer
+            minimum: 0
+          required: true
         - name: conversationId
           in: path
           description: The ID of the group chat (Chat) the user is leaving
           schema:
+            description: The ID of the group chat (Chat)
             type: integer
           required: true
       requestBody:
@@ -319,6 +397,7 @@ paths:
         content:
           application/json: 
             schema:
+              description: New Photo 
               type: object
               properties:
                 photo:
@@ -331,19 +410,29 @@ paths:
           description: photo updated successfully
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Chat" }
+              schema: 
+                $ref: "#/components/schemas/Chat"
         "400":
           description: Invalid input
         "401":
           description: User have to Auth itself to set a photo
         "404": 
           description: User not found
-  /conversations/:
+  /users/{id}/conversations/:
     get:
       tags: ["Conversation Based"]
       summary: Retrieve the list of all the user conversations
       description: Retrieve chronologically reversed all the conversation connected with the user
       operationId: getMyConversations
+      parameters:
+      - name: id
+        in: path
+        description: The ID of the user 
+        schema:
+          description: The ID of the user
+          type: integer
+          minimum: 0
+        required: true
       responses:
         '200':
           description: list of Conversations
@@ -351,21 +440,33 @@ paths:
             application/json:
               schema:
                 type: array
+                description: Array of the conversation retrieved for the user sent
                 items:
                   $ref: '#/components/schemas/Chat'
+                minItems: 0
+                maxItems: 1000000
         "401":
           description: User have to Auth itself to see the Conversations
-  /conversations/{conversationId}:
+  /users/{id}/conversations/{conversationId}:
     get:
       tags: ["Conversation Based"]
       summary: Retrieve a single conversation by ID
       description: Retrieve a specific conversation connected with the user by its ID
       operationId: getConversation
       parameters:
+        - name: id
+          in: path
+          description: The ID of the user
+          schema:
+            description: The ID of the user
+            type: integer
+            minimum: 0
+          required: true
         - name: conversationId
           in: path
           description: The ID of the conversation to retrieve
           schema:
+            description: ID of the conversation
             type: integer
           required: true
       responses:
@@ -381,33 +482,42 @@ paths:
           description: User does not have access rights to the content
         "404":
           description: Conversation not found
-  /conversations/{conversationId}/sendMessage:
+  /users/{id}/conversations/{conversationId}/messages:
     post:
       tags: ["Conversation Based"]
       summary: Send a message in a conversation
       description: Send a new message to a specific conversation identified by conversationId
       operationId: sendMessage
       parameters:
+        - name: id
+          in: path
+          description: The ID of the user 
+          schema:
+            description: The ID of the user 
+            type: integer
+            minimum: 0
+          required: true
         - name: conversationId
           in: path
           description: The ID of the conversation to send the message to
           schema:
+            description: ID of the conversation
             type: integer
           required: true
       requestBody:
         description: The message details to send
-        required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/Message'
+        required: true
       responses:
         '201':
           description: Message sent successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Message'
+                $ref: '#/components/schemas/Chat'
         "400":
           description: Invalid input
         "401":
@@ -416,31 +526,41 @@ paths:
           description: User does not have access rights to the content
         "404":
           description: Conversation not found
-  /conversations/{sourceConversationId}/messages/{messageId}/forward:
+  /users/{id}/conversations/{sourceConversationId}/messages/{messageId}:
+    parameters:
+          - name: id
+            in: path
+            description: The ID of the user
+            schema:
+              description: The ID of the user
+              type: integer
+              minimum: 0
+            required: true
+          - name: sourceConversationId
+            in: path
+            description: The ID of the conversation where you already have the message
+            schema:
+              description: ID of the conversation
+              type: integer
+            required: true
+          - name: messageId
+            in: path
+            description: The ID of the message to forward
+            schema:
+              description: ID of the message
+              type: integer
+            required: true
     post:
       tags: ["Conversation Based"]
       summary: Forward a message to a different conversation
       description: Forward an existing message to the specified conversation
       operationId: forwardMessage
-      parameters:
-        - name: sourceConversationId
-          in: path
-          description: The ID of the conversation where you already have the message
-          schema:
-            type: integer
-          required: true
-        - name: messageId
-          in: path
-          description: The ID of the message to forward
-          schema:
-            type: integer
-          required: true
       requestBody:
         description: Target conversation and additional details for forwarding the message
-        required: true
         content:
           application/json:
             schema:
+              description: Containing conversation and forwarding details
               type: object
               properties:
                 targetConversationId:
@@ -449,15 +569,19 @@ paths:
                 customContent:
                   type: string
                   description: Optional additional content added when forwarding the message
+                  pattern: ".*"
+                  minLength: 3
+                  maxLength: 800
               required:
                 - targetConversationId
+        required: true
       responses:
         '201':
           description: Message forwarded successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Message'
+                $ref: '#/components/schemas/Chat'
         "400":
           description: Invalid input
         "401":
@@ -466,96 +590,11 @@ paths:
           description: User does not have access rights to the content
         "404":
           description: Conversation or message not found
-  /conversations/{conversationId}/messages/{messageId}/comment:
-    post:
-      tags: ["Conversation Based"]
-      summary: Add a comment to a message
-      description: Adds a comment to a specific message within a conversation
-      operationId: commentMessage
-      parameters:
-      - name: conversationId
-        in: path
-        description: The ID of the conversation containing the message to comment on
-        schema:
-          type: integer
-        required: true
-      - name: messageId
-        in: path
-        description: The ID of the message to comment on
-        schema:
-          type: integer
-        required: true
-      requestBody:
-        description: The comment as a Message
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Message'
-      responses:
-        '201':
-          description: Comment added successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Message'
-        "400":
-          description: Invalid input
-        "401":
-          description: User must authenticate to add a comment
-        "403":
-          description: User does not have access rights to the content
-        "404":
-          description: Conversation or message not found
-  /conversations/{conversationId}/messages/{messageId}/uncomment:
-    delete:
-      tags: ["Conversation Based"]
-      summary: Delete a comment from a message
-      description: Deletes a specific comment on a message within a conversation
-      operationId: uncommentMessage
-      parameters:
-      - name: conversationId
-        in: path
-        description: The ID of the conversation containing the message
-        schema:
-          type: integer
-        required: true
-      - name: messageId
-        in: path
-        description: The ID of the message who is a comment
-        schema:
-          type: integer
-        required: true
-      responses:
-        '204':
-          description: Comment deleted successfully
-        "400":
-          description: Invalid input
-        "401":
-          description: User must authenticate to delete the comment
-        "403":
-          description: User is not authorized to delete this comment
-        "404":
-          description: Conversation or comment not found
-  /conversations/{conversationId}/messages/{messageId}/delMessage:
     delete:
       tags: ["Conversation Based"]
       summary: Delete a message from the conversation
       description: Deletes a specific message within a conversation
       operationId: deleteMessage
-      parameters:
-      - name: conversationId
-        in: path
-        description: The ID of the conversation containing the message
-        schema:
-          type: integer
-        required: true
-      - name: messageId
-        in: path
-        description: The ID of the message that will be deleted
-        schema:
-          type: integer
-        required: true
       responses:
         '204':
           description: message deleted successfully
@@ -567,3 +606,70 @@ paths:
           description: User is not authorized to delete this message
         "404":
           description: Conversation or message not found
+  /users/{id}/conversations/{conversationId}/messages/{messageId}/comments:
+    parameters:
+      - name: id
+        in: path
+        description: The ID of the user 
+        schema:
+          description: The ID of the user 
+          type: integer
+          minimum: 0
+        required: true
+      - name: conversationId
+        in: path
+        description: The ID of the conversation containing the message to comment on
+        schema:
+          description: The ID of the conversation
+          type: integer
+        required: true
+      - name: messageId
+        in: path
+        description: The ID of the message to comment on
+        schema:
+          description: The ID of the message
+          type: integer
+        required: true
+    post:
+      tags: ["Conversation Based"]
+      summary: Add a comment to a message
+      description: Adds a comment to a specific message within a conversation
+      operationId: commentMessage
+      requestBody:
+        description: The comment as a Message
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Message'
+        required: true
+      responses:
+        '201':
+          description: Comment added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Chat'
+        "400":
+          description: Invalid input
+        "401":
+          description: User must authenticate to add a comment
+        "403":
+          description: User does not have access rights to the content
+        "404":
+          description: Conversation or message not found
+    delete:
+      tags: ["Conversation Based"]
+      summary: Delete a comment from a message
+      description: Deletes a specific comment on a message within a conversation
+      operationId: uncommentMessage
+      responses:
+        '204':
+          description: Comment deleted successfully
+        "400":
+          description: Invalid input
+        "401":
+          description: User must authenticate to delete the comment
+        "403":
+          description: User is not authorized to delete this comment
+        "404":
+          description: Conversation or comment not found
