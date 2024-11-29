@@ -27,6 +27,8 @@ components:
           description: Image that represent the user
           format: binary
           type: string
+          minLength: 0
+          maxLength: 10000000
         realName:
           description: Real name of the user
           type: string
@@ -116,6 +118,8 @@ components:
           description: Photo of the chat if is a group
           type: string
           format: binary
+          minLength: 0
+          maxLength: 10000000
   securitySchemes:
     BearerAuth: 
       type: http 
@@ -241,6 +245,8 @@ paths:
                   type: string
                   format: binary
                   description: The photo file to upload (image)
+                  minLength: 0
+                  maxLength: 10000000
         required: true
       responses:
         "200":
@@ -261,7 +267,7 @@ paths:
             in: path
             description: The ID of the user
             schema:
-              description: A string representing the ID of the user 
+              description: An int representing the ID of the user 
               type: integer
               minimum: 0
             required: true
@@ -381,7 +387,7 @@ paths:
           in: path
           description: The ID of the user 
           schema:
-            description: A string representing the ID of the user
+            description: An integer representing the ID of the user
             type: integer
             minimum: 0
           required: true
@@ -404,6 +410,8 @@ paths:
                   type: string
                   format: binary
                   description: The photo file to upload (image)
+                  minLength: 0
+                  maxLength: 10000000
         required: true
       responses:
         "200":
