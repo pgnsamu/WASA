@@ -175,36 +175,6 @@ paths:
                     description: user identifier
                     type: integer
                     minimum: 0
-  /users/{username}:
-    parameters:
-        - name: username
-          in: path
-          description: The username of the user who you want to get its id
-          schema:
-            description: A string representing the username of the user who you want to change or add photo
-            type: string
-            pattern: "^[a-zA-Z0-9_.]+$"
-            minLength: 3
-            maxLength: 16
-          required: true
-    get: 
-      tags: ["User Management"]
-      summary: Getting user id
-      description: Getting the user id knowing the username
-      operationId: getUserId
-      responses:
-        "200":
-          description: Id retrieved successfully
-          content:
-            application/json:
-              schema:
-                description: Id of a user 
-                type: integer
-                minimum: 0
-        "400":
-          description: Invalid input
-        "404": 
-          description: User not found
   /users/{id}:
     parameters:
       - name: id
