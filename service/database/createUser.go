@@ -7,9 +7,10 @@ import (
 )
 
 type User struct {
-	ID    int    `json:"-"`
-	Name  string `json:"name"`
-	Email string `json:"email"`
+	Id       int    `json:"id"`
+	Username string `json:"username"`
+	Name     string `json:"name"`
+	Surname  string `json:"surname"`
 }
 
 func (db *appdbimpl) CreateUser(username string, name string, surname string) (string, error) {
@@ -30,7 +31,7 @@ func (db *appdbimpl) CreateUser(username string, name string, surname string) (s
 		return "", errore
 
 	} else { // nel caso in cui il record già esiste ritorno utente già esistente
-		return "", errors.New("Utente già registrato")
+		return "", errors.New("utente già registrato")
 	}
 }
 

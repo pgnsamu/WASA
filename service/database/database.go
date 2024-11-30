@@ -38,10 +38,11 @@ import (
 
 // AppDatabase is the high level interface for the DB
 type AppDatabase interface {
-	GetName() (string, error)
-	SetName(name string) error
+	// GetName() (string, error)
+	// SetName(name string) error
 
 	GetUsersDB() (string, error)
+	GetUserInfo(id int) (*User, error)
 	SearchUser(username string) (int, error)
 	CreateUser(username string, name string, surname string) (string, error)
 

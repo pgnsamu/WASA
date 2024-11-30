@@ -12,13 +12,6 @@ type requestBody struct {
 	Username string `json:"username"`
 }
 
-type User struct {
-	Id       int    `json:"id"`
-	Username string `json:"username"`
-	// Name     string `json:"name"`
-	// Surname  string `json:"surname"`
-}
-
 // getHelloWorld is an example of HTTP endpoint that returns "Hello world!" as a plain text
 func (rt *_router) createUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	/*
@@ -43,7 +36,7 @@ func (rt *_router) createUser(w http.ResponseWriter, r *http.Request, ps httprou
 	}
 
 	result, err := rt.db.CreateUser(reqBody.Username, "", "")
-	if err.Error() == "Utente già registrato" {
+	if err.Error() == "utente già registrato" {
 		http.Error(w, err.Error(), http.StatusConflict)
 		return
 	} else if err != nil {
