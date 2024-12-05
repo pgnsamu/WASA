@@ -226,7 +226,7 @@ paths:
               description: the new username object
               type: object
               properties:
-                newName: 
+                username: 
                   description: string representing the new username of the user
                   type: string
                   pattern: "^[a-zA-Z0-9_.]+$"
@@ -384,7 +384,7 @@ paths:
               type: object
               description: New GroupChat name 
               properties:
-                newName: 
+                username: 
                   description: String representing the new GroupChat name
                   type: string
                   pattern: "^[a-zA-Z0-9_.]+$"

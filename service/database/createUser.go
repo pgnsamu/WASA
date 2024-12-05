@@ -19,7 +19,7 @@ func (db *appdbimpl) CreateUser(username string, name string, surname string) (s
 
 	// se la ricerca non ha trovato errori e ha ritornato -1 allora il nome utente non esiste e va creato un nuovo utente
 	if resSearch == -1 && errore == nil {
-		_, err := db.c.Exec("INSERT INTO utenti (username, nome, cognome) VALUES ($1, $2, $3)", username, name, surname)
+		_, err := db.c.Exec("INSERT INTO users (username, name, surname) VALUES ($1, $2, $3)", username, name, surname)
 		if err != nil {
 			log.Fatal("Failed to read record: ", err)
 			return "", err
@@ -38,7 +38,7 @@ func (db *appdbimpl) CreateUser(username string, name string, surname string) (s
 // ritorna -1 se non c'è gia, altrimenti ritorna l'id dell'utente
 func (db *appdbimpl) SearchUser(username string) (int, error) {
 	var id int
-	err := db.c.QueryRow("SELECT id FROM utenti WHERE username = $1", username).Scan(&id)
+	err := db.c.QueryRow("SELECT id FROM users WHERE username = $1", username).Scan(&id)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			// No rows found

@@ -8,7 +8,7 @@ import (
 /*
 	func (db *appdbimpl) GetUserInfo(id int) (User, error) {
 		var user User
-		query := "SELECT id, username, name, surname FROM utenti WHERE id=$1"
+		query := "SELECT id, username, name, surname FROM users WHERE id=$1"
 		err := db.c.QueryRow(query, id).Scan(&user.Id, &user.Username, &user.Name, &user.Surname)
 		if err != nil {
 			if err == sql.ErrNoRows {
@@ -24,7 +24,7 @@ import (
 */
 
 func (db *appdbimpl) GetUserInfo(id int) (*User, error) {
-	query := "SELECT id, username, name, surname FROM utenti WHERE id=$1"
+	query := "SELECT id, username, name, surname FROM users WHERE id=$1"
 	rows, err := db.c.Query(query, id)
 	if err != nil {
 		log.Fatal("Error executing query:", err)

@@ -7,7 +7,7 @@ import (
 
 func (db *appdbimpl) GetUsersDB() (string, error) {
 	var name string
-	err := db.c.QueryRow("SELECT nome FROM utenti WHERE id=0").Scan(&name)
+	err := db.c.QueryRow("SELECT name FROM users WHERE id=0").Scan(&name)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			// No rows found
