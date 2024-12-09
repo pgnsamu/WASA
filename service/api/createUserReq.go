@@ -36,12 +36,14 @@ func (rt *_router) createUser(w http.ResponseWriter, r *http.Request, ps httprou
 	}
 
 	result, err := rt.db.CreateUser(reqBody.Username, "", "")
-	if err.Error() == "utente già registrato" {
-		http.Error(w, err.Error(), http.StatusConflict)
-		return
-	} else if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+	if err != nil {
+		if err.Error() == "utente già registrato" {
+			http.Error(w, err.Error(), http.StatusConflict)
+			return
+		} else {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 	}
 
 	w.Header().Set("Content-Type", "application/json")

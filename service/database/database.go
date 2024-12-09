@@ -43,6 +43,9 @@ type AppDatabase interface {
 	UpdateUsername(id int, username string) (*User, error)
 	GetUsersDB() (string, error)
 	GetUserInfo(id int) (*User, error)
+
+	SaveImageToDB(imgData []byte, table string, field string, userId int) error
+
 	SearchUser(username string) (int, error)
 	CreateUser(username string, name string, surname string) (string, error)
 
