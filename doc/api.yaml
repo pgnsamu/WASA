@@ -291,21 +291,21 @@ paths:
           description: User not found
   /users/{id}/conversations/{conversationId}/users:
     parameters:
-          - name: id
-            in: path
-            description: The ID of the user
-            schema:
-              description: An int representing the ID of the user 
-              type: integer
-              minimum: 0
-            required: true
-          - name: conversationId
-            in: path
-            description: The ID of the group chat (Chat) to add the user to
-            schema:
-              description: ID of the chat
-              type: integer
-            required: true
+      - name: id
+        in: path
+        description: The ID of the user
+        schema:
+          description: An int representing the ID of the user 
+          type: integer
+          minimum: 0
+        required: true
+      - name: conversationId
+        in: path
+        description: The ID of the group chat (Chat) to add the user to
+        schema:
+          description: ID of the chat
+          type: integer
+        required: true
     post:
       tags: ["Groupchat Management"]
       summary: Add a user to a group chat (Chat)
@@ -455,12 +455,7 @@ paths:
         "404": 
           description: User not found
   /users/{id}/conversations/:
-    get:
-      tags: ["Conversation Based"]
-      summary: Retrieve the list of all the user conversations
-      description: Retrieve chronologically reversed all the conversation connected with the user
-      operationId: getMyConversations
-      parameters:
+    parameters:
       - name: id
         in: path
         description: The ID of the user 
@@ -469,6 +464,12 @@ paths:
           type: integer
           minimum: 0
         required: true
+    get:
+      tags: ["Conversation Based"]
+      summary: Retrieve the list of all the user conversations
+      description: Retrieve chronologically reversed all the conversation connected with the user
+      operationId: getMyConversations
+     
       responses:
         '200':
           description: list of Conversations
@@ -481,6 +482,56 @@ paths:
                   $ref: '#/components/schemas/Chat'
                 minItems: 0
                 maxItems: 1000000
+        "401":
+          description: User have to Auth itself to see the Conversations
+    post: 
+      tags: ["Conversation Based"]
+      summary: Create a new conversation
+      description: Create a new conversation
+      operationId: newConversation
+      requestBody: 
+        description: The info about the conversation
+        content:
+          application/json:
+            schema: 
+              description: An object containing basic info about the new conversation
+              type: object
+              properties:
+                isGroup:
+                  type: boolean
+                  description: property that define what type of conversation is
+                partecipantsId:
+                  type: array
+                  description: Id's of the users who are invited in the group or private chat
+                  items:
+                    description: Id of a user
+                    type: integer
+                    minimum:  0
+                  minItems: 1
+                  maxItems: 64
+                groupPhoto:
+                  type: string
+                  format: binary
+                  description: Photo of the group if is a group
+                  minLength: 0
+                  maxLength: 100000
+                groupDesc:
+                  type: string
+                  description: Description of the group chat
+                  minLength: 0
+                  maxLength: 200
+                  pattern: "^[a-zA-Z0-9_.]+$"
+              required:
+                - isGroup
+                - partecipantsId
+        required: true
+      responses:
+        '200':
+          description: the new Conversation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Chat'
         "401":
           description: User have to Auth itself to see the Conversations
   /users/{id}/conversations/{conversationId}:
