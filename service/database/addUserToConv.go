@@ -3,7 +3,6 @@ package database
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 )
 
 func (db *appdbimpl) AddUserToConv(idConversation int, idUser int, idUserToAdd int) (*[]User, error) {
@@ -65,14 +64,12 @@ func (db *appdbimpl) AddUserToConv(idConversation int, idUser int, idUserToAdd i
 	stringQuery := "INSERT INTO participate (userId, conversationId) VALUES (?, ?);"
 	stmt, err := db.c.Prepare(stringQuery)
 	if err != nil {
-		fmt.Println("aaaaaaaaa")
 		return nil, err
 	}
 	defer stmt.Close()
 
 	_, err = stmt.Exec(idUserToAdd, idConversation)
 	if err != nil {
-		fmt.Println("bbbbbbbbbbb")
 		return nil, err
 	}
 
