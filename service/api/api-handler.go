@@ -16,6 +16,7 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.GET("/users/:id", rt.getUserInfo)
 	rt.router.GET("/users", rt.getUsers)
 	rt.router.GET("/users/:id/conversations/:conversationId/users", rt.getParticipants)
+	rt.router.DELETE("/users/:id/conversations/:conversationId/users/:toDelete", rt.delParticipant)
 	rt.router.POST("/session", rt.createUser)
 
 	// Special routes
