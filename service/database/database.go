@@ -50,6 +50,8 @@ type AppDatabase interface {
 	AddUserToConv(idConversation int, idUser int, idUserToAdd int) (*[]User, error)
 	GetConversationForUser(idUser int) (*[]Conversation, error)
 	SetupGroupName(idUser int, idConversation int, name string) (*Conversation, error)
+	GetMessagesByConversation(conversationID int) (*[]Message, error)
+	SendMessage(idConversation int, idUser int, content string, photoContent []byte, messageType bool, replyTo *int) (*[]Message, error)
 
 	SaveImageToDB(imgData []byte, table string, field string, userId int) error
 
