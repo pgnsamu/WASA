@@ -8,7 +8,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-// sistemare il Doc delle api perché è stato implementato in modo che utente x possa eliminare qualunque utente y nello stesso gruppo
+// TODO: sistemare il Doc delle api perché è stato implementato in modo che utente x possa eliminare qualunque utente y nello stesso gruppo
 func (rt *_router) delParticipant(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	stringIdConv := ps.ByName("conversationId")
 	stringIdUser := ps.ByName("id")
