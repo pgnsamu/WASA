@@ -7,10 +7,11 @@ import (
 )
 
 type User struct {
-	Id       int    `json:"id"`
-	Username string `json:"username"`
-	Name     string `json:"name"`
-	Surname  string `json:"surname"`
+	Id       int     `json:"id"`
+	Username string  `json:"username"`
+	Name     *string `json:"name,omitempty"`
+	Surname  *string `json:"surname,omitempty"`
+	Photo    *[]byte `json:"photo,omitempty"`
 }
 
 func (db *appdbimpl) CreateUser(username string, name string, surname string) (string, error) {

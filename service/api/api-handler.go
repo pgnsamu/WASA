@@ -15,6 +15,7 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.PUT("/users/:id/username", rt.putUsername)
 	rt.router.GET("/users/:id", rt.getUserInfo)
 	rt.router.GET("/users", rt.getUsers)
+	rt.router.GET("/users/:id/conversations/:conversationId/users", rt.getParticipants)
 	rt.router.POST("/session", rt.createUser)
 
 	// Special routes

@@ -45,6 +45,7 @@ type AppDatabase interface {
 	GetUserInfo(id int) (*User, error)
 	GetConversation(id int) (*Conversation, error)
 	CreateConversation(userId int, name string, isGroup bool, photo *[]byte, description *string, partecipantsId []int) (*Conversation, error)
+	GetUsersOfConversation(idConversation int, idUser int) (*[]User, error)
 
 	SaveImageToDB(imgData []byte, table string, field string, userId int) error
 
