@@ -56,6 +56,7 @@ type AppDatabase interface {
 	SearchUser(username string) (int, error)
 	CreateUser(username string, name string, surname string) (string, error)
 
+	UserExist(idConv int, idUser int) (bool, error)
 	Ping() error
 }
 

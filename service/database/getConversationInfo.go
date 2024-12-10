@@ -2,44 +2,22 @@ package database
 
 import (
 	"errors"
-	"fmt"
 	"log"
 )
 
 func (db *appdbimpl) GetConversationInfo(idConversation int, idUser int) (*Conversation, error) {
 
-	fmt.Println(idConversation, idUser)
 	// controllo utente se è all'interno
-	stmt, err := db.c.Prepare("SELECT userId FROM participate as p WHERE p.conversationId = ? and p.userId = ?")
+	resu, err := db.UserExist(idConversation, idUser)
 	if err != nil {
 		return nil, err
 	}
-	defer stmt.Close()
-
-	// Execute the query
-	rows, err := stmt.Query(idConversation, idUser)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	// Count the number of rows
-	count := 0
-	for rows.Next() {
-		count++
-	}
-
-	// Check for errors that may have occurred during iteration
-	if err = rows.Err(); err != nil {
-		return nil, err
-	}
-
-	if count != 1 {
-		return nil, errors.New("utente non registrato nel gruppo")
+	if !resu {
+		return nil, errors.New("utente non registrato")
 	}
 
 	query := "SELECT id, name, createdAt, isGroup, description, photo FROM conversations WHERE id=?"
-	rows, err = db.c.Query(query, idConversation)
+	rows, err := db.c.Query(query, idConversation)
 	if err != nil {
 		log.Fatal("Error executing query:", err)
 		return nil, err

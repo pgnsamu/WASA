@@ -21,6 +21,7 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.GET("/users/:id/conversations", rt.getConversationForUserReq)
 	rt.router.GET("/users/:id/conversations/:conversationId", rt.GetConversationInfoReq)
 	rt.router.POST("/users/:id/conversations/:conversationId/group", rt.postGroupName) // TODO: rinominare endpoint?
+	rt.router.POST("/users/:id/conversations/:conversationId/photo", rt.postGroupchatPhoto)
 
 	rt.router.POST("/session", rt.createUser)
 
