@@ -2,7 +2,6 @@ package database
 
 import (
 	"errors"
-	"log"
 )
 
 /*
@@ -24,10 +23,9 @@ import (
 */
 
 func (db *appdbimpl) GetUserInfo(id int) (*User, error) {
-	query := "SELECT id, username, name, surname, photo FROM users WHERE id=$1"
+	query := "SELECT id, username, name, surname, photo FROM users WHERE id= ?"
 	rows, err := db.c.Query(query, id)
 	if err != nil {
-		log.Fatal("Error executing query:", err)
 		return nil, err
 	}
 	defer rows.Close() // defer keyword is used to schedule a function call to be executed after the surrounding function has completed. Deferred functions are typically used for cleanup tasks
@@ -37,7 +35,6 @@ func (db *appdbimpl) GetUserInfo(id int) (*User, error) {
 	if rows.Next() {
 		err := rows.Scan(&user.Id, &user.Username, &user.Name, &user.Surname, &user.Photo)
 		if err != nil {
-			log.Fatal("Error scanning row:", err)
 			return nil, err
 		}
 	} else {

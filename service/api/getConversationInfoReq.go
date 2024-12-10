@@ -8,17 +8,25 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-func (rt *_router) getUserInfo(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (rt *_router) GetConversationInfoReq(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	paramId := ps.ByName("id")
 
 	// conversione string to int
-	id, err := strconv.Atoi(paramId)
+	idUser, err := strconv.Atoi(paramId)
+	if err != nil {
+		http.Error(w, "Errore id non intero", http.StatusBadRequest)
+		return
+	}
+	paramId2 := ps.ByName("conversationId")
+
+	// conversione string to int
+	idConv, err := strconv.Atoi(paramId2)
 	if err != nil {
 		http.Error(w, "Errore id non intero", http.StatusBadRequest)
 		return
 	}
 
-	user, err := rt.db.GetUserInfo(id)
+	user, err := rt.db.GetConversationInfo(idConv, idUser)
 
 	if user == nil && err.Error() == "user not found" {
 		http.Error(w, "Errore id non registrato", http.StatusBadRequest)

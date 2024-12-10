@@ -384,7 +384,7 @@ paths:
               type: object
               description: New GroupChat name 
               properties:
-                username: 
+                groupName: 
                   description: String representing the new GroupChat name
                   type: string
                   pattern: "^[a-zA-Z0-9_.]+$"

@@ -1,10 +1,5 @@
 package database
 
-import (
-	"errors"
-	"log"
-)
-
 /*
 	func (db *appdbimpl) GetUserInfo(id int) (User, error) {
 		var user User
@@ -36,22 +31,22 @@ func (db *appdbimpl) UpdateUsername(id int, username string) (*User, error) {
 	// esecuzione
 	res, err := stmt.Exec(username, id)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	// controllo righe interessate che in questo caso dovranno essere == 1
 	rowsAffected, err := res.RowsAffected()
 	if rowsAffected != 1 {
 		if err != nil {
-			log.Fatal(err)
+			return nil, err
 		} else {
-			log.Fatal(errors.New("too much rows"))
+			return nil, err
 		}
 	}
 	var user *User
 	user, err = db.GetUserInfo(id)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 
 	}
 

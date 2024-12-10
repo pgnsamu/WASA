@@ -8,7 +8,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-func (rt *_router) getUserInfo(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (rt *_router) getConversationForUserReq(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	paramId := ps.ByName("id")
 
 	// conversione string to int
@@ -18,9 +18,9 @@ func (rt *_router) getUserInfo(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-	user, err := rt.db.GetUserInfo(id)
+	user, err := rt.db.GetConversationForUser(id)
 
-	if user == nil && err.Error() == "user not found" {
+	if user == nil && err.Error() == "no conversations found" {
 		http.Error(w, "Errore id non registrato", http.StatusBadRequest)
 		return
 	} else if user == nil && err != nil {

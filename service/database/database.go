@@ -43,11 +43,13 @@ type AppDatabase interface {
 	UpdateUsername(id int, username string) (*User, error)
 	GetUsersDB() (*[]User, error)
 	GetUserInfo(id int) (*User, error)
-	GetConversation(id int) (*Conversation, error)
+	GetConversationInfo(idConversation int, idUser int) (*Conversation, error)
 	CreateConversation(userId int, name string, isGroup bool, photo *[]byte, description *string, partecipantsId []int) (*Conversation, error)
 	GetUsersOfConversation(idConversation int, idUser int) (*[]User, error)
 	DeleteUserFromConv(idConversation int, idUser int, idUserToDelete int) (*[]User, error)
 	AddUserToConv(idConversation int, idUser int, idUserToAdd int) (*[]User, error)
+	GetConversationForUser(idUser int) (*[]Conversation, error)
+	SetupGroupName(idUser int, idConversation int, name string) (*Conversation, error)
 
 	SaveImageToDB(imgData []byte, table string, field string, userId int) error
 

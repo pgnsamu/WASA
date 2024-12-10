@@ -58,7 +58,7 @@ func (db *appdbimpl) CreateConversation(userId int, name string, isGroup bool, p
 			}
 		}
 
-		conversation, err := db.GetConversation(int(lastInsertID))
+		conversation, err := db.GetConversationInfo(int(lastInsertID), userId)
 		if err != nil {
 			return nil, fmt.Errorf("getting last insert ID: %v", err)
 		}
@@ -95,7 +95,7 @@ func (db *appdbimpl) CreateConversation(userId int, name string, isGroup bool, p
 			}
 		}
 
-		conversation, err := db.GetConversation(int(lastInsertID))
+		conversation, err := db.GetConversationInfo(int(lastInsertID), userId)
 		if err != nil {
 			return nil, fmt.Errorf("getting last insert ID: %v", err)
 		}
