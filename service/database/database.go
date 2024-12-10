@@ -41,12 +41,13 @@ type AppDatabase interface {
 	// GetName() (string, error)
 	// SetName(name string) error
 	UpdateUsername(id int, username string) (*User, error)
-	GetUsersDB() (string, error)
+	GetUsersDB() (*[]User, error)
 	GetUserInfo(id int) (*User, error)
 	GetConversation(id int) (*Conversation, error)
 	CreateConversation(userId int, name string, isGroup bool, photo *[]byte, description *string, partecipantsId []int) (*Conversation, error)
 	GetUsersOfConversation(idConversation int, idUser int) (*[]User, error)
 	DeleteUserFromConv(idConversation int, idUser int, idUserToDelete int) (*[]User, error)
+	AddUserToConv(idConversation int, idUser int, idUserToAdd int) (*[]User, error)
 
 	SaveImageToDB(imgData []byte, table string, field string, userId int) error
 

@@ -24,7 +24,7 @@ import (
 */
 
 func (db *appdbimpl) GetUserInfo(id int) (*User, error) {
-	query := "SELECT id, username, name, surname FROM users WHERE id=$1"
+	query := "SELECT id, username, name, surname, photo FROM users WHERE id=$1"
 	rows, err := db.c.Query(query, id)
 	if err != nil {
 		log.Fatal("Error executing query:", err)
@@ -35,7 +35,7 @@ func (db *appdbimpl) GetUserInfo(id int) (*User, error) {
 	var user User
 	// scanning multiplo anche per ricercare una singola riga in modo da passare tutti i parametri
 	if rows.Next() {
-		err := rows.Scan(&user.Id, &user.Username, &user.Name, &user.Surname)
+		err := rows.Scan(&user.Id, &user.Username, &user.Name, &user.Surname, &user.Photo)
 		if err != nil {
 			log.Fatal("Error scanning row:", err)
 			return nil, err
