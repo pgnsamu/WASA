@@ -43,7 +43,7 @@ func (db *appdbimpl) CreateConversation(userId int, name string, isGroup bool, p
 		tempParticipantsId = append(tempParticipantsId, userId) // Append userId to the slice before the loop
 		// fmt.Println(len(tempParticipantsId)) debug:
 
-		for i := 0; i < len(tempParticipantsId)-1; i++ { // TODO: è stato aggiunto un meno 1 ma non so se è giusto controllare
+		for i := 0; i < len(tempParticipantsId); i++ { // TODO: è stato aggiunto un meno 1 ma non so se è giusto controllare (ora è stato tolto e funziona, non lo so )
 			stmt, err := db.c.Prepare("INSERT INTO participate (userId, conversationId) VALUES (?, ?);")
 			if err != nil {
 				return nil, fmt.Errorf("prepare statement: %v", err)

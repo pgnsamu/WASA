@@ -64,7 +64,6 @@ func (rt *_router) postConversation(w http.ResponseWriter, r *http.Request, ps h
 		defer file.Close()
 		imgData, err = io.ReadAll(file)
 		if err != nil {
-
 			http.Error(w, "Unable to read file data", http.StatusInternalServerError)
 			return
 		}
@@ -80,7 +79,7 @@ func (rt *_router) postConversation(w http.ResponseWriter, r *http.Request, ps h
 	*/
 	result, err := rt.db.CreateConversation(id, name, isGroup, &imgData, &description, partecipantsId)
 	if err != nil {
-		http.Error(w, "Unable to read file data", http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
