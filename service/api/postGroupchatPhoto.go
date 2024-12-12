@@ -58,7 +58,7 @@ func (rt *_router) postGroupchatPhoto(w http.ResponseWriter, r *http.Request, ps
 		if err.Error() == "id not found" {
 			http.Error(w, "id not found", http.StatusBadRequest)
 		} else {
-			fmt.Println(err.Error())
+			// fmt.Println(err.Error())
 			http.Error(w, "Unable to save the image in the Database", http.StatusInternalServerError)
 		}
 		return

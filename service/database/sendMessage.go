@@ -2,7 +2,6 @@ package database
 
 import (
 	"errors"
-	"fmt"
 	"time"
 )
 
@@ -109,7 +108,7 @@ func (db *appdbimpl) SendMessage(idConversation int, idUser int, content string,
 
 	// per ogni utente appartenente alla conversation dove è stato inviato il messaggio aggiungere una riga di insert in received
 	for _, id := range userIDs {
-		fmt.Println(id, idUser)
+		// fmt.Println(id, idUser)
 		if id != idUser {
 			_, err := stmt.Exec(id, lastInsertId, "delivered")
 			if err != nil {

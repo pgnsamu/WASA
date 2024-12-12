@@ -24,6 +24,7 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.POST("/users/:id/conversations/:conversationId/photo", rt.postGroupchatPhoto)
 	rt.router.POST("/users/:id/conversations/:conversationId/messages", rt.sendMessageReq)
 	rt.router.POST("/users/:id/conversations/:conversationId/messages/:messageId", rt.postForwardMessage)
+	rt.router.DELETE("/users/:id/conversations/:conversationId/messages/:messageId", rt.delMessage)
 
 	rt.router.POST("/session", rt.createUser)
 

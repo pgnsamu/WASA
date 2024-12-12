@@ -54,7 +54,7 @@ func (rt *_router) postForwardMessage(w http.ResponseWriter, r *http.Request, ps
 		return
 	}
 
-	fmt.Println(idConv, requestData.Id, idUser, idMessage)
+	// fmt.Println(idConv, requestData.Id, idUser, idMessage)
 	_, err = rt.db.ForwardMessage(idConv, requestData.Id, idUser, idMessage)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)

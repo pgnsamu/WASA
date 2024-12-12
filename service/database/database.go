@@ -53,6 +53,7 @@ type AppDatabase interface {
 	GetMessagesByConversation(conversationID int) (*[]Message, error)
 	SendMessage(idConversation int, idUser int, content string, photoContent []byte, messageType bool, replyTo *int, isForwarded int) (*[]Message, error)
 	ForwardMessage(idConversationSource int, idConversationDest int, idUser int, idMessage int) (*Conversation, error)
+	DeleteMessage(idConversation int, idUser int, idMessageToDelete int) error
 
 	SaveImageToDB(imgData []byte, table string, field string, userId int) error
 
