@@ -9,7 +9,7 @@ import (
 // TODO: messagetype per ora sul doc è enum invece di bool
 // TODO: togliere il previewContent dal doc
 // TODO: forse l'attributo replyTo su sendmessage è inutile
-func (db *appdbimpl) SendMessage(idConversation int, idUser int, content string, photoContent []byte, messageType bool, replyTo *int) (*[]Message, error) {
+func (db *appdbimpl) SendMessage(idConversation int, idUser int, content string, photoContent []byte, messageType bool, replyTo *int, isForwarded int) (*[]Message, error) {
 	resu, err := db.UserExist(idConversation, idUser)
 	if err != nil {
 		return nil, err
@@ -25,8 +25,8 @@ func (db *appdbimpl) SendMessage(idConversation int, idUser int, content string,
 	}
 
 	queryStr := `
-	INSERT INTO messages (content, photoContent, sentAt, conversationId)
-	VALUES (?, ?, ?, ?)
+	INSERT INTO messages (content, photoContent, sentAt, conversationId, isForwarded)
+	VALUES (?, ?, ?, ?, ?)
 	`
 	// Prepara la query di INSERT
 	stmt, err := tx.Prepare(queryStr)
@@ -40,7 +40,7 @@ func (db *appdbimpl) SendMessage(idConversation int, idUser int, content string,
 	sentAt := time.Now().UnixMilli()
 
 	// Esegui la query
-	resul, err := stmt.Exec(content, photoContent, sentAt, idConversation)
+	resul, err := stmt.Exec(content, photoContent, sentAt, idConversation, isForwarded)
 	if err != nil {
 		tx.Rollback() // Rollback in caso di errore
 		return nil, err
