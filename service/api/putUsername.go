@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -32,15 +31,15 @@ func (rt *_router) putUsername(w http.ResponseWriter, r *http.Request, ps httpro
 	defer r.Body.Close()
 
 	user, err := rt.db.UpdateUsername(id, data.Username)
-
 	if user == nil && err != nil && err.Error() == "userNotFound" {
 		http.Error(w, "Errore id non registrato", http.StatusBadRequest)
 		return
 	} else if user == nil && err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
-	} else {
-		fmt.Println(user.Name)
+	} else if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")

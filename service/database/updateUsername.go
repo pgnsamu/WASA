@@ -1,5 +1,9 @@
 package database
 
+import (
+	"errors"
+)
+
 /*
 	func (db *appdbimpl) GetUserInfo(id int) (User, error) {
 		var user User
@@ -40,9 +44,10 @@ func (db *appdbimpl) UpdateUsername(id int, username string) (*User, error) {
 		if err != nil {
 			return nil, err
 		} else {
-			return nil, err
+			return nil, errors.New("utente non trovato")
 		}
 	}
+
 	var user *User
 	user, err = db.GetUserInfo(id)
 	if err != nil {
