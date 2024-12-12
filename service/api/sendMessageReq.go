@@ -9,6 +9,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
+// TODO: è useful usare messagetype?
 func (rt *_router) sendMessageReq(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 	paramId := ps.ByName("id")
@@ -34,7 +35,7 @@ func (rt *_router) sendMessageReq(w http.ResponseWriter, r *http.Request, ps htt
 
 	// Retrieve values from the form
 	content := r.FormValue("content")
-	messageTypeStr := r.FormValue("messageType")
+	messageTypeStr := r.FormValue("messageType") //TODO: cambiare e mettere isPhoto
 
 	// messageType = false not image
 	// messageType = true image
@@ -65,7 +66,6 @@ func (rt *_router) sendMessageReq(w http.ResponseWriter, r *http.Request, ps htt
 		defer file.Close()
 		imgData, err = io.ReadAll(file)
 		if err != nil {
-
 			http.Error(w, "Unable to read file data", http.StatusInternalServerError)
 			return
 		}
@@ -74,15 +74,18 @@ func (rt *_router) sendMessageReq(w http.ResponseWriter, r *http.Request, ps htt
 	resu, err := rt.db.UserExist(idConv, idUser)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	if !resu {
 		http.Error(w, "user not in the group", http.StatusBadRequest)
+		return
 	}
 
 	_, err = rt.db.SendMessage(idConv, idUser, content, imgData, messageType, answerTo)
 	if err != nil {
-		http.Error(w, "Unable to read file data", http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	fmt.Fprintf(w, "File uploaded successfully")

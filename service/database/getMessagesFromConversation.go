@@ -1,23 +1,19 @@
 package database
 
-import (
-	"database/sql"
-)
-
 type Message struct {
-	ID             int    `json:"id"`
-	Content        string `json:"content"`
-	PhotoContent   []byte `json:"photoContent,omitempty"` // Optional in JSON
-	SenderID       int    `json:"senderId"`
-	SentAt         int    `json:"sentAt"`
-	ConversationID int    `json:"conversationId"`
-	AnswerTo       *int   `json:"answerTo,omitempty"` // Omit if nil
+	ID           int    `json:"id"`
+	Content      string `json:"content"`
+	PhotoContent []byte `json:"photoContent,omitempty"` // Optional in JSON
+	// SenderID       int    `json:"senderId"`
+	SentAt         int `json:"sentAt"`
+	ConversationID int `json:"conversationId"`
+	// AnswerTo       *int   `json:"answerTo,omitempty"` // Omit if nil
 }
 
 // TODO: da scrivere l'endpoint
 func (db *appdbimpl) GetMessagesByConversation(conversationID int) (*[]Message, error) {
 	query := `
-        SELECT id, content, photoContent, senderId, sentAt, conversationId, answerTo
+        SELECT id, content, photoContent, sentAt, conversationId
         FROM messages
         WHERE conversationId = ?
         ORDER BY sentAt ASC
@@ -33,21 +29,21 @@ func (db *appdbimpl) GetMessagesByConversation(conversationID int) (*[]Message, 
 
 	for rows.Next() {
 		var msg Message
-		var answerTo sql.NullInt64 // Handle nullable integer for the answerTo column
+		// var answerTo sql.NullInt64 // Handle nullable integer for the answerTo column
 
-		err := rows.Scan(&msg.ID, &msg.Content, &msg.PhotoContent, &msg.SenderID, &msg.SentAt, &msg.ConversationID, &answerTo)
+		err := rows.Scan(&msg.ID, &msg.Content, &msg.PhotoContent, &msg.SentAt, &msg.ConversationID)
 		if err != nil {
 			return nil, err
 		}
-
-		// Convert sql.NullInt64 to *int
-		if answerTo.Valid {
-			val := int(answerTo.Int64)
-			msg.AnswerTo = &val
-		} else {
-			msg.AnswerTo = nil
-		}
-
+		/*
+			// Convert sql.NullInt64 to *int
+			if answerTo.Valid {
+				val := int(answerTo.Int64)
+				msg.AnswerTo = &val
+			} else {
+				msg.AnswerTo = nil
+			}
+		*/
 		messages = append(messages, msg)
 	}
 

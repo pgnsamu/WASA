@@ -7,6 +7,7 @@ import (
 
 func (db *appdbimpl) GetConversationInfo(idConversation int, idUser int) (*Conversation, error) {
 
+	// TODO: cambiare struct conversation in modo che tenga anche i messaggi mandati
 	// controllo utente se è all'interno
 	resu, err := db.UserExist(idConversation, idUser)
 	if err != nil {

@@ -12,6 +12,7 @@ type groupData struct {
 	Username string `json:"groupName"`
 }
 
+// TODO: forse da gestire il fatto che puoi cambiargli nome solo se è un gruppo
 func (rt *_router) postGroupName(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var data groupData
 	paramId := ps.ByName("id")

@@ -653,12 +653,6 @@ paths:
                 targetConversationId:
                   type: integer
                   description: The ID of the target conversation to which the message is being forwarded
-                customContent:
-                  type: string
-                  description: Optional additional content added when forwarding the message
-                  pattern: ".*"
-                  minLength: 3
-                  maxLength: 800
               required:
                 - targetConversationId
         required: true
