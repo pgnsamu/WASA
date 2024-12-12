@@ -31,7 +31,6 @@ func (rt *_router) delParticipant(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 
-	w.Header().Set("content-type", "application/json")
 	users, err := rt.db.DeleteUserFromConv(idConv, idUser, idToDelete)
 	if err != nil && err.Error() == "partecipanti non trovati" {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -40,6 +39,11 @@ func (rt *_router) delParticipant(w http.ResponseWriter, r *http.Request, ps htt
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	if users == nil {
+		w.WriteHeader(http.StatusNoContent)
+		return
+	}
+	w.Header().Set("content-type", "application/json")
 	json.NewEncoder(w).Encode(*users)
 
 }

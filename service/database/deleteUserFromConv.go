@@ -60,13 +60,19 @@ func (db *appdbimpl) DeleteUserFromConv(idConversation int, idUser int, idUserTo
 		if err != nil {
 			return nil, err
 		}
-		users, err = db.GetUsersOfConversation(idConversation, idUser)
-		if err != nil {
-			return nil, err
+
+		if idUserToDelete != idUser {
+			users, err = db.GetUsersOfConversation(idConversation, idUser)
+			if err != nil {
+				return nil, err
+			}
+			// TODO: controllare se esista almeno un altro partecipante dopo l'eliminazione in caso sia una isGroup = false
+			// 		 controllare se esista almeno un altro partecipante dopo l'eliminazione in caso sia una isGroup = true
+			return users, nil
+		} else {
+			return nil, nil
 		}
-		// TODO: controllare se esista almeno un altro partecipante dopo l'eliminazione in caso sia una isGroup = false
-		// 		 controllare se esista almeno un altro partecipante dopo l'eliminazione in caso sia una isGroup = true
-		return users, nil
+
 	}
 
 }
