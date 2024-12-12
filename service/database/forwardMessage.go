@@ -19,7 +19,7 @@ func (db *appdbimpl) ForwardMessage(idConversationSource int, idConversationDest
 	}
 
 	// fmt.Println(idConversationDest, idUser)
-	// controllo se l'utente
+	// controllo se l'utente esiste nella conversazione di dest
 	resu, err = db.UserExist(idConversationDest, idUser)
 	if err != nil {
 		return nil, err

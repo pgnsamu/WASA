@@ -2,7 +2,7 @@ package database
 
 import (
 	"errors"
-	"log"
+	"fmt"
 	"time"
 )
 
@@ -21,26 +21,31 @@ func (db *appdbimpl) SendMessage(idConversation int, idUser int, content string,
 	// Inizia una transazione
 	tx, err := db.c.Begin()
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	queryStr := `
-	INSERT INTO messages (content, photoContent, sentAt, conversationId, isForwarded)
-	VALUES (?, ?, ?, ?, ?)
+	INSERT INTO messages (content, photoContent, sentAt, conversationId, isForwarded, senderId, answerTo)
+	VALUES (?, ?, ?, ?, ?, ?, ?)
 	`
 	// Prepara la query di INSERT
 	stmt, err := tx.Prepare(queryStr)
 	if err != nil {
 		tx.Rollback() // Rollback in caso di errore
-		log.Fatal(err)
+		return nil, err
 	}
 	defer stmt.Close()
 
 	// Ottieni il timestamp corrente
 	sentAt := time.Now().UnixMilli()
 
+	repl := -1
+	if replyTo != nil {
+		repl = *replyTo
+	}
+
 	// Esegui la query
-	resul, err := stmt.Exec(content, photoContent, sentAt, idConversation, isForwarded)
+	resul, err := stmt.Exec(content, photoContent, sentAt, idConversation, isForwarded, idUser, repl)
 	if err != nil {
 		tx.Rollback() // Rollback in caso di errore
 		return nil, err
@@ -95,24 +100,22 @@ func (db *appdbimpl) SendMessage(idConversation int, idUser int, content string,
 	}
 
 	// Prepara la query di INSERT
-	stmt, err = tx.Prepare("INSERT INTO sent (userId, messageId, status, answerTo) VALUES (?, ?, ?, ?)") //TODO: forse meglio usare il sent? BOH
+	stmt, err = tx.Prepare("INSERT INTO received (userId, messageId, status) VALUES (?, ?, ?)")
 	if err != nil {
 		tx.Rollback() // Rollback in caso di errore
 		return nil, err
 	}
 	defer stmt.Close()
 
-	repl := -1
-	if replyTo != nil {
-		repl = *replyTo
-	}
-
-	// per ogni utente appartenente alla conversation dove è stato inviato il messaggio aggiungere una riga di insert in sent
+	// per ogni utente appartenente alla conversation dove è stato inviato il messaggio aggiungere una riga di insert in received
 	for _, id := range userIDs {
-		_, err := stmt.Exec(id, lastInsertId, "delivered", repl)
-		if err != nil {
-			tx.Rollback() // Rollback in caso di errore
-			return nil, err
+		fmt.Println(id, idUser)
+		if id != idUser {
+			_, err := stmt.Exec(id, lastInsertId, "delivered")
+			if err != nil {
+				tx.Rollback() // Rollback in caso di errore
+				return nil, err
+			}
 		}
 	}
 
