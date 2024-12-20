@@ -47,7 +47,7 @@ type AppDatabase interface {
 	CreateConversation(userId int, name string, isGroup bool, photo *[]byte, description *string, partecipantsId []int) (*Conversation, error)
 	GetUsersOfConversation(idConversation int, idUser int) (*[]User, error)
 	DeleteUserFromConv(idConversation int, idUser int, idUserToDelete int) (*[]User, error)
-	AddUserToConv(idConversation int, idUser int, idUserToAdd int) (*[]User, error)
+	AddToGroup(idConversation int, idUser int, idUserToAdd int) (*[]User, error)
 	GetConversationForUser(idUser int) (*[]Conversation, error)
 	SetupGroupName(idUser int, idConversation int, name string) (*Conversation, error)
 	GetMessagesByConversation(conversationID int) (*[]Message, error)
@@ -58,7 +58,7 @@ type AppDatabase interface {
 	SaveImageToDB(imgData []byte, table string, field string, userId int) error
 
 	SearchUser(username string) (int, error)
-	CreateUser(username string, name string, surname string) (string, error)
+	DoLogin(username string, name string, surname string) (string, error)
 
 	UserExist(idConv int, idUser int) (bool, error)
 	Ping() error

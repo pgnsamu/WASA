@@ -14,7 +14,7 @@ type User struct {
 	Photo    *[]byte `json:"photo,omitempty"`
 }
 
-func (db *appdbimpl) CreateUser(username string, name string, surname string) (string, error) {
+func (db *appdbimpl) DoLogin(username string, name string, surname string) (string, error) {
 	// ricerca se l'username è già nel DB
 	resSearch, errore := db.SearchUser(username)
 

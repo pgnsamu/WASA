@@ -13,7 +13,7 @@ type requestBody struct {
 }
 
 // getHelloWorld is an example of HTTP endpoint that returns "Hello world!" as a plain text
-func (rt *_router) createUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	/*
 		var username string
 		decoder := json.NewDecoder(r.Body)
@@ -35,7 +35,7 @@ func (rt *_router) createUser(w http.ResponseWriter, r *http.Request, ps httprou
 		return
 	}
 
-	result, err := rt.db.CreateUser(reqBody.Username, "", "")
+	result, err := rt.db.DoLogin(reqBody.Username, "", "")
 	if err != nil {
 		if err.Error() == "utente già registrato" {
 			http.Error(w, err.Error(), http.StatusConflict)

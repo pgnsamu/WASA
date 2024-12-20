@@ -17,16 +17,16 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.GET("/users", rt.getUsers)
 	rt.router.GET("/users/:id/conversations/:conversationId/users", rt.getParticipants)
 	rt.router.DELETE("/users/:id/conversations/:conversationId/users/:toDelete", rt.delParticipant)
-	rt.router.POST("/users/:id/conversations/:conversationId/users", rt.postParticipant)
+	rt.router.POST("/users/:id/conversations/:conversationId/users", rt.addToGroup)
 	rt.router.GET("/users/:id/conversations", rt.getConversationForUserReq)
 	rt.router.GET("/users/:id/conversations/:conversationId", rt.GetConversationInfoReq)
 	rt.router.POST("/users/:id/conversations/:conversationId/group", rt.postGroupName) // TODO: rinominare endpoint?
 	rt.router.POST("/users/:id/conversations/:conversationId/photo", rt.postGroupchatPhoto)
 	rt.router.POST("/users/:id/conversations/:conversationId/messages", rt.sendMessageReq)
 	rt.router.POST("/users/:id/conversations/:conversationId/messages/:messageId", rt.postForwardMessage)
-	rt.router.DELETE("/users/:id/conversations/:conversationId/messages/:messageId", rt.delMessage)
+	rt.router.DELETE("/users/:id/conversations/:conversationId/messages/:messageId", rt.deleteMessage)
 
-	rt.router.POST("/session", rt.createUser)
+	rt.router.POST("/session", rt.doLogin)
 
 	// Special routes
 	rt.router.GET("/liveness", rt.liveness)

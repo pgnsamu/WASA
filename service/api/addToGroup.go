@@ -14,7 +14,7 @@ type requestBodyId struct {
 	UserId int `json:"userId"`
 }
 
-func (rt *_router) postParticipant(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (rt *_router) addToGroup(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	stringIdConv := ps.ByName("conversationId")
 	stringIdUser := ps.ByName("id")
 
@@ -49,7 +49,7 @@ func (rt *_router) postParticipant(w http.ResponseWriter, r *http.Request, ps ht
 	}
 
 	w.Header().Set("content-type", "application/json")
-	users, err := rt.db.AddUserToConv(idConv, idUser, requestData.UserId)
+	users, err := rt.db.AddToGroup(idConv, idUser, requestData.UserId)
 	if err != nil && (err.Error() == "chat piena" || err.Error() == "utente da aggiungere già presente") {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return

@@ -7,7 +7,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-func (rt *_router) delMessage(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (rt *_router) deleteMessage(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	stringIdConv := ps.ByName("conversationId")
 	stringIdUser := ps.ByName("id")
 	stringIdUserToDelete := ps.ByName("messageId")

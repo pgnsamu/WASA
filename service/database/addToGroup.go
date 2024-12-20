@@ -5,7 +5,7 @@ import (
 	"errors"
 )
 
-func (db *appdbimpl) AddUserToConv(idConversation int, idUser int, idUserToAdd int) (*[]User, error) {
+func (db *appdbimpl) AddToGroup(idConversation int, idUser int, idUserToAdd int) (*[]User, error) {
 
 	// controllare che l'utente esista
 	_, err := db.GetUserInfo(idUserToAdd)
