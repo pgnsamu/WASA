@@ -12,7 +12,7 @@ func (rt *_router) Handler() http.Handler {
 
 	rt.router.POST("/users/:id/conversations", rt.postConversation)
 	rt.router.POST("/users/:id/photo", rt.postProfileImage)
-	rt.router.PUT("/users/:id/username", rt.putUsername)
+	rt.router.PUT("/users/:id/username", rt.setMyUserName)
 	rt.router.GET("/users/:id", rt.getUserInfo)
 	rt.router.GET("/users", rt.getUsers)
 	rt.router.GET("/users/:id/conversations/:conversationId/users", rt.getParticipants)

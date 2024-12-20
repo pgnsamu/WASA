@@ -23,7 +23,7 @@ import (
 */
 
 // ritornare l'utente aggiornato
-func (db *appdbimpl) UpdateUsername(id int, username string) (*User, error) {
+func (db *appdbimpl) SetMyUserName(id int, username string) (*User, error) {
 
 	// preparazione della query
 	stmt, err := db.c.Prepare("UPDATE users SET username = ? WHERE id = ?;")

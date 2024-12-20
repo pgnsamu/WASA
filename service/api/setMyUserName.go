@@ -12,7 +12,7 @@ type usernameData struct {
 	Username string `json:"username"`
 }
 
-func (rt *_router) putUsername(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var data usernameData
 	paramId := ps.ByName("id")
 
@@ -30,7 +30,7 @@ func (rt *_router) putUsername(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 	defer r.Body.Close()
 
-	user, err := rt.db.UpdateUsername(id, data.Username)
+	user, err := rt.db.SetMyUserName(id, data.Username)
 	if user == nil && err != nil && err.Error() == "userNotFound" {
 		http.Error(w, "Errore id non registrato", http.StatusBadRequest)
 		return
