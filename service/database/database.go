@@ -44,7 +44,7 @@ type AppDatabase interface {
 	GetUsersDB() (*[]User, error)
 	GetUserInfo(id int) (*User, error)
 	GetConversationInfo(idConversation int, idUser int) (*Conversation, error)
-	CreateConversation(userId int, name string, isGroup bool, photo *[]byte, description *string, partecipantsId []int) (*Conversation, error)
+	NewConversation(userId int, name string, isGroup bool, photo *[]byte, description *string, partecipantsId []int) (*Conversation, error)
 	GetUsersOfConversation(idConversation int, idUser int) (*[]User, error)
 	DeleteUserFromConv(idConversation int, idUser int, idUserToDelete int) (*[]User, error)
 	AddToGroup(idConversation int, idUser int, idUserToAdd int) (*[]User, error)

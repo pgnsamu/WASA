@@ -9,7 +9,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-func (rt *_router) postConversation(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (rt *_router) newConversation(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 	// get param
 	paramId := ps.ByName("id")
@@ -77,7 +77,7 @@ func (rt *_router) postConversation(w http.ResponseWriter, r *http.Request, ps h
 		fmt.Println(isGroup)
 		fmt.Println(imgData)
 	*/
-	result, err := rt.db.CreateConversation(id, name, isGroup, &imgData, &description, partecipantsId)
+	result, err := rt.db.NewConversation(id, name, isGroup, &imgData, &description, partecipantsId)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

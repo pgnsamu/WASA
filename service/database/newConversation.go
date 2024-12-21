@@ -16,7 +16,7 @@ type Conversation struct {
 	Photo       *[]byte `json:"photo,omitempty"`
 }
 
-func (db *appdbimpl) CreateConversation(userId int, name string, isGroup bool, photo *[]byte, description *string, partecipantsId []int) (*Conversation, error) {
+func (db *appdbimpl) NewConversation(userId int, name string, isGroup bool, photo *[]byte, description *string, partecipantsId []int) (*Conversation, error) {
 
 	// TODO: aggiungere sulla tabella participate collegamento utente conversation per ogni partecipantId+userId
 	// TODO: mancante nel db il check value del fatto che se isGroup allora partecipantsId == 1
