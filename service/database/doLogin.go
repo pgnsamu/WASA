@@ -3,7 +3,6 @@ package database
 import (
 	"database/sql"
 	"errors"
-	"log"
 )
 
 type User struct {
@@ -22,13 +21,11 @@ func (db *appdbimpl) DoLogin(username string, name string, surname string) (stri
 	if resSearch == -1 && errore == nil {
 		_, err := db.c.Exec("INSERT INTO users (username, name, surname) VALUES ($1, $2, $3)", username, name, surname)
 		if err != nil {
-			log.Fatal("Failed to read record: ", err)
 			return "", err
 		}
 		return username, nil
 
 	} else if resSearch == -1 && errore != nil { // se la ricerca ha trovato errori e quindi non ha trovato il record allora ritorno errore
-		log.Fatal("Failed to read record: ", errore)
 		return "", errore
 
 	} else { // nel caso in cui il record già esiste ritorno utente già esistente
@@ -46,7 +43,6 @@ func (db *appdbimpl) SearchUser(username string) (int, error) {
 			return -1, nil
 		}
 		// Other errors
-		log.Fatal("Failed to read record: ", err)
 		return -1, err
 	}
 
