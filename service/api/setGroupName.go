@@ -13,7 +13,7 @@ type groupData struct {
 }
 
 // TODO: forse da gestire il fatto che puoi cambiargli nome solo se è un gruppo
-func (rt *_router) postGroupName(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (rt *_router) setGroupName(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var data groupData
 	paramId := ps.ByName("id")
 	paramId2 := ps.ByName("conversationId")
@@ -37,7 +37,7 @@ func (rt *_router) postGroupName(w http.ResponseWriter, r *http.Request, ps http
 	}
 	defer r.Body.Close()
 
-	user, err := rt.db.SetupGroupName(id, idConversation, data.Username)
+	user, err := rt.db.SetGroupName(id, idConversation, data.Username)
 
 	if user == nil && err != nil && err.Error() == "userNotFound" {
 		http.Error(w, "Errore id non registrato", http.StatusBadRequest)

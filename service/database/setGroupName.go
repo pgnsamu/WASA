@@ -5,7 +5,7 @@ import (
 )
 
 // ritornare la conversation aggiornata
-func (db *appdbimpl) SetupGroupName(idUser int, idConversation int, name string) (*Conversation, error) {
+func (db *appdbimpl) SetGroupName(idUser int, idConversation int, name string) (*Conversation, error) {
 
 	// controllo utente se è all'interno
 	stmt, err := db.c.Prepare("SELECT userId FROM participate as p WHERE p.conversationId = ? and p.userId = ?")
