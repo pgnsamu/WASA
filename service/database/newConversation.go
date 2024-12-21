@@ -53,7 +53,7 @@ func (db *appdbimpl) NewConversation(userId int, name string, isGroup bool, phot
 			_, err = stmt.Exec(tempParticipantsId[i], lastInsertID)
 			if err != nil {
 				// fmt.Println(tempParticipantsId[i])
-				fmt.Println(err.Error()) // errore qui UNIQUE constraint failed: participate.userId, participate.conversationId
+				// fmt.Println(err.Error()) // errore qui UNIQUE constraint failed: participate.userId, participate.conversationId
 				return nil, err
 			}
 		}
