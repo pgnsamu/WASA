@@ -469,7 +469,6 @@ paths:
       summary: Retrieve the list of all the user conversations
       description: Retrieve chronologically reversed all the conversation connected with the user
       operationId: getMyConversations
-     
       responses:
         '200':
           description: list of Conversations

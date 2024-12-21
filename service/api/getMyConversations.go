@@ -8,7 +8,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-func (rt *_router) getConversationForUserReq(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (rt *_router) getMyConversations(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	paramId := ps.ByName("id")
 
 	// conversione string to int
