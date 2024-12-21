@@ -14,6 +14,10 @@ func (rt *_router) getUsers(w http.ResponseWriter, r *http.Request, ps httproute
 	if err != nil {
 		return
 	}
-	json.NewEncoder(w).Encode(name)
+	err = json.NewEncoder(w).Encode(name)
+	if err != nil {
+		http.Error(w, "Failed to encode users to JSON", http.StatusInternalServerError)
+		return
+	}
 
 }

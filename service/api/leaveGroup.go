@@ -44,6 +44,10 @@ func (rt *_router) leaveGroup(w http.ResponseWriter, r *http.Request, ps httprou
 		return
 	}
 	w.Header().Set("content-type", "application/json")
-	json.NewEncoder(w).Encode(*users)
+	err = json.NewEncoder(w).Encode(*users)
+	if err != nil {
+		http.Error(w, "Failed to encode users to JSON", http.StatusInternalServerError)
+		return
+	}
 
 }

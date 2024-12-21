@@ -33,6 +33,10 @@ func (rt *_router) getParticipants(w http.ResponseWriter, r *http.Request, ps ht
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	json.NewEncoder(w).Encode(*users)
+	err = json.NewEncoder(w).Encode(*users)
+	if err != nil {
+		http.Error(w, "Failed to encode users to JSON", http.StatusInternalServerError)
+		return
+	}
 
 }
