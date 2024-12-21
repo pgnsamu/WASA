@@ -10,7 +10,7 @@ import (
 )
 
 // TODO: è useful usare messagetype?
-func (rt *_router) sendMessageReq(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (rt *_router) sendMessage(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 	paramId := ps.ByName("id")
 	idUser, err := strconv.Atoi(paramId)
