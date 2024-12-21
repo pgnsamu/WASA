@@ -66,7 +66,10 @@ func (db *appdbimpl) ForwardMessage(idConversationSource int, idConversationDest
 		messageType = true
 	}
 
-	db.SendMessage(idConversationDest, idUser, content, photoContent, messageType, nil, 1)
+	_, err = db.SendMessage(idConversationDest, idUser, content, photoContent, messageType, nil, 1)
+	if err != nil {
+		return nil, err
+	}
 
 	result, err := db.GetConversationInfo(idConversationDest, idUser)
 	if err != nil {
