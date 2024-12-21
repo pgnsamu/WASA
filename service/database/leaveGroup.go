@@ -43,6 +43,10 @@ func (db *appdbimpl) DeleteUserFromConv(idConversation int, idUser int, idUserTo
 		}
 		idResults = append(idResults, tempString)
 	}
+	// Check for errors that may have occurred during iteration
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
 
 	if len(idResults) == 0 {
 		return nil, errors.New("id not found")

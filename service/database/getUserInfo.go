@@ -41,5 +41,9 @@ func (db *appdbimpl) GetUserInfo(id int) (*User, error) {
 		errorUserNotFound := errors.New("user not found")
 		return nil, errorUserNotFound
 	}
+	// Check for errors that may have occurred during iteration
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
 	return &user, nil
 }
