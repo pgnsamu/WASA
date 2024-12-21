@@ -15,7 +15,7 @@ type targetB struct {
 }
 
 // TODO: errori non gestiti perfetti
-func (rt *_router) postForwardMessage(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (rt *_router) forwardMessage(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 	paramId := ps.ByName("id")
 	idUser, err := strconv.Atoi(paramId)

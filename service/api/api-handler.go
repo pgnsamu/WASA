@@ -23,7 +23,7 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.POST("/users/:id/conversations/:conversationId/group", rt.setGroupName) // TODO: rinominare endpoint?
 	rt.router.POST("/users/:id/conversations/:conversationId/photo", rt.setGroupPhoto)
 	rt.router.POST("/users/:id/conversations/:conversationId/messages", rt.sendMessage)
-	rt.router.POST("/users/:id/conversations/:conversationId/messages/:messageId", rt.postForwardMessage)
+	rt.router.POST("/users/:id/conversations/:conversationId/messages/:messageId", rt.forwardMessage)
 	rt.router.DELETE("/users/:id/conversations/:conversationId/messages/:messageId", rt.deleteMessage)
 
 	rt.router.POST("/session", rt.doLogin)
