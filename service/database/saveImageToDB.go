@@ -15,7 +15,7 @@ func (db *appdbimpl) SaveImageToDB(imgData []byte, table string, field string, u
 	query := fmt.Sprintf("UPDATE %s SET %s = ? WHERE id = ?;", table, field)
 	stmt, err := db.c.Prepare(query)
 	if err != nil {
-		return fmt.Errorf("prepare statement: %v", err)
+		return fmt.Errorf("prepare statement: %w", err)
 	}
 	defer stmt.Close()
 

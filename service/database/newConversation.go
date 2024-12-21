@@ -25,7 +25,7 @@ func (db *appdbimpl) NewConversation(userId int, name string, isGroup bool, phot
 		// se è un gruppo riprepariamo
 		stmt, err := db.c.Prepare("INSERT INTO conversations (name, createdAt, isGroup, description, photo) VALUES (?, ?, ?, ?, ?);")
 		if err != nil {
-			return nil, fmt.Errorf("prepare statement: %v", err)
+			return nil, fmt.Errorf("prepare statement: %w", err)
 		}
 		defer stmt.Close()
 
@@ -36,7 +36,7 @@ func (db *appdbimpl) NewConversation(userId int, name string, isGroup bool, phot
 
 		lastInsertID, err := result.LastInsertId()
 		if err != nil {
-			return nil, fmt.Errorf("getting last insert ID: %v", err)
+			return nil, fmt.Errorf("getting last insert ID: %w", err)
 		}
 
 		tempParticipantsId := partecipantsId
@@ -46,7 +46,7 @@ func (db *appdbimpl) NewConversation(userId int, name string, isGroup bool, phot
 		for i := 0; i < len(tempParticipantsId); i++ { // TODO: è stato aggiunto un meno 1 ma non so se è giusto controllare (ora è stato tolto e funziona, non lo so )
 			stmt, err := db.c.Prepare("INSERT INTO participate (userId, conversationId) VALUES (?, ?);")
 			if err != nil {
-				return nil, fmt.Errorf("prepare statement: %v", err)
+				return nil, fmt.Errorf("prepare statement: %w", err)
 			}
 			defer stmt.Close()
 			// fmt.Println(tempParticipantsId[i])
@@ -60,13 +60,13 @@ func (db *appdbimpl) NewConversation(userId int, name string, isGroup bool, phot
 
 		conversation, err := db.GetConversationInfo(int(lastInsertID), userId)
 		if err != nil {
-			return nil, fmt.Errorf("getting last insert ID: %v", err)
+			return nil, fmt.Errorf("getting last insert ID: %w", err)
 		}
 		return conversation, nil
 	} else {
 		stmt, err := db.c.Prepare("INSERT INTO conversations (name, createdAt, isGroup) VALUES (?, ?, ?);")
 		if err != nil {
-			return nil, fmt.Errorf("prepare statement: %v", err)
+			return nil, fmt.Errorf("prepare statement: %w", err)
 		}
 		defer stmt.Close()
 
@@ -77,7 +77,7 @@ func (db *appdbimpl) NewConversation(userId int, name string, isGroup bool, phot
 
 		lastInsertID, err := result.LastInsertId()
 		if err != nil {
-			return nil, fmt.Errorf("getting last insert ID: %v", err)
+			return nil, fmt.Errorf("getting last insert ID: %w", err)
 		}
 
 		tempParticipantsId := partecipantsId
@@ -85,7 +85,7 @@ func (db *appdbimpl) NewConversation(userId int, name string, isGroup bool, phot
 		for i := 0; i < len(tempParticipantsId); i++ {
 			stmt, err := db.c.Prepare("INSERT INTO participate (userId, conversationId) VALUES (?, ?);")
 			if err != nil {
-				return nil, fmt.Errorf("prepare statement: %v", err)
+				return nil, fmt.Errorf("prepare statement: %w", err)
 			}
 			defer stmt.Close()
 
@@ -97,7 +97,7 @@ func (db *appdbimpl) NewConversation(userId int, name string, isGroup bool, phot
 
 		conversation, err := db.GetConversationInfo(int(lastInsertID), userId)
 		if err != nil {
-			return nil, fmt.Errorf("getting last insert ID: %v", err)
+			return nil, fmt.Errorf("getting last insert ID: %w", err)
 		}
 		return conversation, nil
 	}
