@@ -1,8 +1,8 @@
 package api
 
 import (
-	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -63,6 +63,7 @@ func (rt *_router) setGroupPhoto(w http.ResponseWriter, r *http.Request, ps http
 		}
 		return
 	}
-
-	fmt.Fprintf(w, "File uploaded successfully")
+	// TODO: capire se va bene
+	io.WriteString(w, "File uploaded successfully")
+	log.Println("File uploaded successfully")
 }
