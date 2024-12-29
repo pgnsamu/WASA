@@ -13,23 +13,30 @@ type User struct {
 	Photo    *[]byte `json:"photo,omitempty"`
 }
 
-func (db *appdbimpl) DoLogin(username string, name string, surname string) (string, error) {
+func (db *appdbimpl) DoLogin(username string, name string, surname string) (*int, error) {
 	// ricerca se l'username è già nel DB
 	resSearch, errore := db.SearchUser(username)
 
 	// se la ricerca non ha trovato errori e ha ritornato -1 allora il nome utente non esiste e va creato un nuovo utente
 	if resSearch == -1 && errore == nil {
-		_, err := db.c.Exec("INSERT INTO users (username, name, surname) VALUES ($1, $2, $3)", username, name, surname)
+		res, err := db.c.Exec("INSERT INTO users (username, name, surname) VALUES ($1, $2, $3)", username, name, surname)
 		if err != nil {
-			return "", err
+			return nil, err
 		}
-		return username, nil
+		// ritorno l'id dell'utente appena creato
+		lastInsertId, err := res.LastInsertId()
+		if err != nil {
+			return nil, err
+		}
+		// conversione int64 to int
+		id := int(lastInsertId)
+		return &id, nil
 
 	} else if resSearch == -1 && errore != nil { // se la ricerca ha trovato errori e quindi non ha trovato il record allora ritorno errore
-		return "", errore
+		return nil, errore
 
 	} else { // nel caso in cui il record già esiste ritorno utente già esistente
-		return "", errors.New("utente già registrato")
+		return &resSearch, errors.New("utente già registrato")
 	}
 }
 

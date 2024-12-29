@@ -12,7 +12,6 @@ type requestBody struct {
 	Username string `json:"username"`
 }
 
-// getHelloWorld is an example of HTTP endpoint that returns "Hello world!" as a plain text
 func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	/*
 		var username string
@@ -35,12 +34,24 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 		return
 	}
 
-	result, err := rt.db.DoLogin(reqBody.Username, "", "")
+	token := ""
+
+	id, err := rt.db.DoLogin(reqBody.Username, "", "")
 	if err != nil {
 		if err.Error() == "utente già registrato" {
-			http.Error(w, err.Error(), http.StatusConflict)
-			return
+			token, err = GenerateJWT(reqBody.Username, *id)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
 		} else {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	} else {
+		// Genero il token
+		token, err = GenerateJWT(reqBody.Username, *id)
+		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -48,24 +59,10 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	err = json.NewEncoder(w).Encode(result)
+	err = json.NewEncoder(w).Encode(token)
 	if err != nil {
 		http.Error(w, "Failed to encode users to JSON", http.StatusInternalServerError)
 		return
 	}
-
-	/*
-		// Respond back to the client
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"message": "Body received successfully"}`))
-
-		w.Header().Set("content-type", "text/plain")
-		name, err := rt.db.GetUsersDB()
-		if err != nil {
-			return
-		}
-		json.NewEncoder(w).Encode(name)
-	*/
 
 }

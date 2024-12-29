@@ -5,17 +5,37 @@ import (
 	"io"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/julienschmidt/httprouter"
 )
 
 func (rt *_router) newConversation(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
+	authHeader := r.Header.Get("Authorization")
+	if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
+		http.Error(w, "Token mancante o invalido", http.StatusUnauthorized)
+		return
+	}
+
+	tokenString := strings.TrimPrefix(authHeader, "Bearer ")
+
+	// Validazione del token
+	claims, err := ValidateJWT(tokenString)
+	if err != nil {
+		http.Error(w, "Token non valido", http.StatusUnauthorized)
+		return
+	}
+
 	// get param
 	paramId := ps.ByName("id")
 	id, err := strconv.Atoi(paramId)
 	if err != nil {
 		http.Error(w, "Errore id non intero", http.StatusBadRequest)
+		return
+	}
+	if id != claims["id"] {
+		http.Error(w, "Utente non autorizzato", http.StatusUnauthorized)
 		return
 	}
 
@@ -69,14 +89,6 @@ func (rt *_router) newConversation(w http.ResponseWriter, r *http.Request, ps ht
 		}
 	}
 
-	// debug
-	/*
-		fmt.Println(id)
-		fmt.Println(name)
-		fmt.Println(description)
-		fmt.Println(isGroup)
-		fmt.Println(imgData)
-	*/
 	result, err := rt.db.NewConversation(id, name, isGroup, &imgData, &description, partecipantsId)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

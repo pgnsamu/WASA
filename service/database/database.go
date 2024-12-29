@@ -58,7 +58,7 @@ type AppDatabase interface {
 	SaveImageToDB(imgData []byte, table string, field string, userId int) error
 
 	SearchUser(username string) (int, error)
-	DoLogin(username string, name string, surname string) (string, error)
+	DoLogin(username string, name string, surname string) (*int, error)
 
 	UserExist(idConv int, idUser int) (bool, error)
 	Ping() error

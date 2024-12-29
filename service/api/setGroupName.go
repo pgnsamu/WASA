@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/julienschmidt/httprouter"
 )
@@ -14,6 +15,21 @@ type groupData struct {
 
 // TODO: forse da gestire il fatto che puoi cambiargli nome solo se è un gruppo
 func (rt *_router) setGroupName(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	authHeader := r.Header.Get("Authorization")
+	if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
+		http.Error(w, "Token mancante o invalido", http.StatusUnauthorized)
+		return
+	}
+
+	tokenString := strings.TrimPrefix(authHeader, "Bearer ")
+
+	// Validazione del token
+	claims, err := ValidateJWT(tokenString)
+	if err != nil {
+		http.Error(w, "Token non valido", http.StatusUnauthorized)
+		return
+	}
+
 	var data groupData
 	paramId := ps.ByName("id")
 	paramId2 := ps.ByName("conversationId")
@@ -21,6 +37,10 @@ func (rt *_router) setGroupName(w http.ResponseWriter, r *http.Request, ps httpr
 	id, err := strconv.Atoi(paramId)
 	if err != nil {
 		http.Error(w, "Errore id non intero", http.StatusBadRequest)
+		return
+	}
+	if id != claims["id"] {
+		http.Error(w, "Utente non autorizzato", http.StatusUnauthorized)
 		return
 	}
 	idConversation, err := strconv.Atoi(paramId2)
@@ -38,7 +58,6 @@ func (rt *_router) setGroupName(w http.ResponseWriter, r *http.Request, ps httpr
 	defer r.Body.Close()
 
 	user, err := rt.db.SetGroupName(id, idConversation, data.Username)
-
 	if user == nil && err != nil && err.Error() == "userNotFound" {
 		http.Error(w, "Errore id non registrato", http.StatusBadRequest)
 		return
