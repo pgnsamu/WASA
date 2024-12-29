@@ -20,7 +20,10 @@ func (db *appdbimpl) DeleteMessage(idConversation int, idUser int, idMessageToDe
 	queryStr := "SELECT senderId FROM messages as m WHERE m.id = ?"
 	stmt, err := tx.Prepare(queryStr)
 	if err != nil {
-		tx.Rollback() // Rollback in caso di errore
+		err2 := tx.Rollback() // Rollback in caso di errore
+		if err2 != nil {
+			return err2
+		}
 		return err
 	}
 	defer stmt.Close()
@@ -28,18 +31,27 @@ func (db *appdbimpl) DeleteMessage(idConversation int, idUser int, idMessageToDe
 	var sentBy int
 	err = stmt.QueryRow(idMessageToDelete).Scan(&sentBy)
 	if err != nil {
-		tx.Rollback() // Rollback in caso di errore
+		err2 := tx.Rollback() // Rollback in caso di errore
+		if err2 != nil {
+			return err2
+		}
 		return err
 	}
 	if sentBy != idUser {
-		tx.Rollback() // Rollback in caso di errore
+		err2 := tx.Rollback() // Rollback in caso di errore
+		if err2 != nil {
+			return err2
+		}
 		return errors.New("autore del messaggio sbagliato")
 	}
 
 	queryStr = "DELETE FROM received WHERE messageId = ?"
 	stmt, err = tx.Prepare(queryStr)
 	if err != nil {
-		tx.Rollback() // Rollback in caso di errore
+		err2 := tx.Rollback() // Rollback in caso di errore
+		if err2 != nil {
+			return err2
+		}
 		return err
 	}
 	defer stmt.Close()
@@ -47,14 +59,20 @@ func (db *appdbimpl) DeleteMessage(idConversation int, idUser int, idMessageToDe
 	// Execute the deletion
 	res, err := stmt.Exec(idMessageToDelete)
 	if err != nil {
-		tx.Rollback() // Rollback in caso di errore
+		err2 := tx.Rollback() // Rollback in caso di errore
+		if err2 != nil {
+			return err2
+		}
 		return err
 	}
 
 	// Check how many rows were affected
 	rowsAffected, err := res.RowsAffected()
 	if err != nil {
-		tx.Rollback() // Rollback in caso di errore
+		err2 := tx.Rollback() // Rollback in caso di errore
+		if err2 != nil {
+			return err2
+		}
 		return err
 	}
 	if rowsAffected == 0 {
@@ -64,7 +82,10 @@ func (db *appdbimpl) DeleteMessage(idConversation int, idUser int, idMessageToDe
 	queryStr = "DELETE FROM messages WHERE id = ?"
 	stmt, err = tx.Prepare(queryStr)
 	if err != nil {
-		tx.Rollback() // Rollback in caso di errore
+		err2 := tx.Rollback() // Rollback in caso di errore
+		if err2 != nil {
+			return err2
+		}
 		return err
 	}
 	defer stmt.Close()
@@ -72,14 +93,20 @@ func (db *appdbimpl) DeleteMessage(idConversation int, idUser int, idMessageToDe
 	// Execute the deletion
 	res, err = stmt.Exec(idMessageToDelete)
 	if err != nil {
-		tx.Rollback() // Rollback in caso di errore
+		err2 := tx.Rollback() // Rollback in caso di errore
+		if err2 != nil {
+			return err2
+		}
 		return err
 	}
 
 	// Check how many rows were affected
 	rowsAffected, err = res.RowsAffected()
 	if err != nil {
-		tx.Rollback() // Rollback in caso di errore
+		err2 := tx.Rollback() // Rollback in caso di errore
+		if err2 != nil {
+			return err2
+		}
 		return err
 	}
 	if rowsAffected == 0 {

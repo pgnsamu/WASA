@@ -30,7 +30,10 @@ func (db *appdbimpl) SendMessage(idConversation int, idUser int, content string,
 	// Prepara la query di INSERT
 	stmt, err := tx.Prepare(queryStr)
 	if err != nil {
-		tx.Rollback() // Rollback in caso di errore
+		err2 := tx.Rollback() // Rollback in caso di errore
+		if err2 != nil {
+			return nil, err2
+		}
 		return nil, err
 	}
 	defer stmt.Close()
@@ -46,13 +49,19 @@ func (db *appdbimpl) SendMessage(idConversation int, idUser int, content string,
 	// Esegui la query
 	resul, err := stmt.Exec(content, photoContent, sentAt, idConversation, isForwarded, idUser, repl)
 	if err != nil {
-		tx.Rollback() // Rollback in caso di errore
+		err2 := tx.Rollback() // Rollback in caso di errore
+		if err2 != nil {
+			return nil, err2
+		}
 		return nil, err
 	}
 
 	lastInsertId, err := resul.LastInsertId()
 	if err != nil {
-		tx.Rollback() // Rollback in caso di errore
+		err2 := tx.Rollback() // Rollback in caso di errore
+		if err2 != nil {
+			return nil, err2
+		}
 		return nil, err
 	}
 
@@ -65,7 +74,10 @@ func (db *appdbimpl) SendMessage(idConversation int, idUser int, content string,
 
 	stmt, err = tx.Prepare(queryStr)
 	if err != nil {
-		tx.Rollback() // Rollback in caso di errore
+		err2 := tx.Rollback() // Rollback in caso di errore
+		if err2 != nil {
+			return nil, err2
+		}
 		return nil, err
 	}
 	defer stmt.Close()
@@ -73,7 +85,10 @@ func (db *appdbimpl) SendMessage(idConversation int, idUser int, content string,
 	// Execute the query with the conversation ID (e.g., 20)
 	rows, err := stmt.Query(idConversation) // Passing 20 as the conversationId
 	if err != nil {
-		tx.Rollback() // Rollback in caso di errore
+		err2 := tx.Rollback() // Rollback in caso di errore
+		if err2 != nil {
+			return nil, err2
+		}
 		return nil, err
 	}
 	defer rows.Close()
@@ -86,7 +101,10 @@ func (db *appdbimpl) SendMessage(idConversation int, idUser int, content string,
 		var userID int
 		err := rows.Scan(&userID)
 		if err != nil {
-			tx.Rollback() // Rollback in caso di errore
+			err2 := tx.Rollback() // Rollback in caso di errore
+			if err2 != nil {
+				return nil, err2
+			}
 			return nil, err
 		}
 		userIDs = append(userIDs, userID) // Append the user ID to the slice
@@ -94,14 +112,20 @@ func (db *appdbimpl) SendMessage(idConversation int, idUser int, content string,
 
 	// Check for any errors after iterating
 	if err := rows.Err(); err != nil {
-		tx.Rollback() // Rollback in caso di errore
+		err2 := tx.Rollback() // Rollback in caso di errore
+		if err2 != nil {
+			return nil, err2
+		}
 		return nil, err
 	}
 
 	// Prepara la query di INSERT
 	stmt, err = tx.Prepare("INSERT INTO received (userId, messageId, status) VALUES (?, ?, ?)")
 	if err != nil {
-		tx.Rollback() // Rollback in caso di errore
+		err2 := tx.Rollback() // Rollback in caso di errore
+		if err2 != nil {
+			return nil, err2
+		}
 		return nil, err
 	}
 	defer stmt.Close()
@@ -112,7 +136,10 @@ func (db *appdbimpl) SendMessage(idConversation int, idUser int, content string,
 		if id != idUser {
 			_, err := stmt.Exec(id, lastInsertId, "delivered")
 			if err != nil {
-				tx.Rollback() // Rollback in caso di errore
+				err2 := tx.Rollback() // Rollback in caso di errore
+				if err2 != nil {
+					return nil, err2
+				}
 				return nil, err
 			}
 		}
