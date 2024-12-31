@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -12,9 +11,8 @@ import (
 func (rt *_router) uncommentMessage(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	authHeader := r.Header.Get("Authorization")
 	if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
-		//http.Error(w, "Token mancante o invalido", http.StatusUnauthorized)
-		//return
-		fmt.Println("Token mancante o invalido")
+		http.Error(w, "Token mancante o invalido", http.StatusUnauthorized)
+		return
 	}
 
 	tokenString := strings.TrimPrefix(authHeader, "Bearer ")
@@ -22,9 +20,8 @@ func (rt *_router) uncommentMessage(w http.ResponseWriter, r *http.Request, ps h
 	// Validazione del token
 	_, err := ValidateJWT(tokenString)
 	if err != nil {
-		//http.Error(w, "Token non valido", http.StatusUnauthorized)
-		//return
-		fmt.Println("Token non valido")
+		http.Error(w, "Token non valido", http.StatusUnauthorized)
+		return
 	}
 
 	stringIdConv := ps.ByName("conversationId")
@@ -43,12 +40,10 @@ func (rt *_router) uncommentMessage(w http.ResponseWriter, r *http.Request, ps h
 		http.Error(w, "Errore id utente non intero", http.StatusBadRequest)
 		return
 	}
-	/*
-		if idUser != claims["id"] {
-			http.Error(w, "Utente non autorizzato", http.StatusUnauthorized)
-			return
-		}
-	*/
+	if idUser != claims["id"] {
+		http.Error(w, "Utente non autorizzato", http.StatusUnauthorized)
+		return
+	}
 	idMessage, err := strconv.Atoi(stringIdMessage)
 	if err != nil {
 		http.Error(w, "Errore id conversazione non intero", http.StatusBadRequest)
