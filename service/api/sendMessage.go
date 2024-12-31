@@ -54,7 +54,7 @@ func (rt *_router) sendMessage(w http.ResponseWriter, r *http.Request, ps httpro
 
 	// Retrieve values from the form
 	content := r.FormValue("content")
-	messageTypeStr := r.FormValue("messageType") //TODO: cambiare e mettere isPhoto
+	messageTypeStr := r.FormValue("isPhoto") //TODO: cambiare e mettere isPhoto
 
 	// messageType = false not image
 	// messageType = true image
@@ -63,17 +63,6 @@ func (rt *_router) sendMessage(w http.ResponseWriter, r *http.Request, ps httpro
 	if err != nil {
 		http.Error(w, "Invalid value for messageType", http.StatusBadRequest)
 		return
-	}
-	// Convert answerTo to *int (nullable)
-	answerToStr := r.FormValue("answerTo")
-	var answerTo *int
-	if answerToStr != "" {
-		answerToVal, err := strconv.Atoi(answerToStr)
-		if err != nil {
-			http.Error(w, "Invalid answerTo value", http.StatusBadRequest)
-			return
-		}
-		answerTo = &answerToVal
 	}
 
 	var imgData []byte
@@ -101,7 +90,7 @@ func (rt *_router) sendMessage(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-	_, err = rt.db.SendMessage(idConv, idUser, content, imgData, messageType, answerTo, 0)
+	_, err = rt.db.SendMessage(idConv, idUser, content, imgData, messageType, nil, 0)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

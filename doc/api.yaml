@@ -737,6 +737,37 @@ paths:
           description: User does not have access rights to the content
         "404":
           description: Conversation or message not found
+  /users/{id}/conversations/{conversationId}/messages/{messageId}/comments/{commentId}:
+    parameters:
+      - name: id
+        in: path
+        description: The ID of the user 
+        schema:
+          description: The ID of the user 
+          type: integer
+          minimum: 0
+        required: true
+      - name: conversationId
+        in: path
+        description: The ID of the conversation containing the message to comment on
+        schema:
+          description: The ID of the conversation
+          type: integer
+        required: true
+      - name: messageId
+        in: path
+        description: The ID of the message to comment on
+        schema:
+          description: The ID of the message
+          type: integer
+        required: true
+      - name: commentId
+        in: path
+        description: The ID of the comment to delete
+        schema:
+          description: The ID of the comment
+          type: integer
+        required: true
     delete:
       tags: ["Conversation Based"]
       summary: Delete a comment from a message

@@ -79,6 +79,28 @@ func (db *appdbimpl) DeleteMessage(idConversation int, idUser int, idMessageToDe
 		return errors.New("no message found with that id")
 	}
 
+	// cancellazione di tutti i commenti collegati al messaggio da eliminare
+	queryStr = "DELETE FROM messages WHERE answerTo = ?"
+	stmt, err = tx.Prepare(queryStr)
+	if err != nil {
+		err2 := tx.Rollback() // Rollback in caso di errore
+		if err2 != nil {
+			return err2
+		}
+		return err
+	}
+	defer stmt.Close()
+
+	// Execute the deletion
+	_, err = stmt.Exec(idMessageToDelete)
+	if err != nil {
+		err2 := tx.Rollback() // Rollback in caso di errore
+		if err2 != nil {
+			return err2
+		}
+		return err
+	}
+
 	queryStr = "DELETE FROM messages WHERE id = ?"
 	stmt, err = tx.Prepare(queryStr)
 	if err != nil {

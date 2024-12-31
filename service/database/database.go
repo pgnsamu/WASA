@@ -61,6 +61,7 @@ type AppDatabase interface {
 	DoLogin(username string, name string, surname string) (*int, error)
 
 	UserExist(idConv int, idUser int) (bool, error)
+	IsCommentTo(idComment int, idMessage int, idConversation int) (bool, error)
 	Ping() error
 }
 
