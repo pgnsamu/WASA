@@ -329,7 +329,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Chat'
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
         "400":
           description: Invalid input (e.g. invalid user ID)
         "401":
