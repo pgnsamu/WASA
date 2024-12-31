@@ -52,7 +52,7 @@ func (rt *_router) setGroupPhoto(w http.ResponseWriter, r *http.Request, ps http
 	}
 
 	// Get the file from the form data
-	file, _, err := r.FormFile("file") // "file" is the form field name
+	file, _, err := r.FormFile("photo") // "file" is the form field name
 	if err != nil {
 		http.Error(w, "Unable to read file", http.StatusBadRequest)
 		return

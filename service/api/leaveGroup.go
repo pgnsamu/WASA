@@ -28,7 +28,7 @@ func (rt *_router) leaveGroup(w http.ResponseWriter, r *http.Request, ps httprou
 
 	stringIdConv := ps.ByName("conversationId")
 	stringIdUser := ps.ByName("id")
-	stringIdUserToDelete := ps.ByName("toDelete")
+	// stringIdUserToDelete := ps.ByName("toDelete")
 
 	// conversione string to int
 	idConv, err := strconv.Atoi(stringIdConv)
@@ -41,18 +41,20 @@ func (rt *_router) leaveGroup(w http.ResponseWriter, r *http.Request, ps httprou
 		http.Error(w, "Errore id utente non intero", http.StatusBadRequest)
 		return
 	}
-	idToDelete, err := strconv.Atoi(stringIdUserToDelete)
-	if err != nil {
-		http.Error(w, "Errore id conversazione non intero", http.StatusBadRequest)
-		return
-	}
+	/*
+		idToDelete, err := strconv.Atoi(stringIdUserToDelete)
+		if err != nil {
+			http.Error(w, "Errore id conversazione non intero", http.StatusBadRequest)
+			return
+		}
+	*/
 
 	if idUser != claims["id"] {
 		http.Error(w, "Utente non autorizzato", http.StatusUnauthorized)
 		return
 	}
 
-	users, err := rt.db.DeleteUserFromConv(idConv, idUser, idToDelete)
+	users, err := rt.db.DeleteUserFromConv(idConv, idUser, idUser)
 	if err != nil && err.Error() == "partecipanti non trovati" {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return

@@ -264,7 +264,7 @@ paths:
       requestBody:
         description: User new Photo over the last one
         content:
-          application/json: 
+          multipart/form-data:
             schema:
               description: User new Photo over the last one
               type: object
@@ -429,7 +429,7 @@ paths:
       requestBody:
         description: Group new Photo over the last one
         content:
-          application/json: 
+          multipart/form-data: 
             schema:
               description: New Photo 
               type: object
@@ -491,11 +491,17 @@ paths:
       requestBody: 
         description: The info about the conversation
         content:
-          application/json:
-            schema: 
-              description: An object containing basic info about the new conversation
+          multipart/form-data:
+            schema:
+              description: The info about the conversation
               type: object
               properties:
+                name:
+                  type: string
+                  description: Name of the conversation
+                  pattern: "^[a-zA-Z0-9_.]+$"
+                  minLength: 3
+                  maxLength: 16
                 isGroup:
                   type: boolean
                   description: property that define what type of conversation is
@@ -508,13 +514,13 @@ paths:
                     minimum:  0
                   minItems: 1
                   maxItems: 64
-                groupPhoto:
+                photo:
                   type: string
                   format: binary
                   description: Photo of the group if is a group
                   minLength: 0
                   maxLength: 100000
-                groupDesc:
+                description:
                   type: string
                   description: Description of the group chat
                   minLength: 0
@@ -593,7 +599,7 @@ paths:
       requestBody:
         description: The message details to send
         content:
-          application/json:
+          multipart/form-data:
             schema:
               $ref: '#/components/schemas/Message'
         required: true
@@ -612,7 +618,7 @@ paths:
           description: User does not have access rights to the content
         "404":
           description: Conversation not found
-  /users/{id}/conversations/{sourceConversationId}/messages/{messageId}:
+  /users/{id}/conversations/{conversationId}/messages/{messageId}:
     parameters:
           - name: id
             in: path
@@ -622,7 +628,7 @@ paths:
               type: integer
               minimum: 0
             required: true
-          - name: sourceConversationId
+          - name: conversationId
             in: path
             description: The ID of the conversation where you already have the message
             schema:
@@ -718,7 +724,7 @@ paths:
       requestBody:
         description: The comment as a Message
         content:
-          application/json:
+          multipart/form-data:
             schema:
               $ref: '#/components/schemas/Message'
         required: true
