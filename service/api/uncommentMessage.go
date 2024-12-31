@@ -18,7 +18,7 @@ func (rt *_router) uncommentMessage(w http.ResponseWriter, r *http.Request, ps h
 	tokenString := strings.TrimPrefix(authHeader, "Bearer ")
 
 	// Validazione del token
-	_, err := ValidateJWT(tokenString)
+	claims, err := ValidateJWT(tokenString)
 	if err != nil {
 		http.Error(w, "Token non valido", http.StatusUnauthorized)
 		return
