@@ -47,6 +47,11 @@ func ValidateJWT(tokenString string) (jwt.MapClaims, error) {
 
 	// Estrai i claims
 	if claims, ok := token.Claims.(jwt.MapClaims); ok {
+		// Conversione di claims["id"] da float64 a int
+		if idFloat, ok := claims["id"].(float64); ok {
+			claims["id"] = int(idFloat)
+		}
+
 		return claims, nil
 	}
 
