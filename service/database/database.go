@@ -50,7 +50,7 @@ type AppDatabase interface {
 	AddToGroup(idConversation int, idUser int, idUserToAdd int) (*[]User, error)
 	GetConversationForUser(idUser int) (*[]Conversation, error)
 	SetGroupName(idUser int, idConversation int, name string) (*Conversation, error)
-	GetMessagesByConversation(conversationID int) (*[]Message, error)
+	GetMessagesFromConversation(conversationID int) (*[]Message, error)
 	SendMessage(idConversation int, idUser int, content string, photoContent []byte, messageType bool, replyTo *int, isForwarded int) (*[]Message, error)
 	ForwardMessage(idConversationSource int, idConversationDest int, idUser int, idMessage int) (*Conversation, error)
 	DeleteMessage(idConversation int, idUser int, idMessageToDelete int) error

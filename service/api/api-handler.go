@@ -10,9 +10,10 @@ func (rt *_router) Handler() http.Handler {
 	// rt.router.GET("/", rt.getHelloWorld)
 	rt.router.GET("/context", rt.wrap(rt.getContextReply))
 
-	rt.router.GET("/users", rt.getUsers)                                                // sta nel doc
-	rt.router.GET("/users/:id/conversations/:conversationId/users", rt.getParticipants) // non sta nel doc
-	rt.router.POST("/info", rt.getLoggedUserInfo)                                       // non sta nel doc e non viene usata (per ora)
+	rt.router.GET("/users", rt.getUsers)                                                               // sta nel doc
+	rt.router.GET("/users/:id/conversations/:conversationId/users", rt.getParticipants)                // non sta nel doc
+	rt.router.POST("/info", rt.getLoggedUserInfo)                                                      // non sta nel doc e non viene usata (per ora)
+	rt.router.GET("/users/:id/conversations/:conversationId/messages", rt.getMessagesFromConversation) // sta nel doc
 
 	rt.router.POST("/session", rt.doLogin)                                                                                    // sta nel doc // TODO: da cambiare nel doc
 	rt.router.GET("/users/:id", rt.getUserInfo)                                                                               // sta nel doc

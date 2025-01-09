@@ -151,7 +151,7 @@ func (db *appdbimpl) SendMessage(idConversation int, idUser int, content string,
 		return nil, err
 	}
 
-	res, err := db.GetMessagesByConversation(idConversation)
+	res, err := db.GetMessagesFromConversation(idConversation)
 	if err != nil {
 		return nil, err
 	}

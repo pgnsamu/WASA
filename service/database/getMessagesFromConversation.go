@@ -4,16 +4,17 @@ type Message struct {
 	ID           int    `json:"id"`
 	Content      string `json:"content"`
 	PhotoContent []byte `json:"photoContent,omitempty"` // Optional in JSON
-	// SenderID       int    `json:"senderId"`
-	SentAt         int `json:"sentAt"`
-	ConversationID int `json:"conversationId"`
-	// AnswerTo       *int   `json:"answerTo,omitempty"` // Omit if nil
+	SentAt       int    `json:"sentAt"`
+	// ConversationID int 	`json:"conversationId"`
+	AnswerTo    *int `json:"answerTo,omitempty"` // Omit if nil
+	IsForwarded bool `json:"isForwarded"`
+	SenderID    int  `json:"senderId"`
 }
 
 // TODO: da scrivere l'endpoint
-func (db *appdbimpl) GetMessagesByConversation(conversationID int) (*[]Message, error) {
+func (db *appdbimpl) GetMessagesFromConversation(conversationID int) (*[]Message, error) {
 	query := `
-        SELECT id, content, photoContent, sentAt, conversationId
+        SELECT id, content, photoContent, sentAt, answerTo, isForwarded, senderId
         FROM messages
         WHERE conversationId = ?
         ORDER BY sentAt ASC
@@ -31,7 +32,7 @@ func (db *appdbimpl) GetMessagesByConversation(conversationID int) (*[]Message, 
 		var msg Message
 		// var answerTo sql.NullInt64 // Handle nullable integer for the answerTo column
 
-		err := rows.Scan(&msg.ID, &msg.Content, &msg.PhotoContent, &msg.SentAt, &msg.ConversationID)
+		err := rows.Scan(&msg.ID, &msg.Content, &msg.PhotoContent, &msg.SentAt, &msg.AnswerTo, &msg.IsForwarded, &msg.SenderID)
 		if err != nil {
 			return nil, err
 		}
