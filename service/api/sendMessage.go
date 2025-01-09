@@ -54,7 +54,7 @@ func (rt *_router) sendMessage(w http.ResponseWriter, r *http.Request, ps httpro
 
 	// Retrieve values from the form
 	content := r.FormValue("content")
-	messageTypeStr := r.FormValue("isPhoto") //TODO: cambiare e mettere isPhoto
+	messageTypeStr := r.FormValue("isPhoto")
 
 	// messageType = false not image
 	// messageType = true image
@@ -96,5 +96,5 @@ func (rt *_router) sendMessage(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-	//TODO: write a response
+	// TODO: write a response
 }

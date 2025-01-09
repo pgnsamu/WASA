@@ -12,8 +12,9 @@ func (rt *_router) Handler() http.Handler {
 
 	rt.router.GET("/users", rt.getUsers)                                                // sta nel doc
 	rt.router.GET("/users/:id/conversations/:conversationId/users", rt.getParticipants) // non sta nel doc
+	rt.router.POST("/info", rt.getLoggedUserInfo)                                       // non sta nel doc e non viene usata (per ora)
 
-	rt.router.POST("/session", rt.doLogin)                                                                                    // sta nel doc
+	rt.router.POST("/session", rt.doLogin)                                                                                    // sta nel doc // TODO: da cambiare nel doc
 	rt.router.GET("/users/:id", rt.getUserInfo)                                                                               // sta nel doc
 	rt.router.PUT("/users/:id/username", rt.setMyUserName)                                                                    // TODO: togliere put e mettere post sta nel doc
 	rt.router.POST("/users/:id/photo", rt.setMyPhoto)                                                                         // sta nel doc

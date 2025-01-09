@@ -1,0 +1,49 @@
+package api
+
+import (
+	"encoding/json"
+	"net/http"
+	"strings"
+
+	"github.com/julienschmidt/httprouter"
+)
+
+func (rt *_router) getLoggedUserInfo(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	authHeader := r.Header.Get("Authorization")
+	if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
+		http.Error(w, "Token mancante o invalido", http.StatusUnauthorized)
+		return
+	}
+
+	tokenString := strings.TrimPrefix(authHeader, "Bearer ")
+
+	// Validazione del token
+	claims, err := ValidateJWT(tokenString)
+	if err != nil {
+		http.Error(w, "Token non valido", http.StatusUnauthorized)
+		return
+	}
+
+	id, ok := claims["id"].(int)
+	if !ok {
+		http.Error(w, "Invalid token claims", http.StatusUnauthorized)
+		return
+	}
+
+	user, err := rt.db.GetUserInfo(id)
+	if user == nil && err.Error() == "user not found" {
+		http.Error(w, "Errore id non registrato", http.StatusBadRequest)
+		return
+	} else if user == nil && err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(user)
+	if err != nil {
+		http.Error(w, "Failed to encode users to JSON", http.StatusInternalServerError)
+		return
+	}
+}

@@ -57,9 +57,32 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 		}
 	}
 
+	claims, err := ValidateJWT(token)
+	if err != nil {
+		http.Error(w, "Token non valido", http.StatusUnauthorized)
+		return
+	}
+
+	idF, ok := claims["id"].(int)
+	if !ok {
+		http.Error(w, "Invalid token claims", http.StatusUnauthorized)
+		return
+	}
+	user, err := rt.db.GetUserInfo(idF)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	err = json.NewEncoder(w).Encode(token)
+	response := map[string]interface{}{
+		"token":    token,
+		"user_id":  user.Id,
+		"username": user.Username,
+	}
+
+	err = json.NewEncoder(w).Encode(response)
 	if err != nil {
 		http.Error(w, "Failed to encode users to JSON", http.StatusInternalServerError)
 		return
