@@ -83,7 +83,7 @@ func (rt *_router) setGroupPhoto(w http.ResponseWriter, r *http.Request, ps http
 		}
 		return
 	}
-	// TODO: capire se va bene
+
 	_, err = io.WriteString(w, "File uploaded successfully")
 	if err != nil {
 		http.Error(w, "Unable to write response", http.StatusInternalServerError)

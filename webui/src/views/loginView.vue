@@ -37,19 +37,13 @@ export default {
             };
 
             // Example POST request (Replace with actual AJAX request)
-            fetch(backendUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(loginData)
-            })
+            this.$axios.post(backendUrl, loginData)
                 .then(response => {
-                    if (!response.ok) {
+                    if (response.status !== 200) {
                         this.errorMessage = 'Invalid username. Please try again.';
                         throw new Error(`HTTP error! Status: ${response.status}`);
                     }
-                    return response.json();
+                    return response.data;
                 })
                 .then(data => {
                     if (data.user_id && data.token) {
@@ -57,10 +51,8 @@ export default {
                         localStorage.setItem('authToken', data.token); // Store the token securely
                         this.$router.push({
                             name: 'HomeView',
-                            params: { userId: data.user_id },
-                            query: { token: data.token }
+                            params: { userId: data.user_id }
                         });
-                        
                     } else {
                         // Handle unsuccessful login, assuming an error message is present
                         this.errorMessage = data.message || 'Login failed. Please check your credentials.';
