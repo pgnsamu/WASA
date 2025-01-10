@@ -19,6 +19,10 @@ func (db *appdbimpl) IsCommentTo(idComment int, idMessage int, idConversation in
 	if rows.Next() {
 		return true, nil
 	}
+	// Check for errors that may have occurred during iteration
+	if err := rows.Err(); err != nil {
+		return false, err
+	}
 	return false, nil
 
 }
