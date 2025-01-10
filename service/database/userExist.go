@@ -23,7 +23,7 @@ func (db *appdbimpl) UserExist(idConv int, idUser int) (bool, error) {
 	}
 
 	// Check for errors that may have occurred during iteration
-	if err = rows.Err(); err != nil {
+	if err := rows.Err(); err != nil {
 		return false, err
 	}
 

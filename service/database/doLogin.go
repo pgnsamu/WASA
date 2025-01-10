@@ -16,10 +16,9 @@ type User struct {
 func (db *appdbimpl) DoLogin(username string, name string, surname string) (*int, error) {
 	// ricerca se l'username è già nel DB
 	resSearch, errore := db.SearchUser(username)
-
 	// se la ricerca non ha trovato errori e ha ritornato -1 allora il nome utente non esiste e va creato un nuovo utente
 	if resSearch == -1 && errore == nil {
-		res, err := db.c.Exec("INSERT INTO users (username, name, surname) VALUES ($1, $2, $3)", username, name, surname)
+		res, err := db.c.Exec("INSERT INTO users (username, name, surname) VALUES (?, ?, ?)", username, name, surname)
 		if err != nil {
 			return nil, err
 		}
@@ -43,7 +42,7 @@ func (db *appdbimpl) DoLogin(username string, name string, surname string) (*int
 // ritorna -1 se non c'è gia, altrimenti ritorna l'id dell'utente
 func (db *appdbimpl) SearchUser(username string) (int, error) {
 	var id int
-	err := db.c.QueryRow("SELECT id FROM users WHERE username = $1", username).Scan(&id)
+	err := db.c.QueryRow("SELECT id FROM users WHERE username = ?", username).Scan(&id)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			// No rows found

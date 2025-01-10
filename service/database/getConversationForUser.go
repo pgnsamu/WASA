@@ -24,7 +24,7 @@ func (db *appdbimpl) GetConversationForUser(idUser int) (*[]Conversation, error)
 		convFinale = append(convFinale, conv)
 	}
 	// Check for errors that may have occurred during iteration
-	if err = rows.Err(); err != nil {
+	if err := rows.Err(); err != nil {
 		return nil, err
 	}
 

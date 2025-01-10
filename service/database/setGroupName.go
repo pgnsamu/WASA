@@ -28,7 +28,7 @@ func (db *appdbimpl) SetGroupName(idUser int, idConversation int, name string) (
 	}
 
 	// Check for errors that may have occurred during iteration
-	if err = rows.Err(); err != nil {
+	if err := rows.Err(); err != nil {
 		return nil, err
 	}
 

@@ -37,14 +37,14 @@ func (db *appdbimpl) DeleteUserFromConv(idConversation int, idUser int, idUserTo
 	for rows.Next() {
 		var tempString string
 		err := rows.Scan(&tempString)
-
 		if err != nil {
 			return nil, err
 		}
+
 		idResults = append(idResults, tempString)
 	}
 	// Check for errors that may have occurred during iteration
-	if err = rows.Err(); err != nil {
+	if err := rows.Err(); err != nil {
 		return nil, err
 	}
 

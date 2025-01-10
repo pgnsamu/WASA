@@ -47,7 +47,7 @@ func (db *appdbimpl) GetUsersOfConversation(idConversation int, idUser int) (*[]
 	}
 
 	// Check for errors after iteration
-	if err = rows.Err(); err != nil {
+	if err := rows.Err(); err != nil {
 		return nil, err
 	}
 	if len(users) < 1 {

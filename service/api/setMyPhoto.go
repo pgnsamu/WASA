@@ -88,7 +88,11 @@ func (rt *_router) setMyPhoto(w http.ResponseWriter, r *http.Request, ps httprou
 	*/
 	// Respond with a success message
 	// TODO: capire se va bene
-	io.WriteString(w, "File uploaded successfully")
+	_, err = io.WriteString(w, "File uploaded successfully")
+	if err != nil {
+		http.Error(w, "Unable to write response", http.StatusInternalServerError)
+		return
+	}
 	log.Println("File uploaded successfully")
 	// fmt.Fprintf(w, "File uploaded successfully")
 }

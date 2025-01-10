@@ -40,7 +40,7 @@ func (db *appdbimpl) AddToGroup(idConversation int, idUser int, idUserToAdd int)
 
 	err = db.c.QueryRow(saturationQuery, idConversation).Scan(&userCount, &conversationID, &isGroup)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if err == sql.ErrNoRows { // TODO: fix go-errorlint ./... comparing errors ERRORE
 			// No results were found
 			return nil, err
 		}

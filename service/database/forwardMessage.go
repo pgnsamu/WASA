@@ -56,7 +56,7 @@ func (db *appdbimpl) ForwardMessage(idConversationSource int, idConversationDest
 
 	err = stmt.QueryRow(idMessage).Scan(&content, &photoContent)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if err == sql.ErrNoRows { // TODO: fix go-errorlint ./... comparing errors ERRORE
 			return nil, fmt.Errorf("no message found with id %d", idMessage)
 		}
 		return nil, err
