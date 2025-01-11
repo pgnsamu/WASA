@@ -21,7 +21,7 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.POST("/users/:id/photo", rt.setMyPhoto)                                                                         // sta nel doc
 	rt.router.POST("/users/:id/conversations/:conversationId/users", rt.addToGroup)                                           // sta nel doc
 	rt.router.DELETE("/users/:id/conversations/:conversationId/users", rt.leaveGroup)                                         // TODO: nel doc è scritto senza toDelete perché era pensato in modo che un utente non possa espellere altri
-	rt.router.POST("/users/:id/conversations/:conversationId/group", rt.setGroupName)                                         // TODO: rinominare endpoint? STA NEL DOC
+	rt.router.POST("/users/:id/conversations/:conversationId/group", rt.setGroupName)                                         // STA NEL DOC
 	rt.router.POST("/users/:id/conversations/:conversationId/photo", rt.setGroupPhoto)                                        // sta nel doc
 	rt.router.GET("/users/:id/conversations", rt.getMyConversations)                                                          // sta nel doc
 	rt.router.POST("/users/:id/conversations", rt.newConversation)                                                            // sta nel doc
