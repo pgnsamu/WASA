@@ -33,14 +33,17 @@
                     <!-- Profile Settings Content -->
                     <form>
                         <div class="mb-3">
-                            <div class="mb-3">
-                                <label for="photo" class="form-label">Profile Photo</label>
-                                <input type="file" id="photo" class="form-control" @change="handlePhotoUpload">
+                            <label for="photo" class="form-label mt-4">Profile Photo</label>
+                            <div class="d-flex align-items-center">
+                                <input type="file" id="photo" class="form-control me-2" @change="handlePhotoUpload">
+                                <button type="submit" class="btn btn-primary btn-sm"
+                                    style="height: 35px; font-size: 0.8rem;" @click="setMyPhoto">SAVVVVA </button>
                             </div>
-                            <label for="username" class="form-label">Username</label>
+                            <label for="username" class="form-label mt-4">Username</label>
                             <div class="d-flex align-items-center">
                                 <input type="text" id="username" class="form-control me-2" v-model="userInfo.username">
-                                <button type="submit" class="btn btn-primary btn-sm" style="height: 38px; font-size: 0.8rem;" @click="putUsername">Save </button>
+                                <button type="submit" class="btn btn-primary btn-sm"
+                                    style="height: 35px; font-size: 0.8rem;" @click="putUsername">Save </button>
                             </div>
                         </div>
                     </form>
@@ -87,6 +90,7 @@ export default {
             userId: null,
             chats: [],
             selectedChat: null,
+            selectedFile: null,
             messages: [],
             userInfo: {
                 id: null,
@@ -130,7 +134,6 @@ export default {
                 });
         },
         toggleView() {
-            console.log(this.userInfo);
             this.isChatView = !this.isChatView;
         },
         convertBlobToBase64(blob) {
@@ -188,6 +191,32 @@ export default {
             this.selectedChat = chat;
             this.fetchMessages(chat.id);
         },
+        handlePhotoUpload(event) {
+            this.selectedFile = event.target.files[0];
+        },
+        async setMyPhoto(event) {   
+            event.preventDefault();  // Prevent the form from submitting
+            if (!this.selectedFile) {
+                alert('Please select a file first.');
+                return;
+            }
+            const token = localStorage.getItem('authToken');
+            const formData = new FormData();
+            formData.append('photo', this.selectedFile);
+
+            try {
+                const response = await this.$axios.post(`/users/${this.userId}/photo`, formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                        'Authorization': `Bearer ${token}`,
+                    }
+                });
+                this.userInfo.photo = response.data.photo;
+                console.log('File uploaded successfully:', response.data);
+            } catch (error) {
+                console.error('Error uploading file:', error);
+            }
+        }
     },
 };
 </script>

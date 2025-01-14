@@ -1,8 +1,8 @@
 package api
 
 import (
+	"encoding/json"
 	"io"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -86,12 +86,38 @@ func (rt *_router) setMyPhoto(w http.ResponseWriter, r *http.Request, ps httprou
 			return
 		}
 	*/
-	// Respond with a success message
-	_, err = io.WriteString(w, "File uploaded successfully")
+	ph, err := rt.db.GetProfilePhoto(id)
 	if err != nil {
-		http.Error(w, "Unable to write response", http.StatusInternalServerError)
+		http.Error(w, "Unable to encode response", http.StatusInternalServerError)
 		return
 	}
-	log.Println("File uploaded successfully")
+
+	// Respond with a success message
+	response := map[string]interface{}{
+		"photo": ph,
+	}
+
+	//w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(response)
+	if err != nil {
+		http.Error(w, "Unable to encode response", http.StatusInternalServerError)
+		return
+	}
+	/*
+		w.Header().Set("Content-Type", "image/jpeg")
+		w.WriteHeader(http.StatusOK)
+		_, err = w.Write(imgData)
+		if err != nil {
+			http.Error(w, "Unable to write image data to response", http.StatusInternalServerError)
+			return
+		}
+
+			_, err = io.WriteString(w, "File uploaded successfully")
+			if err != nil {
+				http.Error(w, "Unable to write response", http.StatusInternalServerError)
+				return
+			}
+	*/
 	// fmt.Fprintf(w, "File uploaded successfully")
 }

@@ -33,6 +33,5 @@ func (db *appdbimpl) SaveImageToDB(imgData []byte, table string, field string, u
 		return errors.New("id not found")
 	} else {
 		return nil
-		// fmt.Println("Rows were updated successfully.")
 	}
 }
