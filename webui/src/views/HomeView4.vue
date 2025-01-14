@@ -58,17 +58,33 @@
                 </div>
 
                 <!-- Chat Body -->
-               <div v-if="selectedChat" class="chat-body p-3 flex-grow-1" style="overflow-y: auto; max-height: 75vh;" ref="chatBody">
-                    <div v-for="message in messages" :key="message.id" class="mb-3">
-                        <div :class="['p-2', message.senderId == userId ? 'bg-primary text-white ms-auto' : 'bg-light']" style="max-width: 40%;">
-                            <div v-if="message.photoContent">
-                                <img :src="convertBlobToBase64(message.photoContent)" alt="photo" class="img-fluid" style="max-width: 100%; max-height: 300px;" />
-                            </div>
-                            <p v-html="formatContent(message.content)"></p>
-                            <small class="text-muted">{{ convertUnixToTime(message.sentAt) }}</small>
+            <div v-if="selectedChat" class="chat-body p-3 flex-grow-1" style="overflow-y: auto; max-height: 75vh;" ref="chatBody">
+                <div v-for="message in messages" :key="message.id" class="mb-3 d-flex align-items-start">
+                    
+                    <button v-if="message.senderId != userId" class="btn btn-sm btn-secondary me-2">A</button> <!--icona profilo?-->
+
+                    <div v-if="message.senderId == userId" class="d-flex flex-column ms-auto">
+                        <button class="btn btn-sm btn-secondary mb-2" @click="deleteMessage(message)">B</button> <!--delete-->
+                        <button class="btn btn-sm btn-secondary">C</button> <!--delete-->
+
+                    </div>
+                    
+                    <div :class="['p-2', message.senderId == userId ? 'bg-primary text-white ms-2' : 'bg-light']" style="max-width: 40%;">
+                        <div v-if="message.photoContent">
+                            <img :src="convertBlobToBase64(message.photoContent)" alt="photo" class="img-fluid" style="max-width: 100%; max-height: 300px;" />
                         </div>
+                        <p v-html="formatContent(message.content)"></p>
+                        <small class="text-muted">{{ convertUnixToTime(message.sentAt) }}</small>
+                    </div>
+                   
+                    <button v-if="message.senderId == userId" class="btn btn-sm btn-secondary ms-2">A</button> <!--icona profilo?-->
+                    
+                    <div v-if="message.senderId != userId" class="d-flex flex-column ms-2">
+                        <button class="btn btn-sm btn-secondary mb-2" @click="deleteMessage(message)">B</button> <!--delete-->
+                        <button class="btn btn-sm btn-secondary">C</button> <!--inoltra-->
                     </div>
                 </div>
+            </div>
 
                 <!-- Chat Footer -->
                 <div v-if="selectedChat" class="chat-footer border-top p-3">
@@ -268,6 +284,20 @@ export default {
                 console.error('Error sending message:', error);
             }
         
+        },
+        async deleteMessage(message){
+            const token = localStorage.getItem('authToken');
+            try {
+                const response = await this.$axios.delete(`/users/${this.userId}/conversations/${this.selectedChat.id}/messages/${message.id}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+                console.log('Message deleted successfully:', response.data);
+                this.fetchMessages(this.selectedChat.id);
+            } catch (error) {
+                console.error('Error deleting message:', error);
+            }
         }
     },
 };
