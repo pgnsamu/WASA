@@ -123,12 +123,14 @@ export default {
             })
                 .then(response => {
                     this.userInfo = response.data; // Set user info data
+                    console.log('User info:', this.userInfo);
                 })
                 .catch(error => {
                     console.error("There was an error fetching user data:", error);
                 });
         },
         toggleView() {
+            console.log(this.userInfo);
             this.isChatView = !this.isChatView;
         },
         convertBlobToBase64(blob) {
@@ -177,7 +179,7 @@ export default {
                         'Authorization': `Bearer ${token}`,
                     },
                 });
-                userInfo = response.data;
+                this.userInfo = response.data;
             } catch (error) {
                 console.error('Error updating username:', error);
             }
