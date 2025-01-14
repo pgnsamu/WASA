@@ -58,20 +58,20 @@
                 </div>
 
                 <!-- Chat Body -->
-                <div v-if="selectedChat" class="chat-body p-3 flex-grow-1" style="overflow-y: auto; max-height: 75vh;">
+               <div v-if="selectedChat" class="chat-body p-3 flex-grow-1" style="overflow-y: auto; max-height: 75vh;" ref="chatBody">
                     <div v-for="message in messages" :key="message.id" class="mb-3">
-                        <div :class="['p-2', message.senderId == userId ? 'bg-primary text-white' : 'bg-light']">
+                        <div :class="['p-2', message.senderId == userId ? 'bg-primary text-white ms-auto' : 'bg-light']" style="max-width: 40%;">
                             <div v-if="message.photoContent">
                                 <img :src="convertBlobToBase64(message.photoContent)" alt="photo" class="img-fluid" style="max-width: 100%; max-height: 300px;" />
                             </div>
-                            <p>{{ message.content }}</p>
+                            <p v-html="formatContent(message.content)"></p>
+                            <small class="text-muted">{{ convertUnixToTime(message.sentAt) }}</small>
                         </div>
-                        <small class="text-muted">{{ convertUnixToTime(message.sentAt) }}</small>
                     </div>
                 </div>
 
                 <!-- Chat Footer -->
-                <div v-if="selectedChat && isChatView" class="chat-footer border-top p-3">
+                <div v-if="selectedChat" class="chat-footer border-top p-3">
                     <textarea v-model="newMessage" class="form-control w-100" placeholder="Type a message" rows="2"></textarea>
                     <div class="d-flex justify-content-between align-items-center">
                         <input type="file" id="photo" class="form-control mt-2 w-100 me-2" @change="handlePhotoUpload">
@@ -113,7 +113,30 @@ export default {
             this.fetchUserData(true);
         }
     },
+    watch: {
+        messages() {
+            this.scrollToBottom();
+        },
+        selectedChat() {
+            this.scrollToBottom();
+        }
+    },
     methods: {
+        scrollToBottom() {
+            this.$nextTick(() => {
+                const chatBody = this.$refs.chatBody;
+                if (chatBody) {
+                    chatBody.scrollTo({
+                        top: chatBody.scrollHeight,
+                        behavior: 'smooth'
+                    });
+                    // chatBody.scrollTop = chatBody.scrollHeight; alternative senza animazione
+                }
+            });
+        },
+        formatContent(content) { 
+            return content.replace(/\n/g, '<br>');
+        },
         fetchUserData(firstTime = false) {
             const token = localStorage.getItem('authToken');
             // Call toggleView to switch the view before fetching the user data
