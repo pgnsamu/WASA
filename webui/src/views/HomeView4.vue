@@ -58,11 +58,11 @@
                 </div>
 
                 <!-- Chat Body -->
-                <div v-if="selectedChat" class="chat-body p-3 flex-grow-1" style="overflow-y: auto;">
+                <div v-if="selectedChat" class="chat-body p-3 flex-grow-1" style="overflow-y: auto; max-height: 75vh;">
                     <div v-for="message in messages" :key="message.id" class="mb-3">
                         <div :class="['p-2', message.senderId == userId ? 'bg-primary text-white' : 'bg-light']">
                             <div v-if="message.photoContent">
-                                <img :src="message.photoContent" alt="photo" class="img-fluid" />
+                                <img :src="convertBlobToBase64(message.photoContent)" alt="photo" class="img-fluid" style="max-width: 100%; max-height: 300px;" />
                             </div>
                             <p>{{ message.content }}</p>
                         </div>
@@ -72,9 +72,11 @@
 
                 <!-- Chat Footer -->
                 <div v-if="selectedChat && isChatView" class="chat-footer border-top p-3">
-                    <textarea v-model="newMessage" class="form-control w-100" placeholder="Type a message"
-                        rows="2"></textarea>
-                    <button @click="sendMessage" class="btn btn-primary mt-2 w-100">Send</button>
+                    <textarea v-model="newMessage" class="form-control w-100" placeholder="Type a message" rows="2"></textarea>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <input type="file" id="photo" class="form-control mt-2 w-100 me-2" @change="handlePhotoUpload">
+                        <button @click="sendMessage" class="btn btn-primary mt-2 w-100">Send</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -88,6 +90,7 @@ export default {
             newMessage: '', // Model for the new message input
             isChatView: true,
             userId: null,
+            answerTo: null, // TODO: servirebbe per cambiare il bottone finale nel caso viene scelta una chat a cui rispondere
             chats: [],
             selectedChat: null,
             selectedFile: null,
@@ -194,7 +197,7 @@ export default {
         handlePhotoUpload(event) {
             this.selectedFile = event.target.files[0];
         },
-        async setMyPhoto(event) {   
+        async setMyPhoto(event) {
             event.preventDefault();  // Prevent the form from submitting
             if (!this.selectedFile) {
                 alert('Please select a file first.');
@@ -216,6 +219,32 @@ export default {
             } catch (error) {
                 console.error('Error uploading file:', error);
             }
+        }, 
+        async sendMessage(){
+            const token = localStorage.getItem('authToken');
+            const messageData = {
+                content: this.newMessage,
+                isPhoto: this.selectedFile != null ? true : false,
+                photo: this.selectedFile,
+            };
+            if (this.selectedFile) {
+                messageData.photoContent = this.selectedFile;
+            }
+            try {
+                const response = await this.$axios.post(`/users/${this.userId}/conversations/${this.selectedChat.id}/messages`, messageData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                        'Authorization': `Bearer ${token}`,
+                    }
+                });
+                console.log('Message sent successfully:', response.data);
+                this.newMessage = '';
+                this.selectedFile = null;
+                this.fetchMessages(this.selectedChat.id);
+            } catch (error) {
+                console.error('Error sending message:', error);
+            }
+        
         }
     },
 };
