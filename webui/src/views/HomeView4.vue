@@ -103,23 +103,26 @@
                 </div>
 
                 <!-- Chat Body -->
-                <div v-if="selectedChat" class="chat-body p-3 flex-grow-1" style="overflow-y: auto; max-height: 75vh;"
-                    ref="chatBody">
+                <div v-if="selectedChat" class="chat-body p-3 flex-grow-1" style="overflow-y: auto; max-height: 75vh;" ref="chatBody">
                     <div v-for="message in messages" :key="message.id" class="mb-3 d-flex align-items-start">
 
                         <button v-if="message.senderId != userId" class="btn btn-sm btn-secondary me-2">A</button> <!--icona profilo?-->
 
                         <div v-if="message.senderId == userId" class="d-flex flex-column ms-auto">
                             <button class="btn btn-sm btn-secondary mb-2" @click="deleteMessage(message)">B</button> <!--delete-->
-                            <button class="btn btn-sm btn-secondary">C</button> <!--reply-->
-
+                            <button class="btn btn-sm btn-secondary" @click="selectMessage(message)">C</button> <!--reply-->
                         </div>
 
-                        <div :class="['p-2', message.senderId == userId ? 'bg-primary text-white ms-2' : 'bg-light']"
-                            style="max-width: 40%;">
+                        <div :id="message.id" :class="['p-2', (selectedMessage != null && message.id == selectedMessage.id) ? (message.senderId == userId ? 'bg-success text-white rounded ms-2' : 'bg-success text-white rounded')  : (message.senderId == userId ? 'bg-primary text-white rounded ms-2' : 'bg-light rounded')]" style="max-width: 40%;">
+                            <div v-if="message.answerTo != -1">
+                                <div class="bg-success text-white p-1 mb-2 rounded">
+                                    <button class="btn btn-link text-white p-0" @click="scrollToMessage(message.answerTo)" style="text-decoration: none;">
+                                        <small>{{ messages.find(msg => msg.id === message.answerTo)?.content }}</small> <!-- TODO: mmettere nel caso in cui non esista content un'icona della foto-->
+                                    </button>
+                                </div>
+                            </div>
                             <div v-if="message.photoContent">
-                                <img :src="convertBlobToBase64(message.photoContent)" alt="photo" class="img-fluid"
-                                    style="max-width: 100%; max-height: 300px;" />
+                                <img :src="convertBlobToBase64(message.photoContent)" alt="photo" class="img-fluid" style="max-width: 100%; max-height: 300px;" />
                             </div>
                             <p v-html="formatContent(message.content)"></p>
                             <small class="text-muted">{{ convertUnixToTime(message.sentAt) }}</small>
@@ -129,7 +132,7 @@
 
                         <div v-if="message.senderId != userId" class="d-flex flex-column ms-2">
                             <button class="btn btn-sm btn-secondary mb-2" @click="deleteMessage(message)">B</button> <!--delete-->
-                            <button class="btn btn-sm btn-secondary">C</button> <!--reply-->
+                            <button class="btn btn-sm btn-secondary" @click="selectMessage(message)">C</button> <!--reply-->
                         </div>
                     </div>
                 </div>
@@ -140,7 +143,8 @@
                         rows="2"></textarea>
                     <div class="d-flex justify-content-between align-items-center">
                         <input type="file" id="photo" class="form-control mt-2 w-100 me-2" @change="handlePhotoUpload">
-                        <button @click="sendMessage" class="btn btn-primary mt-2 w-100">Send</button>
+                        <button v-if="selectedMessage != null" class="btn btn-success mt-2 w-100" @click="commentMessage">Rispondi a</button>
+                        <button v-else @click="sendMessage" class="btn btn-primary mt-2 w-100">Invia</button>
                     </div>
                 </div>
             </div>
@@ -186,6 +190,11 @@ export default {
                 description: null,
                 photo: null,
             },
+
+            // risposta a messaggio
+            replyToMode: false,
+            selectedMessage: null,
+
         }
     },
     async mounted() {
@@ -214,6 +223,25 @@ export default {
         }
     },
     methods: {
+        scrollToMessage(messageId) {
+            const messageElement = document.getElementById(messageId);
+            if (messageElement) {
+                const offset = messageElement.offsetTop - (this.$refs.chatBody.clientHeight / 2) + (messageElement.clientHeight / 2);
+                this.$refs.chatBody.scrollTo({
+                    top: offset,
+                    behavior: 'smooth'
+                });
+            }
+        },
+        selectMessage(message){
+            if(this.replyToMode && this.selectedMessage == message){
+                this.replyToMode=false;
+                this.selectedMessage=null;
+            }else{
+                this.replyToMode=true;
+                this.selectedMessage=message
+            }
+        },
         handleGroupPhotoUpload(event) {
             this.groupReqInfo.photo = event.target.files[0];
         },
@@ -380,6 +408,13 @@ export default {
                 });
                 console.log('Message sent successfully:', response.data);
                 this.newMessage = '';
+
+                // Clear the file input
+                const fileInput = document.getElementById('photo');
+                if (fileInput) {
+                    fileInput.value = '';
+                }
+
                 this.selectedFile = null;
                 this.fetchMessages(this.selectedChat.id);
             } catch (error) {
@@ -404,6 +439,10 @@ export default {
         async newConversation(username = '') {
             if (!this.isGroup && username.trim() === '') {
                 alert('Please enter a valid username.');
+                return;
+            }
+            if (this.isGroup && (this.groupReqInfo.name == '' || this.participants.length < 2 || this.groupReqInfo.photo == null)) {
+                alert('Please enter some data.');
                 return;
             }
             const token = localStorage.getItem('authToken');
@@ -448,6 +487,37 @@ export default {
                 console.error('Error creating chat:', error);
             }
         },
+        async commentMessage(){
+            const token = localStorage.getItem('authToken');
+            const messageData = {
+                content: this.newMessage,
+                isPhoto: this.selectedFile != null ? true : false,
+                photo: this.selectedFile,
+            };
+            if (this.selectedFile) {
+                messageData.photoContent = this.selectedFile;
+            }
+            try {
+                const response = await this.$axios.post(`/users/${this.userId}/conversations/${this.selectedChat.id}/messages/${this.selectedMessage.id}/comments`, messageData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                        'Authorization': `Bearer ${token}`,
+                    }
+                });
+                console.log('Message sent successfully:', response.data);
+                this.newMessage = '';
+                this.selectedFile = null;
+                // Clear the file input
+                const fileInput = document.getElementById('photo');
+                if (fileInput) {
+                    fileInput.value = '';
+                }
+                this.selectedMessage = null;
+                this.fetchMessages(this.selectedChat.id);
+            } catch (error) {
+                console.error('Error sending message:', error);
+            }
+        }
     },
 };
 </script>
