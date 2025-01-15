@@ -6,8 +6,31 @@ import (
 
 func (db *appdbimpl) GetConversationForUser(idUser int) (*[]Conversation, error) {
 
-	query := "SELECT id, name, createdAt, isGroup, photo, description FROM conversations as c, participate as p WHERE c.id = p.conversationId and userId = ?"
-	rows, err := db.c.Query(query, idUser)
+	// TODO: capire se fare la stessa cosa anche con il nome
+	query2 := `
+		SELECT c.id, c.name, c.createdAt, c.isGroup, 
+			CASE 
+				WHEN c.isGroup = false
+				THEN (
+					SELECT u.photo
+					FROM conversations c
+					JOIN participate p1 ON c.id = p1.conversationId
+					JOIN participate p2 ON c.id = p2.conversationId
+					JOIN users u ON p2.userId = u.id
+					WHERE p1.userId = ?
+					AND p2.userId != ? 
+					AND c.isGroup = false
+				)
+				ELSE c.photo
+			END as photo, 
+			c.description 
+		FROM conversations as c
+		JOIN participate as p ON c.id = p.conversationId
+		JOIN users as u ON p.userId = u.id
+		WHERE p.userId = ?;`
+
+	// query := "SELECT id, name, createdAt, isGroup, photo, description FROM conversations as c, participate as p WHERE c.id = p.conversationId and userId = ?"
+	rows, err := db.c.Query(query2, idUser, idUser, idUser)
 	if err != nil {
 		return nil, err
 	}

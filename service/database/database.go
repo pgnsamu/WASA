@@ -62,6 +62,7 @@ type AppDatabase interface {
 
 	UserExist(idConv int, idUser int) (bool, error)
 	GetProfilePhoto(id int) ([]byte, error)
+	GetUserId(username string) (*int, error) // non viene usata per ora
 	IsCommentTo(idComment int, idMessage int, idConversation int) (bool, error)
 	Ping() error
 }

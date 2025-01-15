@@ -47,10 +47,10 @@ func (rt *_router) newConversation(w http.ResponseWriter, r *http.Request, ps ht
 	}
 
 	// Retrieve and parse form data
-	name := r.FormValue("name")                   // String, no parsing needed
-	isGroupStr := r.FormValue("isGroup")          // Boolean value sent as string (e.g., "true")
-	description := r.FormValue("description")     // String, no parsing needed
-	partecipantsIdStr := r.Form["partecipantsId"] // Slice of strings (e.g., ["1", "2", "3"])
+	name := r.FormValue("name")                       // String, no parsing needed
+	isGroupStr := r.FormValue("isGroup")              // Boolean value sent as string (e.g., "true")
+	description := r.FormValue("description")         // String, no parsing needed
+	partecipantsStr := r.Form["partecipantsUsername"] // Slice of strings (e.g., ["1", "2", "3"])
 
 	// Parse `isGroup` into a boolean
 	isGroup, err := strconv.ParseBool(isGroupStr)
@@ -58,20 +58,34 @@ func (rt *_router) newConversation(w http.ResponseWriter, r *http.Request, ps ht
 		http.Error(w, "Invalid value for isGroup", http.StatusBadRequest)
 		return
 	}
-
-	// Parse `partecipantsId` into a slice of integers
-	partecipantsId := []int{}
-	for _, idStr := range partecipantsIdStr {
-		id, err := strconv.Atoi(idStr)
+	/*
+		// Parse `partecipantsId` into a slice of integers
+		partecipantsId := []int{}
+		for _, idStr := range partecipantsIdStr {
+			id, err := strconv.Atoi(idStr)
+			if err != nil {
+				http.Error(w, "Invalid participant ID", http.StatusBadRequest)
+				return
+			}
+			partecipantsId = append(partecipantsId, id)
+		}
+	*/
+	if !isGroup && len(partecipantsStr) != 1 {
+		http.Error(w, "Invalid number of participants", http.StatusBadRequest)
+		return
+	}
+	var partecipantsId []int
+	for _, username := range partecipantsStr {
+		tempId, err := rt.db.GetUserId(username)
 		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		if *tempId == id {
 			http.Error(w, "Invalid participant ID", http.StatusBadRequest)
 			return
 		}
-		partecipantsId = append(partecipantsId, id)
-	}
-	if !isGroup && len(partecipantsId) != 1 {
-		http.Error(w, "Invalid number of participants", http.StatusBadRequest)
-		return
+		partecipantsId = append(partecipantsId, *tempId)
 	}
 
 	var imgData []byte

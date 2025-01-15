@@ -32,6 +32,7 @@ func (db *appdbimpl) SetMyUserName(id int, username string) (*User, error) {
 	}
 	defer stmt.Close()
 
+	// TODO: aggiungere controllo username già esistente
 	// esecuzione
 	res, err := stmt.Exec(username, id)
 	if err != nil {

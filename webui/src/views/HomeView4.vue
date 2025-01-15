@@ -2,24 +2,34 @@
     <div class="dashboard container-fluid d-flex flex-column" style="min-height: 100vh;">
         <div class="row flex-grow-1">
             <!-- Sidebar -->
-            <div id="app" class="col-md-3 col-lg-3 bg-light border-end d-flex flex-column">
+            <div id="app" class="col-md-3 col-lg-3 bg-light border-end d-flex flex-column" style="overflow-y: auto; max-height: 100vh;">
                 <div class="sidebar-header py-3">
                     <div class="d-flex align-items-center">
                         <button class="btn btn-sm me-2" @click="toggleView()">
                             <img :src="convertBlobToBase64(userInfo.photo)" alt="avatar" class="rounded-circle image">
                         </button>
-                        <div>
-                            <h5 v-if="isChatView" class="mb-0">Chats</h5>
-                            <h5 v-else class="mb-0">Profile Settings</h5>
+                        <div class="d-flex">
+                            <h2 v-if="selectedView == 0" class="mb-0">Chats</h2>
+                            <h2 v-if="selectedView == 1" class="mb-0">Profile Settings</h2>
+                            <h2 v-if="selectedView == 2" class="mb-0">Creazione gruppo</h2>
                         </div>
-                    </div>
+                        <button v-if="selectedView == 0" class="btn btn-sm ms-auto btn-primary" @click="this.selectedView=2">nuova conversazione</button>
+                        <button v-if="selectedView == 2" class="btn btn-sm ms-auto btn-primary" @click="this.selectedView=0">x</button>
 
+                    </div>
+                    <!--create conversation-->
+                    <div v-if="this.selectedView == 0" class="d-flex align-items-center mt-3">
+                        <input type="text" v-model="selectedUser" class="form-control me-2" placeholder="Username a cui scrivere"/>
+                        <button type="button" class="btn ms-auto btn-primary" style="border-radius: 0.4rem;" @click="newConversation(selectedUser)">vai</button>
+                    </div>
                 </div>
-                <div v-if="isChatView" class="flex-grow-1">
+                
+                <!--chat list-->
+                <div v-if="selectedView == 0" class="flex-grow-1">
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item" v-for="chat in chats" :key="chat.id" @click="selectChat(chat)">
                             <div class="d-flex align-items-center">
-                                <img :src="convertBlobToBase64(chat.photo)" alt="avatar"
+                                <img v-if="chat.photo != null" :src="convertBlobToBase64(chat.photo)" alt="avatar"
                                     class="rounded-circle me-2 image">
                                 <div>
                                     <h6 class="mb-0">{{ chat.name }}</h6>
@@ -29,7 +39,9 @@
                         </li>
                     </ul>
                 </div>
-                <div v-else class="flex-grow-1">
+
+                <!--profile settings-->
+                <div v-if="selectedView == 1" class="flex-grow-1">
                     <!-- Profile Settings Content -->
                     <form>
                         <div class="mb-3">
@@ -48,6 +60,38 @@
                         </div>
                     </form>
                 </div>
+                
+                <!--TODO: aggiungere controlli new conversation--> 
+                <div v-if="selectedView == 2" class="flex-grow-1 mb-2">
+                    <div class="mb-2 mt-2 pt-2">
+                        <label for="groupPhoto" class="form-label">Foto del Gruppo</label>
+                        <input type="file" id="groupPhoto" class="form-control" @change="handleGroupPhotoUpload">
+                    </div>
+                    <div class="mb-2 mt-2 pt-2">
+                        <label for="newParticipant" class="form-label">Nome Gruppo</label>
+                        <input type="text" v-model="newParticipant" class="form-control" id="groupName" placeholder="Nome gruppo">
+                    </div>
+                    <div class="mb-2 mt-2 pt-2">
+                        <label for="groupDescription" class="form-label">Descrizione Gruppo</label>
+                        <textarea v-model="groupDescription" class="form-control" id="groupDescription" placeholder="Descrizione del gruppo"></textarea>
+                    </div>
+                    <div class="mb-2 mt-2 pt-2">
+                        <label for="addMember" class="form-label">Username membro da aggiungere</label>
+                        <input type="text" v-model="newParticipant" class="form-control" id="addMember" placeholder="username dell'utente">
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <button class="btn btn-secondary mb-3" @click="addParticipant">Aggiungi membro</button>
+                        <button class="btn btn-primary mb-3" @click="addParticipant">Crea Gruppo</button>
+                    </div>
+                    <ul class="list-group">
+                        <li v-for="(participant, index) in participants" :key="index" class="list-group-item d-flex justify-content-between align-items-center">
+                            {{ participant }}
+                            <button class="btn btn-danger btn-sm" @click="removeParticipant(index)">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </li>
+                    </ul>
+                </div>
             </div>
 
             <!-- Main Chat Area -->
@@ -55,40 +99,45 @@
                 <div v-if="selectedChat"
                     class="chat-header border-bottom py-3 d-flex justify-content-between align-items-center">
                     <h5>{{ selectedChat.name }}</h5>
+                    <button class="btn btn-sm btn-primary">Settings</button> <!--TODO: icona ingranaggio?-->
                 </div>
 
                 <!-- Chat Body -->
-            <div v-if="selectedChat" class="chat-body p-3 flex-grow-1" style="overflow-y: auto; max-height: 75vh;" ref="chatBody">
-                <div v-for="message in messages" :key="message.id" class="mb-3 d-flex align-items-start">
-                    
-                    <button v-if="message.senderId != userId" class="btn btn-sm btn-secondary me-2">A</button> <!--icona profilo?-->
+                <div v-if="selectedChat" class="chat-body p-3 flex-grow-1" style="overflow-y: auto; max-height: 75vh;"
+                    ref="chatBody">
+                    <div v-for="message in messages" :key="message.id" class="mb-3 d-flex align-items-start">
 
-                    <div v-if="message.senderId == userId" class="d-flex flex-column ms-auto">
-                        <button class="btn btn-sm btn-secondary mb-2" @click="deleteMessage(message)">B</button> <!--delete-->
-                        <button class="btn btn-sm btn-secondary">C</button> <!--delete-->
+                        <button v-if="message.senderId != userId" class="btn btn-sm btn-secondary me-2">A</button> <!--icona profilo?-->
 
-                    </div>
-                    
-                    <div :class="['p-2', message.senderId == userId ? 'bg-primary text-white ms-2' : 'bg-light']" style="max-width: 40%;">
-                        <div v-if="message.photoContent">
-                            <img :src="convertBlobToBase64(message.photoContent)" alt="photo" class="img-fluid" style="max-width: 100%; max-height: 300px;" />
+                        <div v-if="message.senderId == userId" class="d-flex flex-column ms-auto">
+                            <button class="btn btn-sm btn-secondary mb-2" @click="deleteMessage(message)">B</button> <!--delete-->
+                            <button class="btn btn-sm btn-secondary">C</button> <!--reply-->
+
                         </div>
-                        <p v-html="formatContent(message.content)"></p>
-                        <small class="text-muted">{{ convertUnixToTime(message.sentAt) }}</small>
-                    </div>
-                   
-                    <button v-if="message.senderId == userId" class="btn btn-sm btn-secondary ms-2">A</button> <!--icona profilo?-->
-                    
-                    <div v-if="message.senderId != userId" class="d-flex flex-column ms-2">
-                        <button class="btn btn-sm btn-secondary mb-2" @click="deleteMessage(message)">B</button> <!--delete-->
-                        <button class="btn btn-sm btn-secondary">C</button> <!--inoltra-->
+
+                        <div :class="['p-2', message.senderId == userId ? 'bg-primary text-white ms-2' : 'bg-light']"
+                            style="max-width: 40%;">
+                            <div v-if="message.photoContent">
+                                <img :src="convertBlobToBase64(message.photoContent)" alt="photo" class="img-fluid"
+                                    style="max-width: 100%; max-height: 300px;" />
+                            </div>
+                            <p v-html="formatContent(message.content)"></p>
+                            <small class="text-muted">{{ convertUnixToTime(message.sentAt) }}</small>
+                        </div>
+
+                        <button v-if="message.senderId == userId" class="btn btn-sm btn-secondary ms-2">A</button> <!--icona profilo?-->
+
+                        <div v-if="message.senderId != userId" class="d-flex flex-column ms-2">
+                            <button class="btn btn-sm btn-secondary mb-2" @click="deleteMessage(message)">B</button> <!--delete-->
+                            <button class="btn btn-sm btn-secondary">C</button> <!--reply-->
+                        </div>
                     </div>
                 </div>
-            </div>
 
                 <!-- Chat Footer -->
                 <div v-if="selectedChat" class="chat-footer border-top p-3">
-                    <textarea v-model="newMessage" class="form-control w-100" placeholder="Type a message" rows="2"></textarea>
+                    <textarea v-model="newMessage" class="form-control w-100" placeholder="Type a message"
+                        rows="2"></textarea>
                     <div class="d-flex justify-content-between align-items-center">
                         <input type="file" id="photo" class="form-control mt-2 w-100 me-2" @change="handlePhotoUpload">
                         <button @click="sendMessage" class="btn btn-primary mt-2 w-100">Send</button>
@@ -104,12 +153,14 @@ export default {
     data() {
         return {
             newMessage: '', // Model for the new message input
-            isChatView: true,
+            selectedView: 0,
+            participants: [],
             userId: null,
             answerTo: null, // TODO: servirebbe per cambiare il bottone finale nel caso viene scelta una chat a cui rispondere
             chats: [],
             selectedChat: null,
             selectedFile: null,
+            selectedUser: '',
             messages: [],
             userInfo: {
                 id: null,
@@ -125,8 +176,8 @@ export default {
         const token = localStorage.getItem('authToken'); // Retrieve token from localStorage
         console.log('userId:', this.userId, 'token:', token);
         if (this.userId && token) {
-            await this.fetchChats(token);
-            this.fetchUserData(true);
+            await this.fetchChats();
+            this.fetchUserData();
         }
     },
     watch: {
@@ -138,6 +189,17 @@ export default {
         }
     },
     methods: {
+        addParticipant() {
+            if (this.newParticipant.trim() !== '') {
+                if (!this.participants.includes(this.newParticipant.trim())) { // forse far uscire un feedback a schermo
+                    this.participants.push(this.newParticipant.trim()); 
+                    this.newParticipant = '';
+                }
+            }
+        },
+        removeParticipant(index) {
+            this.participants.splice(index, 1);
+        },
         scrollToBottom() {
             this.$nextTick(() => {
                 const chatBody = this.$refs.chatBody;
@@ -150,10 +212,10 @@ export default {
                 }
             });
         },
-        formatContent(content) { 
+        formatContent(content) {
             return content.replace(/\n/g, '<br>');
         },
-        fetchUserData(firstTime = false) {
+        fetchUserData() {
             const token = localStorage.getItem('authToken');
             // Call toggleView to switch the view before fetching the user data
 
@@ -176,7 +238,11 @@ export default {
                 });
         },
         toggleView() {
-            this.isChatView = !this.isChatView;
+            if(this.selectedView != 0){
+                this.selectedView = 0;
+            } else {
+                this.selectedView = 1;
+            }
         },
         convertBlobToBase64(blob) {
             return "data:image/jpeg;base64," + blob;
@@ -188,7 +254,8 @@ export default {
             // Format the date as a human-readable string
             return date.toLocaleString(); // Example: "1/9/2025, 12:00:00 PM"
         },
-        async fetchChats(token) {
+        async fetchChats() {
+            const token = localStorage.getItem('authToken');
             try {
                 const response = await this.$axios.get(`/users/${this.userId}/conversations`, {
                     headers: {
@@ -258,8 +325,8 @@ export default {
             } catch (error) {
                 console.error('Error uploading file:', error);
             }
-        }, 
-        async sendMessage(){
+        },
+        async sendMessage() {
             const token = localStorage.getItem('authToken');
             const messageData = {
                 content: this.newMessage,
@@ -283,9 +350,9 @@ export default {
             } catch (error) {
                 console.error('Error sending message:', error);
             }
-        
+
         },
-        async deleteMessage(message){
+        async deleteMessage(message) {
             const token = localStorage.getItem('authToken');
             try {
                 const response = await this.$axios.delete(`/users/${this.userId}/conversations/${this.selectedChat.id}/messages/${message.id}`, {
@@ -298,7 +365,27 @@ export default {
             } catch (error) {
                 console.error('Error deleting message:', error);
             }
-        }
+        },
+        async newConversation(username) {
+            const token = localStorage.getItem('authToken');
+            const convData = {
+                name: username,
+                isGroup: false, // farla più generica
+                partecipantsUsername: username,
+            };
+            try {
+                const response = await this.$axios.post(`/users/${this.userId}/conversations`, convData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                        'Authorization': `Bearer ${token}`,
+                    }
+                });
+                username = '';
+                this.fetchChats();
+            } catch (error) {
+                console.error('Error creating chat:', error);
+            }
+        },
     },
 };
 </script>

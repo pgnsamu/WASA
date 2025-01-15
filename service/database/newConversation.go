@@ -82,6 +82,7 @@ func (db *appdbimpl) NewConversation(userId int, name string, isGroup bool, phot
 
 		tempParticipantsId := partecipantsId
 		tempParticipantsId = append(tempParticipantsId, userId)
+		// log.Println(len(tempParticipantsId)) // TODO: vedere se è da controllare il numero <3
 		for i := 0; i < len(tempParticipantsId); i++ {
 			stmt, err := db.c.Prepare("INSERT INTO participate (userId, conversationId) VALUES (?, ?);")
 			if err != nil {
