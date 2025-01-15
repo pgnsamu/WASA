@@ -13,8 +13,8 @@
                             <h2 v-if="selectedView == 1" class="mb-0">Profile Settings</h2>
                             <h2 v-if="selectedView == 2" class="mb-0">Creazione gruppo</h2>
                         </div>
-                        <button v-if="selectedView == 0" class="btn btn-sm ms-auto btn-primary" @click="this.selectedView=2">nuova conversazione</button>
-                        <button v-if="selectedView == 2" class="btn btn-sm ms-auto btn-primary" @click="this.selectedView=0">x</button>
+                        <button v-if="selectedView == 0" class="btn btn-sm ms-auto btn-primary" @click="changeToCreateGroupView">nuovo gruppo</button>
+                        <button v-if="selectedView == 2" class="btn btn-sm ms-auto btn-primary" @click="changeToCreateGroupView">x</button>
 
                     </div>
                     <!--create conversation-->
@@ -68,12 +68,12 @@
                         <input type="file" id="groupPhoto" class="form-control" @change="handleGroupPhotoUpload">
                     </div>
                     <div class="mb-2 mt-2 pt-2">
-                        <label for="newParticipant" class="form-label">Nome Gruppo</label>
-                        <input type="text" v-model="newParticipant" class="form-control" id="groupName" placeholder="Nome gruppo">
+                        <label for="groupName" class="form-label">Nome Gruppo</label>
+                        <input type="text" v-model="groupReqInfo.name" class="form-control" id="groupName" placeholder="Nome gruppo">
                     </div>
                     <div class="mb-2 mt-2 pt-2">
                         <label for="groupDescription" class="form-label">Descrizione Gruppo</label>
-                        <textarea v-model="groupDescription" class="form-control" id="groupDescription" placeholder="Descrizione del gruppo"></textarea>
+                        <textarea v-model="groupReqInfo.description" class="form-control" id="groupDescription" placeholder="Descrizione del gruppo"></textarea>
                     </div>
                     <div class="mb-2 mt-2 pt-2">
                         <label for="addMember" class="form-label">Username membro da aggiungere</label>
@@ -81,7 +81,7 @@
                     </div>
                     <div class="d-flex justify-content-between align-items-center">
                         <button class="btn btn-secondary mb-3" @click="addParticipant">Aggiungi membro</button>
-                        <button class="btn btn-primary mb-3" @click="addParticipant">Crea Gruppo</button>
+                        <button class="btn btn-primary mb-3" @click="newConversation">Crea Gruppo</button>
                     </div>
                     <ul class="list-group">
                         <li v-for="(participant, index) in participants" :key="index" class="list-group-item d-flex justify-content-between align-items-center">
@@ -152,16 +152,19 @@
 export default {
     data() {
         return {
-            newMessage: '', // Model for the new message input
+            // environment variables
             selectedView: 0,
-            participants: [],
-            userId: null,
-            answerTo: null, // TODO: servirebbe per cambiare il bottone finale nel caso viene scelta una chat a cui rispondere
-            chats: [],
             selectedChat: null,
-            selectedFile: null,
-            selectedUser: '',
+            chats: [],
+
+            // newMessage variables
+            answerTo: null, // TODO: servirebbe per cambiare il bottone finale nel caso viene scelta una chat a cui rispondere
             messages: [],
+            newMessage: '', // Model for the new message input
+            selectedFile: null,
+
+            // userInfo variables
+            userId: null,
             userInfo: {
                 id: null,
                 name: null,
@@ -169,7 +172,21 @@ export default {
                 surname: null,
                 photo: null,
             },
-        };
+
+            // newChat singola variables
+            selectedUser: '',
+
+            // newGroup variables
+            isGroup: false,
+            participants: [],
+            newParticipant: '',
+            groupReqInfo: {
+                id: null,
+                name: null,
+                description: null,
+                photo: null,
+            },
+        }
     },
     async mounted() {
         this.userId = this.$route.params.userId;
@@ -186,9 +203,27 @@ export default {
         },
         selectedChat() {
             this.scrollToBottom();
+        },
+        selectedView(){
+            if(this.selectedView == 2){
+                this.isGroup = true;
+            }else{
+                this.isGroup = false;
+            }
+            // console.log(this.isGroup)
         }
     },
     methods: {
+        handleGroupPhotoUpload(event) {
+            this.groupReqInfo.photo = event.target.files[0];
+        },
+        changeToCreateGroupView(){
+            if(this.selectedView != 2){
+                this.selectedView = 2;
+            }else{
+                this.selectedView = 0;
+            }
+        },
         addParticipant() {
             if (this.newParticipant.trim() !== '') {
                 if (!this.participants.includes(this.newParticipant.trim())) { // forse far uscire un feedback a schermo
@@ -366,21 +401,48 @@ export default {
                 console.error('Error deleting message:', error);
             }
         },
-        async newConversation(username) {
+        async newConversation(username = '') {
+            if (!this.isGroup && username.trim() === '') {
+                alert('Please enter a valid username.');
+                return;
+            }
             const token = localStorage.getItem('authToken');
-            const convData = {
-                name: username,
-                isGroup: false, // farla più generica
-                partecipantsUsername: username,
-            };
+            
+            // Crea un nuovo oggetto FormData
+            const formData = new FormData();
+
+            // Aggiungi i dati a FormData
+            formData.append('name', this.isGroup ? this.groupReqInfo.name : '');
+            formData.append('isGroup', this.isGroup);
+
+            if (this.groupReqInfo.photo) {
+                formData.append('photo', this.groupReqInfo.photo);
+            }
+
+            if (this.groupReqInfo.description) {
+                formData.append('description', this.groupReqInfo.description);
+            }
+
+            // Aggiungi i partecipanti se è un gruppo
+            if (this.isGroup) {
+                this.participants.forEach(participant => {
+                    formData.append('partecipantsUsername', participant);
+                });
+            } else {
+                formData.append('partecipantsUsername', username);
+            }
+            console.log('formData:', formData.get('name'), formData.get('isGroup'), formData.get('photo'), formData.get('description'), formData.getAll('partecipantsUsername[]'));
+
+
             try {
-                const response = await this.$axios.post(`/users/${this.userId}/conversations`, convData, {
+                const response = await this.$axios.post(`/users/${this.userId}/conversations`, formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                         'Authorization': `Bearer ${token}`,
                     }
                 });
                 username = '';
+                this.selectedView = 0;
                 this.fetchChats();
             } catch (error) {
                 console.error('Error creating chat:', error);

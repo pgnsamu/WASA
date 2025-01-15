@@ -8,18 +8,35 @@ func (db *appdbimpl) GetConversationForUser(idUser int) (*[]Conversation, error)
 
 	// TODO: capire se fare la stessa cosa anche con il nome
 	query2 := `
-		SELECT c.id, c.name, c.createdAt, c.isGroup, 
+		SELECT c.id,
+			CASE 
+				WHEN c.isGroup = false
+				THEN (
+					SELECT u.username
+					FROM conversations c2
+					JOIN participate p1 ON c2.id = p1.conversationId
+					JOIN participate p2 ON c2.id = p2.conversationId
+					JOIN users u ON p2.userId = u.id
+					WHERE p1.userId = ?
+					AND p2.userId != ? 
+					AND c2.id = c.id
+					AND c2.isGroup = false
+				)
+				ELSE c.name
+			END as name, 
+		  c.createdAt, c.isGroup, 
 			CASE 
 				WHEN c.isGroup = false
 				THEN (
 					SELECT u.photo
-					FROM conversations c
-					JOIN participate p1 ON c.id = p1.conversationId
-					JOIN participate p2 ON c.id = p2.conversationId
+					FROM conversations c2
+					JOIN participate p1 ON c2.id = p1.conversationId
+					JOIN participate p2 ON c2.id = p2.conversationId
 					JOIN users u ON p2.userId = u.id
 					WHERE p1.userId = ?
 					AND p2.userId != ? 
-					AND c.isGroup = false
+					AND c2.id = c.id
+					AND c2.isGroup = false
 				)
 				ELSE c.photo
 			END as photo, 
@@ -30,7 +47,7 @@ func (db *appdbimpl) GetConversationForUser(idUser int) (*[]Conversation, error)
 		WHERE p.userId = ?;`
 
 	// query := "SELECT id, name, createdAt, isGroup, photo, description FROM conversations as c, participate as p WHERE c.id = p.conversationId and userId = ?"
-	rows, err := db.c.Query(query2, idUser, idUser, idUser)
+	rows, err := db.c.Query(query2, idUser, idUser, idUser, idUser, idUser)
 	if err != nil {
 		return nil, err
 	}
