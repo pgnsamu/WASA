@@ -109,7 +109,7 @@
                         <button v-if="message.senderId != userId" class="btn btn-sm btn-secondary me-2">A</button> <!--icona profilo?-->
 
                         <div v-if="message.senderId == userId" class="d-flex flex-column ms-auto">
-                            <button class="btn btn-sm btn-secondary mb-2" @click="deleteMessage(message)">B</button> <!--delete-->
+                            <button class="btn btn-sm btn-secondary mb-2" @click="message.answerTo != -1 ? uncommentMessage(message) : deleteMessage(message)">B</button> <!--delete-->
                             <button class="btn btn-sm btn-secondary" @click="selectMessage(message)">C</button> <!--reply-->
                         </div>
 
@@ -131,7 +131,7 @@
                         <button v-if="message.senderId == userId" class="btn btn-sm btn-secondary ms-2">A</button> <!--icona profilo?-->
 
                         <div v-if="message.senderId != userId" class="d-flex flex-column ms-2">
-                            <button class="btn btn-sm btn-secondary mb-2" @click="deleteMessage(message)">B</button> <!--delete-->
+                            <button class="btn btn-sm btn-secondary mb-2" @click="message.answerTo != -1 ? uncommentMessage(message) : deleteMessage(message)">B</button> <!--delete-->
                             <button class="btn btn-sm btn-secondary" @click="selectMessage(message)">C</button> <!--reply-->
                         </div>
                     </div>
@@ -194,6 +194,7 @@ export default {
             // risposta a messaggio
             replyToMode: false,
             selectedMessage: null,
+
 
         }
     },
@@ -516,6 +517,20 @@ export default {
                 this.fetchMessages(this.selectedChat.id);
             } catch (error) {
                 console.error('Error sending message:', error);
+            }
+        },
+        async uncommentMessage(selectedComment){
+            const token = localStorage.getItem('authToken');
+            try {
+                const response = await this.$axios.delete(`/users/${this.userId}/conversations/${this.selectedChat.id}/messages/${selectedComment.answerTo}/comments/${selectedComment.id}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+                console.log('Message deleted successfully:', response.data);
+                this.fetchMessages(this.selectedChat.id);
+            } catch (error) {
+                console.error('Error deleting message:', error);
             }
         }
     },

@@ -66,7 +66,7 @@ func (rt *_router) uncommentMessage(w http.ResponseWriter, r *http.Request, ps h
 		return
 	}
 	// TODO: capire se aggiungere il controllo di è un commento
-	err = rt.db.DeleteMessage(idConv, idUser, idComment)
+	err = rt.db.UncommentMessage(idConv, idUser, idComment)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
