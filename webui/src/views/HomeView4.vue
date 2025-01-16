@@ -14,6 +14,7 @@
                             <h2 v-if="selectedView == 1" class="mb-0">Profile Settings</h2>
                             <h2 v-if="selectedView == 2" class="mb-0">Creazione gruppo</h2>
                             <h2 v-if="selectedView == 3" class="mb-0">Impostazioni chat</h2>
+                            <h2 v-if="selectedView == 4" class="mb-0">Inoltra a...</h2>
                         </div>
                         <button v-if="selectedView == 0" class="btn btn-sm ms-auto btn-primary" @click="changeToView(2)">nuovo gruppo</button>
                     <button v-if="selectedView == 2 || selectedView == 3" class="btn btn-sm ms-auto btn-primary" @click="changeToView(selectedView)">x</button>
@@ -94,7 +95,8 @@
                         </li>
                     </ul>
                 </div>
-
+                
+                <!--chat settings-->
                 <div v-if="selectedView == 3" class="flex-grow-1 mb-2">
                     <div class="chat-info">
                         <div class="mb-2 mt-2 pt-2">
@@ -121,7 +123,7 @@
                                 <button class="btn btn-primary" @click="addMemberToGroup">Aggiungi</button>
                             </div>
                         </div>
-                        <button class="btn btn-danger mt-2" @click="leaveGroup">Esci dal Gruppo</button>
+                        <button v-if="selectedChat.isGroup" class="btn btn-danger mt-2" @click="leaveGroup">Esci dal Gruppo</button>
                         <div v-if="selectedChat.isGroup" class="mb-2 mt-2 pt-2">
                             <label class="form-label">Membri del Gruppo</label>
                             <ul class="list-group">
@@ -132,6 +134,21 @@
                         </div>
                         
                     </div>
+                </div>
+
+                <!-- List of chats the user participates in -->
+                <div v-if="selectedView == 4" class="flex-grow-1">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item" v-for="chat in chats" :key="chat.id" @click="selectChatToForward(chat)">
+                            <div class="d-flex align-items-center">
+                                <img v-if="chat.photo != null" :src="convertBlobToBase64(chat.photo)" alt="avatar" class="rounded-circle me-2 image">
+                                <div>
+                                    <h6 class="mb-0">{{ chat.name }}</h6>
+                                    <small class="text-muted">{{ chat.lastMessage }}</small>
+                                </div>
+                            </div>                            
+                        </li>
+                    </ul>
                 </div>
             </div>
 
@@ -147,7 +164,7 @@
                 <div v-if="selectedChat" class="chat-body p-3 flex-grow-1" style="overflow-y: auto; max-height: 75vh;" ref="chatBody">
                     <div v-for="message in messages" :key="message.id" class="mb-3 d-flex align-items-start">
                         
-                        <button v-if="message.senderId != userId" class="btn btn-sm btn-secondary me-2">
+                        <button v-if="message.senderId != userId" class="btn btn-sm btn-secondary me-2" @click="changeToView(4); selectedMessage=message">
                             <i class="bi bi-send" ></i>
                         </button> 
                         
@@ -192,7 +209,7 @@
                             </div>
                         </div>
 
-                        <button v-if="message.senderId == userId" class="btn btn-sm btn-secondary ms-2">
+                        <button v-if="message.senderId == userId" class="btn btn-sm btn-secondary ms-2" @click="changeToView(4); selectedMessage=message">
                             <i class="bi bi-send"></i>
                         </button> <!--icona profilo?-->
                         
@@ -306,7 +323,7 @@ export default {
         }
     },
     methods: {
-        
+
         getSnippet(message) {
             return message.content.length > 20 ? message.content.substring(0, 20) + '...' : message.content;
             // TODO: cambiare nel caso sia solo foto 
@@ -506,6 +523,7 @@ export default {
 
                 this.selectedFile = null;
                 this.fetchMessages(this.selectedChat.id);
+                this.fetchChats();
             } catch (error) {
                 console.error('Error sending message:', error);
             }
@@ -603,6 +621,7 @@ export default {
                 }
                 this.selectedMessage = null;
                 this.fetchMessages(this.selectedChat.id);
+                this.fetchChats();
             } catch (error) {
                 console.error('Error sending message:', error);
             }
@@ -730,6 +749,31 @@ export default {
                 this.changeToView(0);
                 this.fetchChats();
                 console.log('Chat info:', response.data);
+            } catch (error) {
+                console.error('Error fetching chat info:', error);
+            }
+        },
+        selectChatToForward(chat) {
+            if (this.selectedMessage) {
+                this.forwardMessage(chat);
+            } else {
+                alert('Please select a message to forward.');
+            }
+        },
+        async forwardMessage(chat) {
+            const token = localStorage.getItem('authToken');
+            try {
+                const response = await this.$axios.post(`/users/${this.userId}/conversations/${this.selectedChat.id}/messages/${this.selectedMessage.id}`, {
+                    targetConversationId: chat.id,
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+                this.fetchChats();
+                this.selectedMessage = null;
+                this.changeToView(0);
+
             } catch (error) {
                 console.error('Error fetching chat info:', error);
             }
