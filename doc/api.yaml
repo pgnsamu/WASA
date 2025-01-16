@@ -204,12 +204,7 @@ paths:
         "404":
           description: User not found
   /users/{id}/username:
-    put: 
-      tags: ["User Management"]
-      summary: Change username
-      description: Update of the username for this service
-      operationId: setMyUserName
-      parameters:
+    parameters:
       - name: id
         in: path
         description: The ID of the user who you want to change username
@@ -218,6 +213,11 @@ paths:
           type: integer
           minimum: 0
         required: true
+    put: 
+      tags: ["User Management"]
+      summary: Change username
+      description: Update of the username for this service
+      operationId: setMyUserName
       requestBody:
         description: User new username over the last one
         content:
@@ -248,14 +248,14 @@ paths:
           description: User not found
   /users/{id}/photo:
     parameters:
-        - name: id
-          in: path
-          description: The ID of the user who you want to change or add photo
-          schema:
-            description: An integer representing the ID of the user who you want to change or add photo
-            type: integer
-            minimum: 0
-          required: true
+      - name: id
+        in: path
+        description: The ID of the user who you want to change or add photo
+        schema:
+          description: An integer representing the ID of the user who you want to change or add photo
+          type: integer
+          minimum: 0
+        required: true
     post: 
       tags: ["User Management"]
       summary: Add or Change Photo
@@ -357,27 +357,27 @@ paths:
         "404":
           description: Conversation not found or user is not a participant
   /users/{id}/conversations/{conversationId}/group:
-    post: 
+    parameters:
+      - name: id
+        in: path
+        description: The ID of the user
+        schema:
+          description: An integer representing the ID of the user 
+          type: integer
+          minimum: 0
+        required: true
+      - name: conversationId
+        in: path
+        description: The ID of the group chat (Chat) the user is leaving
+        schema:
+          description: ID of the GroupChat
+          type: integer
+        required: true
+    put: 
       tags: ["Groupchat Management"]
       summary: Setting up or Change group name
       description: Update or setting up the username for this GroupChat (Chat)
       operationId: setGroupName
-      parameters:
-        - name: id
-          in: path
-          description: The ID of the user
-          schema:
-            description: An integer representing the ID of the user 
-            type: integer
-            minimum: 0
-          required: true
-        - name: conversationId
-          in: path
-          description: The ID of the group chat (Chat) the user is leaving
-          schema:
-            description: ID of the GroupChat
-            type: integer
-          required: true
       requestBody:
         description: New GroupChat name 
         content:
@@ -407,27 +407,27 @@ paths:
         "404": 
           description: Group (Chat) not found       
   /users/{id}/conversations/{conversationId}/photo:
-    post: 
+    parameters:
+      - name: id
+        in: path
+        description: The ID of the user 
+        schema:
+          description: An integer representing the ID of the user
+          type: integer
+          minimum: 0
+        required: true
+      - name: conversationId
+        in: path
+        description: The ID of the group chat (Chat) the user is leaving
+        schema:
+          description: The ID of the group chat (Chat)
+          type: integer
+        required: true
+    put: 
       tags: ["Groupchat Management"]
       summary: Change GroupChat (Chat) Photo
       description: Update of the Photo of the GroupChat (Chat) selected
       operationId: setGroupPhoto
-      parameters:
-        - name: id
-          in: path
-          description: The ID of the user 
-          schema:
-            description: An integer representing the ID of the user
-            type: integer
-            minimum: 0
-          required: true
-        - name: conversationId
-          in: path
-          description: The ID of the group chat (Chat) the user is leaving
-          schema:
-            description: The ID of the group chat (Chat)
-            type: integer
-          required: true
       requestBody:
         description: Group new Photo over the last one
         content:
@@ -456,7 +456,7 @@ paths:
           description: User have to Auth itself to set a photo
         "404": 
           description: User not found
-  /users/{id}/conversations/:
+  /users/{id}/conversations:
     parameters:
       - name: id
         in: path

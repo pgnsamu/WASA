@@ -6,18 +6,19 @@ type Message struct {
 	PhotoContent []byte `json:"photoContent,omitempty"` // Optional in JSON
 	SentAt       int    `json:"sentAt"`
 	// ConversationID int 	`json:"conversationId"`
-	AnswerTo    *int `json:"answerTo,omitempty"` // Omit if nil
-	IsForwarded bool `json:"isForwarded"`
-	SenderID    int  `json:"senderId"`
-	Status      int  `json:"status"`
+	AnswerTo       *int   `json:"answerTo,omitempty"` // Omit if nil
+	IsForwarded    bool   `json:"isForwarded"`
+	SenderID       int    `json:"senderId"`
+	SenderUsername string `json:"senderUsername"`
+	Status         int    `json:"status"`
 }
 
 // TODO: da scrivere l'endpoint
 func (db *appdbimpl) GetMessagesFromConversation(conversationID int) (*[]Message, error) {
 	query := `
-		SELECT m.id, m.content, m.photoContent, m.sentAt, m.answerTo, m.isForwarded, m.senderId, MIN(r.status) as status
-		FROM messages as m, received as r
-		WHERE m.conversationId = ? AND m.id = r.messageId
+		SELECT m.id, m.content, m.photoContent, m.sentAt, m.answerTo, m.isForwarded, m.senderId, u.username, MIN(r.status) as status
+		FROM messages as m, received as r, users u
+		WHERE m.conversationId = ? AND m.id = r.messageId  AND u.id = m.senderId
 		GROUP BY m.id
 		ORDER BY m.sentAt ASC
 	`
@@ -34,7 +35,7 @@ func (db *appdbimpl) GetMessagesFromConversation(conversationID int) (*[]Message
 		var msg Message
 		// var answerTo sql.NullInt64 // Handle nullable integer for the answerTo column
 
-		err := rows.Scan(&msg.ID, &msg.Content, &msg.PhotoContent, &msg.SentAt, &msg.AnswerTo, &msg.IsForwarded, &msg.SenderID, &msg.Status)
+		err := rows.Scan(&msg.ID, &msg.Content, &msg.PhotoContent, &msg.SentAt, &msg.AnswerTo, &msg.IsForwarded, &msg.SenderID, &msg.SenderUsername, &msg.Status)
 		if err != nil {
 			return nil, err
 		}
