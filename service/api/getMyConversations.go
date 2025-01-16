@@ -40,10 +40,7 @@ func (rt *_router) getMyConversations(w http.ResponseWriter, r *http.Request, ps
 	}
 
 	user, err := rt.db.GetConversationForUser(id)
-	if user == nil && err.Error() == "no conversations found" {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	} else if user == nil && err != nil {
+	if user == nil && err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

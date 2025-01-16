@@ -7,7 +7,8 @@
                 <div class="sidebar-header py-3">
                     <div class="d-flex align-items-center">
                         <button class="btn btn-sm me-2" @click="toggleView()">
-                            <img v-if="userInfo.photo" :src="convertBlobToBase64(userInfo.photo)" alt="avatar" class="rounded-circle image">
+                            <img v-if="userInfo.photo != null" :src="convertBlobToBase64(userInfo.photo)" alt="avatar" class="rounded-circle image">
+                            <i v-else class="bi bi-person-circle" style="font-size: 2rem;"></i>
                         </button>
                         <div class="d-flex">
                             <h2 v-if="selectedView == 0" class="mb-0">Chats</h2>
@@ -17,7 +18,7 @@
                             <h2 v-if="selectedView == 4" class="mb-0">Inoltra a...</h2>
                         </div>
                         <button v-if="selectedView == 0" class="btn btn-sm ms-auto btn-primary" @click="changeToView(2)">nuovo gruppo</button>
-                    <button v-if="selectedView == 2 || selectedView == 3" class="btn btn-sm ms-auto btn-primary" @click="changeToView(selectedView)">x</button>
+                    <button v-if="selectedView == 2 || selectedView == 3" class="btn btn-sm ms-auto btn-primary" @click="changeToView(0)">x</button>
 
                     </div>
                     <!--create conversation-->
@@ -104,7 +105,7 @@
                             <input v-if="selectedChat.isGroup" type="file" id="chatPhoto" class="form-control" @change="handlePhotoUpload">
                         </div>
                         <div class="mb-2 mt-2 pt-2">
-                            <img :src="convertBlobToBase64(chatInfo.photo)" alt="chat photo" class="img-fluid" style="max-width: 100%; max-height: 300px;">
+                            <img v-if="chatInfo.photo != null":src="convertBlobToBase64(chatInfo.photo)" alt="chat photo" class="img-fluid" style="max-width: 100%; max-height: 300px;">
                         </div>
                         <div class="mb-2 mt-2 pt-2">
                             <label for="chatName" class="form-label">Nome Chat</label>
@@ -112,7 +113,7 @@
                         </div>
                         <div v-if="selectedChat.isGroup" class="mb-2 mt-2 pt-2">
                             <label for="chatDescription" class="form-label">Descrizione Chat</label>
-                            <textarea v-model="chatInfo.description" class="form-control" id="chatDescription" placeholder="Descrizione della chat"></textarea>
+                            <textarea v-model="chatInfo.description" class="form-control" id="chatDescription" placeholder="Descrizione della chat" disabled></textarea>
                         </div>
                         <div v-if="selectedChat.isGroup" class="d-flex justify-content-between align-items-center">
                             <button class="btn btn-primary mb-3" @click="updateChatInfo">Salva Modifiche</button>
@@ -164,7 +165,7 @@
                 <div v-if="selectedChat" class="chat-body p-3 flex-grow-1" style="overflow-y: auto; max-height: 75vh;" ref="chatBody">
                     <div v-for="message in messages" :key="message.id" class="mb-3 d-flex align-items-start">
                         
-                        <button v-if="message.senderId != userId" class="btn btn-sm btn-secondary me-2" @click="changeToView(4); selectedMessage=message">
+                        <button v-if="message.senderId != userId" class="btn btn-sm btn-secondary me-2" @click="selectMessageToForward(message)">
                             <i class="bi bi-send" ></i>
                         </button> 
                         
@@ -209,7 +210,7 @@
                             </div>
                         </div>
 
-                        <button v-if="message.senderId == userId" class="btn btn-sm btn-secondary ms-2" @click="changeToView(4); selectedMessage=message">
+                        <button v-if="message.senderId == userId" class="btn btn-sm btn-secondary ms-2" @click="selectMessageToForward(message)">
                             <i class="bi bi-send"></i>
                         </button> <!--icona profilo?-->
                         
@@ -295,6 +296,7 @@ export default {
 
             // fetchGroupMembers
             groupMembers: [],
+
         }
     },
     async mounted() {
@@ -319,7 +321,6 @@ export default {
             }else{
                 this.isGroup = false;
             }
-            // console.log(this.isGroup)
         }
     },
     methods: {
@@ -347,14 +348,25 @@ export default {
                 this.selectedMessage=message
             }
         },
+        selectMessageToForward(message){
+            if(this.selectedView == 4 && this.selectedMessage == message){
+                this.selectedView=0;
+                this.selectedMessage=null;
+            }else{
+                this.selectedView=4;
+                this.selectedMessage=message
+            }
+        },
         handleGroupPhotoUpload(event) {
             this.groupReqInfo.photo = event.target.files[0];
         },
         changeToView(tmpView){
+            console.log(tmpView)
             if(this.selectedView != tmpView){
                 this.selectedView = tmpView;
             }else{
                 this.selectedView = 0;
+                selectedMessage = null;
             }
         },
         addParticipant() {
@@ -589,6 +601,7 @@ export default {
                 });
                 username = '';
                 this.selectedView = 0;
+                this.selectedUser = ''
                 this.fetchChats();
             } catch (error) {
                 console.error('Error creating chat:', error);
@@ -641,6 +654,10 @@ export default {
             }
         },
         async fetchChatInfo(){
+            if (this.selectedView == 3) {
+                this.selectedView = 0;
+                return
+            }
             const token = localStorage.getItem('authToken');
             try {
                 const response = await this.$axios.get(`/users/${this.userId}/conversations/${this.selectedChat.id}`, {
@@ -777,7 +794,7 @@ export default {
             } catch (error) {
                 console.error('Error fetching chat info:', error);
             }
-        }
+        },
 
     },
 };

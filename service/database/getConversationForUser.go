@@ -1,9 +1,5 @@
 package database
 
-import (
-	"errors"
-)
-
 func (db *appdbimpl) GetConversationForUser(idUser int) (*[]Conversation, error) {
 
 	// TODO: capire se fare la stessa cosa anche con il nome
@@ -74,9 +70,5 @@ func (db *appdbimpl) GetConversationForUser(idUser int) (*[]Conversation, error)
 		return nil, err
 	}
 
-	// If no conversations were found, return a custom error
-	if len(convFinale) == 0 {
-		return nil, errors.New("no conversations found")
-	}
 	return &convFinale, nil
 }
