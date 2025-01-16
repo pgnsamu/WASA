@@ -90,7 +90,7 @@ func (rt *_router) sendMessage(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-	_, err = rt.db.SendMessage(idConv, idUser, content, imgData, messageType, nil, 0)
+	_, err = rt.db.SendMessage(idConv, idUser, content, imgData, nil, 0)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

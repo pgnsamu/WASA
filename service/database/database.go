@@ -51,7 +51,7 @@ type AppDatabase interface {
 	GetConversationForUser(idUser int) (*[]Conversation, error)
 	SetGroupName(idUser int, idConversation int, name string) (*Conversation, error)
 	GetMessagesFromConversation(conversationID int) (*[]Message, error)
-	SendMessage(idConversation int, idUser int, content string, photoContent []byte, messageType bool, replyTo *int, isForwarded int) (*[]Message, error)
+	SendMessage(idConversation int, idUser int, content string, photoContent []byte, replyTo *int, isForwarded int) (*[]Message, error)
 	ForwardMessage(idConversationSource int, idConversationDest int, idUser int, idMessage int) (*Conversation, error)
 	DeleteMessage(idConversation int, idUser int, idMessageToDelete int) error
 	UncommentMessage(idConversation int, idUser int, idMessageToUncomment int) error

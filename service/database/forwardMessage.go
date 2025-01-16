@@ -61,12 +61,8 @@ func (db *appdbimpl) ForwardMessage(idConversationSource int, idConversationDest
 		}
 		return nil, err
 	}
-	messageType := false
-	if photoContent != nil {
-		messageType = true
-	}
 
-	_, err = db.SendMessage(idConversationDest, idUser, content, photoContent, messageType, nil, 1)
+	_, err = db.SendMessage(idConversationDest, idUser, content, photoContent, nil, 1)
 	if err != nil {
 		return nil, err
 	}

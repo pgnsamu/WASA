@@ -1,6 +1,6 @@
 package database
 
-func (db *appdbimpl) SeeAllMessages(IdUser int, idConv int) (int, error) {
+func (db *appdbimpl) SeeAllMessages(idUser int, idConv int) (int, error) {
 	query := `
 		UPDATE received
 		SET status = 2
@@ -17,7 +17,7 @@ func (db *appdbimpl) SeeAllMessages(IdUser int, idConv int) (int, error) {
 	}
 	defer stmt.Close()
 
-	res, err := stmt.Exec(IdUser, idConv)
+	res, err := stmt.Exec(idUser, idConv)
 	if err != nil {
 		return 0, err
 	}

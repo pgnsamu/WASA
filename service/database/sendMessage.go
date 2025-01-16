@@ -8,7 +8,7 @@ import (
 // TODO: messagetype per ora sul doc è enum invece di bool
 // TODO: togliere il previewContent dal doc
 // TODO: forse l'attributo replyTo su sendmessage è inutile
-func (db *appdbimpl) SendMessage(idConversation int, idUser int, content string, photoContent []byte, messageType bool, replyTo *int, isForwarded int) (*[]Message, error) {
+func (db *appdbimpl) SendMessage(idConversation int, idUser int, content string, photoContent []byte, replyTo *int, isForwarded int) (*[]Message, error) {
 	resu, err := db.UserExist(idConversation, idUser)
 	if err != nil {
 		return nil, err

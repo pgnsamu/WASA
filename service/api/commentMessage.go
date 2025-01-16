@@ -97,7 +97,7 @@ func (rt *_router) commentMessage(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 
-	_, err = rt.db.SendMessage(idConv, idUser, content, imgData, messageType, &replyTo, 0)
+	_, err = rt.db.SendMessage(idConv, idUser, content, imgData, &replyTo, 0)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
