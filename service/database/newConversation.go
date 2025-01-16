@@ -14,6 +14,7 @@ type Conversation struct {
 	CreatedAt   int     `json:"createdAt"`
 	Description *string `json:"description,omitempty"`
 	Photo       *[]byte `json:"photo,omitempty"`
+	LastMessage *string `json:"lastMessage,omitempty"`
 }
 
 func (db *appdbimpl) NewConversation(userId int, name string, isGroup bool, photo *[]byte, description *string, partecipantsId []int) (*Conversation, error) {

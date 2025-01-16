@@ -40,7 +40,13 @@ func (db *appdbimpl) GetConversationForUser(idUser int) (*[]Conversation, error)
 				)
 				ELSE c.photo
 			END as photo, 
-			c.description 
+			c.description, (
+				SELECT m.content
+				FROM messages m
+				WHERE m.conversationId = c.id
+				ORDER BY m.id DESC
+				LIMIT 1
+			) as lastMessage
 		FROM conversations as c
 		JOIN participate as p ON c.id = p.conversationId
 		JOIN users as u ON p.userId = u.id
@@ -57,7 +63,7 @@ func (db *appdbimpl) GetConversationForUser(idUser int) (*[]Conversation, error)
 	// scanning multiplo anche per ricercare una singola riga in modo da passare tutti i parametri
 	for rows.Next() {
 		var conv Conversation
-		err := rows.Scan(&conv.Id, &conv.Name, &conv.CreatedAt, &conv.IsGroup, &conv.Photo, &conv.Description)
+		err := rows.Scan(&conv.Id, &conv.Name, &conv.CreatedAt, &conv.IsGroup, &conv.Photo, &conv.Description, &conv.LastMessage)
 		if err != nil {
 			return nil, err
 		}

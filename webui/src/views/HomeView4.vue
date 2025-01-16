@@ -7,7 +7,7 @@
                 <div class="sidebar-header py-3">
                     <div class="d-flex align-items-center">
                         <button class="btn btn-sm me-2" @click="toggleView()">
-                            <img :src="convertBlobToBase64(userInfo.photo)" alt="avatar" class="rounded-circle image">
+                            <img v-if="userInfo.photo" :src="convertBlobToBase64(userInfo.photo)" alt="avatar" class="rounded-circle image">
                         </button>
                         <div class="d-flex">
                             <h2 v-if="selectedView == 0" class="mb-0">Chats</h2>
@@ -146,15 +146,33 @@
                 <!-- Chat Body -->
                 <div v-if="selectedChat" class="chat-body p-3 flex-grow-1" style="overflow-y: auto; max-height: 75vh;" ref="chatBody">
                     <div v-for="message in messages" :key="message.id" class="mb-3 d-flex align-items-start">
-
-                        <button v-if="message.senderId != userId" class="btn btn-sm btn-secondary me-2">A</button> <!--icona profilo?-->
-
+                        
+                        <button v-if="message.senderId != userId" class="btn btn-sm btn-secondary me-2">
+                            <i class="bi bi-send" ></i>
+                        </button> 
+                        
+                        <!--bottoni interni-->
                         <div v-if="message.senderId == userId" class="d-flex flex-column ms-auto">
-                            <button class="btn btn-sm btn-secondary mb-2" @click="message.answerTo != -1 ? uncommentMessage(message) : deleteMessage(message)">B</button> <!--delete-->
-                            <button class="btn btn-sm btn-secondary" @click="selectMessage(message)">C</button> <!--reply-->
+                            <button class="btn btn-sm btn-secondary rounded mb-2" @click="message.answerTo != -1 ? uncommentMessage(message) : deleteMessage(message)">
+                                <i v-if="message.answerTo == -1" class="bi bi-trash"></i>
+                                <div v-else class="position-relative" style="width: 20px; height: 20px;">
+                                    <!-- Icona di sfondo -->
+                                    <i class="bi bi-reply text-white position-absolute" style="top: 50%; left: 50%; font-size: 20px; transform: translate(-50%, -50%);"></i>
+                                    <!-- Icona sovrapposta -->
+                                    <i class="bi bi-x text-red position-absolute" style="top: 55%; left: 50%; font-size: 30px; transform: translate(-50%, -50%);"></i>
+                                </div>
+                            </button> <!--delete-->
+                            <button class="btn btn-sm btn-secondary" @click="selectMessage(message)">
+                                <div class="position-relative" style="width: 20px; height: 20px;">
+                                    <i class="bi bi-reply text-white position-absolute" style="top: 50%; left: 50%; font-size: 20px; transform: translate(-50%, -50%);"></i>
+                                </div>
+                            </button> <!--reply-->
                         </div>
 
-                        <div :id="message.id" :class="['p-2', (selectedMessage != null && message.id == selectedMessage.id) ? (message.senderId == userId ? 'bg-success text-white rounded ms-2' : 'bg-success text-white rounded')  : (message.senderId == userId ? 'bg-primary text-white rounded ms-2' : 'bg-light rounded')]" style="max-width: 40%;">
+                        <div :id="message.id" :class="['p-2', (selectedMessage != null && message.id == selectedMessage.id) ? (message.senderId == userId ? 'bg-green-light text-black rounded ms-2' : 'bg-green-light text-black rounded')  : (message.senderId == userId ? 'bg-blue-light text-white rounded ms-2' : 'bg-light rounded')]" style="max-width: 40%;">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <strong>{{ message.senderUsername }}</strong>
+                            </div>
                             <div v-if="message.answerTo != -1">
                                 <div class="bg-success text-white p-1 mb-2 rounded">
                                     <button class="btn btn-link text-white p-0" @click="scrollToMessage(message.answerTo)" style="text-decoration: none;">
@@ -166,27 +184,43 @@
                                 <img :src="convertBlobToBase64(message.photoContent)" alt="photo" class="img-fluid" style="max-width: 100%; max-height: 300px;" />
                             </div>
                             <p v-html="formatContent(message.content)"></p>
-                            <small class="text-muted">{{ convertUnixToTime(message.sentAt) }}</small>
                             <div class="message-status mt-1">
+                                <small class="text-muted me-2">{{ convertUnixToTime(message.sentAt) }}</small>
                                 <i v-if="message.status === 0" class="bi bi-check text-secondary"></i> <!-- Sent -->
                                 <i v-if="message.status === 1" class="bi bi-check-all text-secondary"></i> <!-- Received -->
-                                <i v-if="message.status === 2" :class="message.senderId == userId ? 'bi bi-check-all text-white' :'bi bi-check-all text-primary' "></i> <!-- Seen -->
+                                <i v-if="message.status === 2" class="bi bi-check-all text-primary"></i> <!-- Read -->
                             </div>
                         </div>
 
-                        <button v-if="message.senderId == userId" class="btn btn-sm btn-secondary ms-2">A</button> <!--icona profilo?-->
-
+                        <button v-if="message.senderId == userId" class="btn btn-sm btn-secondary ms-2">
+                            <i class="bi bi-send"></i>
+                        </button> <!--icona profilo?-->
+                        
+                        <!--bottoni interni-->
                         <div v-if="message.senderId != userId" class="d-flex flex-column ms-2">
-                            <button class="btn btn-sm btn-secondary mb-2" @click="message.answerTo != -1 ? uncommentMessage(message) : deleteMessage(message)">B</button> <!--delete-->
-                            <button class="btn btn-sm btn-secondary" @click="selectMessage(message)">C</button> <!--reply-->
+                            <button class="btn btn-sm btn-secondary mb-2" @click="message.answerTo != -1 ? uncommentMessage(message) : deleteMessage(message)">
+                                <div v-if="message.answerTo == -1" class="position-relative" style="width: 20px; height: 20px;">
+                                    <i class="bi bi-trash text-red position-absolute" style="top: 50%; left: 50%; font-size: 15px; transform: translate(-50%, -50%);"></i>
+                                </div>
+                                <div v-else class="position-relative" style="width: 20px; height: 20px;">
+                                    <!-- Icona di sfondo -->
+                                    <i class="bi bi-reply text-white position-absolute" style="top: 50%; left: 50%; font-size: 20px; transform: translate(-50%, -50%);"></i>
+                                    <!-- Icona sovrapposta -->
+                                    <i class="bi bi-x text-red position-absolute" style="top: 55%; left: 50%; font-size: 30px; transform: translate(-50%, -50%);"></i>
+                                </div>
+                            </button> <!--delete-->
+                            <button class="btn btn-sm btn-secondary" @click="selectMessage(message)">
+                                <div class="position-relative" style="width: 20px; height: 20px;">
+                                    <i class="bi bi-reply text-white position-absolute" style="top: 50%; left: 50%; font-size: 20px; transform: translate(-50%, -50%);"></i>
+                                </div>
+                            </button> <!--reply-->
                         </div>
                     </div>
                 </div>
 
                 <!-- Chat Footer -->
                 <div v-if="selectedChat" class="chat-footer border-top p-3">
-                    <textarea v-model="newMessage" class="form-control w-100" placeholder="Type a message"
-                        rows="2"></textarea>
+                    <textarea v-model="newMessage" class="form-control w-100" placeholder="Type a message" rows="2"></textarea>
                     <div class="d-flex justify-content-between align-items-center">
                         <input type="file" id="photo" class="form-control mt-2 w-100 me-2" @change="handlePhotoUpload">
                         <button v-if="selectedMessage != null" class="btn btn-success mt-2 w-100" @click="commentMessage">Rispondi a</button>
@@ -217,9 +251,7 @@ export default {
             userId: null,
             userInfo: {
                 id: null,
-                name: null,
                 username: '',
-                surname: null,
                 photo: null,
             },
 
@@ -274,6 +306,7 @@ export default {
         }
     },
     methods: {
+        
         getSnippet(message) {
             return message.content.length > 20 ? message.content.substring(0, 20) + '...' : message.content;
             // TODO: cambiare nel caso sia solo foto 
@@ -746,4 +779,14 @@ button {
     object-fit: cover;
     /* Ensures the image fills the circle without stretching */
 }
+.bg-blue-light {
+    background-color: #77b2d9; /* Colore verde più chiaro */
+}
+.bg-green-light {
+    background-color: #d4edda; /* Colore verde più chiaro */
+}
+.text-red {
+    color: #ff0000; /* Colore rosso personalizzato */
+  }
+.bi-flip-vertical{ transform:scale(1, -1); }
 </style>
