@@ -602,6 +602,15 @@ export default {
                 username = '';
                 this.selectedView = 0;
                 this.selectedUser = ''
+                if (this.isGroup) {
+                    this.groupReqInfo = {
+                        id: null,
+                        name: null,
+                        description: null,
+                        photo: null,
+                    };
+                    this.participants = [];
+                }
                 this.fetchChats();
             } catch (error) {
                 console.error('Error creating chat:', error);
