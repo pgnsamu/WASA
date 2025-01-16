@@ -39,22 +39,24 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 	id, err := rt.db.DoLogin(reqBody.Username, "", "")
 	if err != nil {
 		if err.Error() == "utente già registrato" {
-			token, err = GenerateJWT(reqBody.Username, *id)
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
+			tok, erro := GenerateJWT(reqBody.Username, *id)
+			if erro != nil {
+				http.Error(w, erro.Error(), http.StatusInternalServerError)
 				return
 			}
+			token = tok
 		} else {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 	} else {
 		// Genero il token
-		token, err = GenerateJWT(reqBody.Username, *id)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+		tok, erro := GenerateJWT(reqBody.Username, *id)
+		if erro != nil {
+			http.Error(w, erro.Error(), http.StatusInternalServerError)
 			return
 		}
+		token = tok
 	}
 
 	claims, err := ValidateJWT(token)

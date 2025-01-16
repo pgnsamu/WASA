@@ -14,5 +14,7 @@ docker-compose.log
 
 .vscode/*
 !.vscode/extensions.json
-WASA3DB.db
-WASA2DB.db
+
+*.db
+
+.golanci.yml
