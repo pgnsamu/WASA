@@ -27,7 +27,7 @@ type WebAPIConfiguration struct {
 	Debug bool
 	DB    struct {
 		// Filename string `conf:"default:../WASA.db"`
-		Filename string `conf:"default:./WASA2DB.db"`
+		Filename string `conf:"default:./WASA3DB.db"`
 	}
 }
 
