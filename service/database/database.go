@@ -62,6 +62,8 @@ type AppDatabase interface {
 	DoLogin(username string, name string, surname string) (*int, error)
 
 	UserExist(idConv int, idUser int) (bool, error)
+	SeeAllMessages(idConv int, idUser int) (int, error)
+	ReceiveAllMessages(idUser int) (int, error)
 	GetProfilePhoto(id int) ([]byte, error)
 	GetUserId(username string) (*int, error) // non viene usata per ora
 	IsCommentTo(idComment int, idMessage int, idConversation int) (bool, error)

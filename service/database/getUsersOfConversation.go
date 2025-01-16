@@ -4,20 +4,11 @@ import "errors"
 
 func (db *appdbimpl) GetUsersOfConversation(idConversation int, idUser int) (*[]User, error) {
 	// controllo se l'utente è presente in participate in collegamento con idConv
-	stringQuery := `SELECT 
-					u.id, 
-					u.username, 
-					u.name, 
-					u.surname, 
-					u.photo
-					FROM 
-						users AS u
-					JOIN 
-						participate AS p
-					ON 
-						p.userId = u.id
-					WHERE 
-						p.conversationId = ? 
+	stringQuery := `SELECT u.id, u.username, u.name, u.surname, u.photo
+					FROM users AS u
+					JOIN participate AS p
+					ON p.userId = u.id
+					WHERE p.conversationId = ? 
 						AND p.conversationId IN (
 							SELECT 
 								p2.conversationId 

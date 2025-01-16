@@ -1,4 +1,5 @@
 <template>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
     <div class="dashboard container-fluid d-flex flex-column" style="min-height: 100vh;">
         <div class="row flex-grow-1">
             <!-- Sidebar -->
@@ -12,9 +13,10 @@
                             <h2 v-if="selectedView == 0" class="mb-0">Chats</h2>
                             <h2 v-if="selectedView == 1" class="mb-0">Profile Settings</h2>
                             <h2 v-if="selectedView == 2" class="mb-0">Creazione gruppo</h2>
+                            <h2 v-if="selectedView == 3" class="mb-0">Impostazioni chat</h2>
                         </div>
-                        <button v-if="selectedView == 0" class="btn btn-sm ms-auto btn-primary" @click="changeToCreateGroupView">nuovo gruppo</button>
-                        <button v-if="selectedView == 2" class="btn btn-sm ms-auto btn-primary" @click="changeToCreateGroupView">x</button>
+                        <button v-if="selectedView == 0" class="btn btn-sm ms-auto btn-primary" @click="changeToView(2)">nuovo gruppo</button>
+                    <button v-if="selectedView == 2 || selectedView == 3" class="btn btn-sm ms-auto btn-primary" @click="changeToView(selectedView)">x</button>
 
                     </div>
                     <!--create conversation-->
@@ -92,6 +94,45 @@
                         </li>
                     </ul>
                 </div>
+
+                <div v-if="selectedView == 3" class="flex-grow-1 mb-2">
+                    <div class="chat-info">
+                        <div class="mb-2 mt-2 pt-2">
+                            <label for="chatPhoto" class="form-label">Foto della Chat</label>
+                            <input v-if="selectedChat.isGroup" type="file" id="chatPhoto" class="form-control" @change="handlePhotoUpload">
+                        </div>
+                        <div class="mb-2 mt-2 pt-2">
+                            <img :src="convertBlobToBase64(chatInfo.photo)" alt="chat photo" class="img-fluid" style="max-width: 100%; max-height: 300px;">
+                        </div>
+                        <div class="mb-2 mt-2 pt-2">
+                            <label for="chatName" class="form-label">Nome Chat</label>
+                            <input type="text" v-model="chatInfo.name" class="form-control" id="chatName" placeholder="Nome chat" :disabled="!selectedChat.isGroup">
+                        </div>
+                        <div v-if="selectedChat.isGroup" class="mb-2 mt-2 pt-2">
+                            <label for="chatDescription" class="form-label">Descrizione Chat</label>
+                            <textarea v-model="chatInfo.description" class="form-control" id="chatDescription" placeholder="Descrizione della chat"></textarea>
+                        </div>
+                        <div v-if="selectedChat.isGroup" class="d-flex justify-content-between align-items-center">
+                            <button class="btn btn-primary mb-3" @click="updateChatInfo">Salva Modifiche</button>
+                        </div>
+                        <div v-if="selectedChat.isGroup" class="d-flex justify-content-between align-items-center mt-3">
+                            <div class="d-flex align-items-center">
+                                <input type="text" v-model="newParticipant" class="form-control me-2" placeholder="Username da aggiungere">
+                                <button class="btn btn-primary" @click="addMemberToGroup">Aggiungi</button>
+                            </div>
+                        </div>
+                        <button class="btn btn-danger mt-2" @click="leaveGroup">Esci dal Gruppo</button>
+                        <div v-if="selectedChat.isGroup" class="mb-2 mt-2 pt-2">
+                            <label class="form-label">Membri del Gruppo</label>
+                            <ul class="list-group">
+                                <li v-for="(member, index) in groupMembers" :key="index" class="list-group-item d-flex justify-content-between align-items-center">
+                                    {{ member.username }}
+                                </li>
+                            </ul>
+                        </div>
+                        
+                    </div>
+                </div>
             </div>
 
             <!-- Main Chat Area -->
@@ -99,7 +140,7 @@
                 <div v-if="selectedChat"
                     class="chat-header border-bottom py-3 d-flex justify-content-between align-items-center">
                     <h5>{{ selectedChat.name }}</h5>
-                    <button class="btn btn-sm btn-primary">Settings</button> <!--TODO: icona ingranaggio?-->
+                    <button class="btn btn-sm btn-primary" @click="fetchChatInfo">Settings</button> <!--TODO: icona ingranaggio?-->
                 </div>
 
                 <!-- Chat Body -->
@@ -126,6 +167,11 @@
                             </div>
                             <p v-html="formatContent(message.content)"></p>
                             <small class="text-muted">{{ convertUnixToTime(message.sentAt) }}</small>
+                            <div class="message-status mt-1">
+                                <i v-if="message.status === 0" class="bi bi-check text-secondary"></i> <!-- Sent -->
+                                <i v-if="message.status === 1" class="bi bi-check-all text-secondary"></i> <!-- Received -->
+                                <i v-if="message.status === 2" :class="message.senderId == userId ? 'bi bi-check-all text-white' :'bi bi-check-all text-primary' "></i> <!-- Seen -->
+                            </div>
                         </div>
 
                         <button v-if="message.senderId == userId" class="btn btn-sm btn-secondary ms-2">A</button> <!--icona profilo?-->
@@ -195,7 +241,11 @@ export default {
             replyToMode: false,
             selectedMessage: null,
 
+            // fetchChatInfo
+            chatInfo: null,
 
+            // fetchGroupMembers
+            groupMembers: [],
         }
     },
     async mounted() {
@@ -224,6 +274,10 @@ export default {
         }
     },
     methods: {
+        getSnippet(message) {
+            return message.content.length > 20 ? message.content.substring(0, 20) + '...' : message.content;
+            // TODO: cambiare nel caso sia solo foto 
+        },
         scrollToMessage(messageId) {
             const messageElement = document.getElementById(messageId);
             if (messageElement) {
@@ -246,9 +300,9 @@ export default {
         handleGroupPhotoUpload(event) {
             this.groupReqInfo.photo = event.target.files[0];
         },
-        changeToCreateGroupView(){
-            if(this.selectedView != 2){
-                this.selectedView = 2;
+        changeToView(tmpView){
+            if(this.selectedView != tmpView){
+                this.selectedView = tmpView;
             }else{
                 this.selectedView = 0;
             }
@@ -340,6 +394,7 @@ export default {
                     },
                 });
                 this.messages = response.data;
+                console.log('Messages:', this.messages);
             } catch (error) {
                 console.error('Error fetching messages:', error);
             }
@@ -532,7 +587,121 @@ export default {
             } catch (error) {
                 console.error('Error deleting message:', error);
             }
+        },
+        async fetchChatInfo(){
+            const token = localStorage.getItem('authToken');
+            try {
+                const response = await this.$axios.get(`/users/${this.userId}/conversations/${this.selectedChat.id}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+                this.chatInfo = response.data;
+                this.fetchGroupMembers();
+                this.changeToView(3);
+                console.log('Chat info:', this.chatInfo);
+            } catch (error) {
+                console.error('Error fetching chat info:', error);
+            }
+        }, 
+        async fetchGroupMembers(){
+            const token = localStorage.getItem('authToken');
+            try {
+                const response = await this.$axios.get(`/users/${this.userId}/conversations/${this.selectedChat.id}/users`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+                this.groupMembers = response.data;
+                console.log('Chat info:', this.participants);
+            } catch (error) {
+                console.error('Error fetching chat info:', error);
+            }
+        },
+        async leaveGroup(){
+            const token = localStorage.getItem('authToken');
+            try {
+                const response = await this.$axios.delete(`/users/${this.userId}/conversations/${this.selectedChat.id}/users`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+                console.log('Chat deleted successfully:', response.data);
+                this.selectedChat = null;
+                this.changeToView(0);   
+                this.fetchChats();
+            } catch (error) {
+                console.error('Error deleting chat:', error);
+            }
+        },
+        async addMemberToGroup(){
+            const token = localStorage.getItem('authToken');
+            try {
+                const response = await this.$axios.post(`/users/${this.userId}/conversations/${this.selectedChat.id}/users`, {
+                    username: this.newParticipant,
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+                console.log('Chat info:', response.data);
+                this.newParticipant = '';
+                this.changeToView(0);   
+                this.fetchGroupMembers();
+            } catch (error) {
+                console.error('Error fetching chat info:', error);
+            }
+        },
+        updateChatInfo(){
+            if(this.chatInfo.name != this.selectedChat.name){
+                this.setGroupName();
+            }
+            if(this.chatInfo.description != this.selectedChat.description){
+                
+            }
+            if(this.selectedFile != null){
+                this.setGroupPhoto();
+            }
+        },
+        async setGroupName(){
+            const token = localStorage.getItem('authToken');
+            try {
+                const response = await this.$axios.put(`/users/${this.userId}/conversations/${this.selectedChat.id}/group`, {
+                    name: this.chatInfo.name,
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+                const updatedChat = this.chats.find(chat => chat.id === response.data.id);
+                if (updatedChat) {
+                    updatedChat.name = response.data.name;
+                }
+                this.changeToView(0);
+            } catch (error) {
+                console.error('Error fetching chat info:', error);
+            }
+        },
+        async setGroupPhoto(){
+            const token = localStorage.getItem('authToken');
+            const formData = new FormData();
+            formData.append('photo', this.selectedFile);
+
+            try {
+                const response = await this.$axios.put(`/users/${this.userId}/conversations/${this.selectedChat.id}/photo`, formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+                this.changeToView(0);
+                this.fetchChats();
+                console.log('Chat info:', response.data);
+            } catch (error) {
+                console.error('Error fetching chat info:', error);
+            }
         }
+
     },
 };
 </script>

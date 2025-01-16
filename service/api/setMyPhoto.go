@@ -97,7 +97,7 @@ func (rt *_router) setMyPhoto(w http.ResponseWriter, r *http.Request, ps httprou
 		"photo": ph,
 	}
 
-	//w.Header().Set("Content-Type", "application/json")
+	// w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(response)
 	if err != nil {

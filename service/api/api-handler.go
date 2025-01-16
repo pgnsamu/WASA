@@ -6,9 +6,6 @@ import (
 
 // Handler returns an instance of httprouter.Router that handle APIs registered here
 func (rt *_router) Handler() http.Handler {
-	// Register routes
-	// rt.router.GET("/", rt.getHelloWorld)
-	rt.router.GET("/context", rt.wrap(rt.getContextReply))
 
 	rt.router.GET("/users", rt.getUsers)                                                               // non sta nel doc
 	rt.router.GET("/users/:id/conversations/:conversationId/users", rt.getParticipants)                // non sta nel doc
@@ -21,8 +18,8 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.POST("/users/:id/photo", rt.setMyPhoto)                                                                         // sta nel doc
 	rt.router.POST("/users/:id/conversations/:conversationId/users", rt.addToGroup)                                           // sta nel doc
 	rt.router.DELETE("/users/:id/conversations/:conversationId/users", rt.leaveGroup)                                         // TODO: nel doc è scritto senza toDelete perché era pensato in modo che un utente non possa espellere altri
-	rt.router.POST("/users/:id/conversations/:conversationId/group", rt.setGroupName)                                         // STA NEL DOC
-	rt.router.POST("/users/:id/conversations/:conversationId/photo", rt.setGroupPhoto)                                        // sta nel doc
+	rt.router.PUT("/users/:id/conversations/:conversationId/group", rt.setGroupName)                                          // STA NEL DOC
+	rt.router.PUT("/users/:id/conversations/:conversationId/photo", rt.setGroupPhoto)                                         // sta nel doc
 	rt.router.GET("/users/:id/conversations", rt.getMyConversations)                                                          // sta nel doc
 	rt.router.POST("/users/:id/conversations", rt.newConversation)                                                            // sta nel doc
 	rt.router.GET("/users/:id/conversations/:conversationId", rt.getConversation)                                             // sta nel doc
@@ -34,6 +31,7 @@ func (rt *_router) Handler() http.Handler {
 
 	// Special routes
 	rt.router.GET("/liveness", rt.liveness)
+	rt.router.GET("/context", rt.wrap(rt.getContextReply))
 
 	return rt.router
 }

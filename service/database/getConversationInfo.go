@@ -16,8 +16,44 @@ func (db *appdbimpl) GetConversationInfo(idConversation int, idUser int) (*Conve
 		return nil, errors.New("utente non registrato")
 	}
 
-	query := "SELECT id, name, createdAt, isGroup, description, photo FROM conversations WHERE id=?"
-	rows, err := db.c.Query(query, idConversation)
+	query2 := `
+		SELECT c.id,
+			CASE 
+				WHEN c.isGroup = false
+				THEN (
+					SELECT u.username
+					FROM conversations c2
+					JOIN participate p1 ON c2.id = p1.conversationId
+					JOIN participate p2 ON c2.id = p2.conversationId
+					JOIN users u ON p2.userId = u.id
+					WHERE p1.userId = ?
+					AND p2.userId != ? 
+					AND c2.id = c.id
+					AND c2.isGroup = false
+				)
+				ELSE c.name
+			END as name, 
+		  c.createdAt, c.isGroup, 
+			CASE 
+				WHEN c.isGroup = false
+				THEN (
+					SELECT u.photo
+					FROM conversations c2
+					JOIN participate p1 ON c2.id = p1.conversationId
+					JOIN participate p2 ON c2.id = p2.conversationId
+					JOIN users u ON p2.userId = u.id
+					WHERE p1.userId = ?
+					AND p2.userId != ? 
+					AND c2.id = c.id
+					AND c2.isGroup = false
+				)
+				ELSE c.photo
+			END as photo, 
+			c.description 
+		FROM conversations as c
+		WHERE c.id = ?;`
+
+	rows, err := db.c.Query(query2, idUser, idUser, idUser, idUser, idConversation)
 	if err != nil {
 		return nil, err
 	}
@@ -26,7 +62,7 @@ func (db *appdbimpl) GetConversationInfo(idConversation int, idUser int) (*Conve
 	var conversation Conversation
 	// scanning multiplo anche per ricercare una singola riga in modo da passare tutti i parametri
 	if rows.Next() {
-		err := rows.Scan(&conversation.Id, &conversation.Name, &conversation.CreatedAt, &conversation.IsGroup, &conversation.Description, &conversation.Photo)
+		err := rows.Scan(&conversation.Id, &conversation.Name, &conversation.CreatedAt, &conversation.IsGroup, &conversation.Photo, &conversation.Description)
 		if err != nil {
 			return nil, err
 		}

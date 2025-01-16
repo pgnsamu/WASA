@@ -10,7 +10,7 @@ import (
 )
 
 type groupData struct {
-	Username string `json:"groupName"`
+	Name string `json:"name"`
 }
 
 // TODO: forse da gestire il fatto che puoi cambiargli nome solo se è un gruppo
@@ -51,13 +51,13 @@ func (rt *_router) setGroupName(w http.ResponseWriter, r *http.Request, ps httpr
 
 	// Decode the JSON body
 	err = json.NewDecoder(r.Body).Decode(&data)
-	if err != nil || data.Username == "" {
+	if err != nil || data.Name == "" {
 		http.Error(w, "Invalid JSON", http.StatusBadRequest)
 		return
 	}
 	defer r.Body.Close()
 
-	user, err := rt.db.SetGroupName(id, idConversation, data.Username)
+	user, err := rt.db.SetGroupName(id, idConversation, data.Name)
 	if user == nil && err != nil && err.Error() == "userNotFound" {
 		http.Error(w, "Errore id non registrato", http.StatusBadRequest)
 		return

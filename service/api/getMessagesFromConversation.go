@@ -47,6 +47,11 @@ func (rt *_router) getMessagesFromConversation(w http.ResponseWriter, r *http.Re
 		http.Error(w, "Utente non autorizzato", http.StatusUnauthorized)
 		return
 	}
+	_, err = rt.db.SeeAllMessages(id, conversationId)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	messages, err := rt.db.GetMessagesFromConversation(conversationId)
 	if err != nil {

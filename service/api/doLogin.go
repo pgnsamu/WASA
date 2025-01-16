@@ -88,4 +88,10 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 		return
 	}
 
+	// TODO: capire dove metterla
+	_, err = rt.db.ReceiveAllMessages(idF)
+	if err != nil {
+		return // Errore non handleato perché nel caso in cui non riesco a ricevere i messaggi, non è un problema per il client
+	}
+
 }

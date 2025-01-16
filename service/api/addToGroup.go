@@ -12,7 +12,7 @@ import (
 
 // Define a struct to match the incoming JSON
 type requestBodyId struct {
-	UserId int `json:"userId"`
+	Username string `json:"username"`
 }
 
 func (rt *_router) addToGroup(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -70,7 +70,12 @@ func (rt *_router) addToGroup(w http.ResponseWriter, r *http.Request, ps httprou
 	}
 
 	w.Header().Set("content-type", "application/json")
-	users, err := rt.db.AddToGroup(idConv, idUser, requestData.UserId)
+	finalId, err := rt.db.GetUserId(requestData.Username)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	users, err := rt.db.AddToGroup(idConv, idUser, *finalId)
 	if err != nil && (err.Error() == "chat piena" || err.Error() == "utente da aggiungere già presente") {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return

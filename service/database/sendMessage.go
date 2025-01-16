@@ -134,7 +134,7 @@ func (db *appdbimpl) SendMessage(idConversation int, idUser int, content string,
 	for _, id := range userIDs {
 		// fmt.Println(id, idUser)
 		if id != idUser {
-			_, err := stmt.Exec(id, lastInsertId, "delivered")
+			_, err := stmt.Exec(id, lastInsertId, 0) // TODO: cercare se nel programma ci sono ancora "delivered"
 			if err != nil {
 				err2 := tx.Rollback() // Rollback in caso di errore
 				if err2 != nil {
