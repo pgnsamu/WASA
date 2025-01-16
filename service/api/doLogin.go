@@ -36,7 +36,7 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 
 	token := ""
 
-	id, err := rt.db.DoLogin(reqBody.Username, "", "")
+	id, err := rt.db.DoLogin(reqBody.Username)
 	if err != nil {
 		if err.Error() == "utente già registrato" {
 			tok, erro := GenerateJWT(reqBody.Username, *id)

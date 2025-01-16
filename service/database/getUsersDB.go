@@ -6,7 +6,7 @@ import (
 
 func (db *appdbimpl) GetUsersDB() (*[]User, error) {
 	// Query to get all users
-	query := "SELECT id, username, name, surname, photo FROM users"
+	query := "SELECT id, username, photo FROM users"
 	rows, err := db.c.Query(query)
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute query: %w", err)
@@ -19,7 +19,7 @@ func (db *appdbimpl) GetUsersDB() (*[]User, error) {
 	// Iterate over rows and scan the data into the User struct
 	for rows.Next() {
 		var user User
-		if err := rows.Scan(&user.Id, &user.Username, &user.Name, &user.Surname, &user.Photo); err != nil {
+		if err := rows.Scan(&user.Id, &user.Username, &user.Photo); err != nil {
 			return nil, fmt.Errorf("failed to scan row: %w", err)
 		}
 		users = append(users, user)

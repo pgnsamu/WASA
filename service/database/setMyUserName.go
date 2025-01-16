@@ -4,26 +4,18 @@ import (
 	"errors"
 )
 
-/*
-	func (db *appdbimpl) GetUserInfo(id int) (User, error) {
-		var user User
-		query := "SELECT id, username, name, surname FROM users WHERE id=$1"
-		err := db.c.QueryRow(query, id).Scan(&user.Id, &user.Username, &user.Name, &user.Surname)
-		if err != nil {
-			if err == sql.ErrNoRows {
-				// No rows foundm
-				return User{}, errors.New("userNotFound")
-			}
-			// Other errors
-			log.Fatal("Failed to read record: ", err)
-			return User{}, err
-		}
-		return user, nil
-	}
-*/
-
 // ritornare l'utente aggiornato
 func (db *appdbimpl) SetMyUserName(id int, username string) (*User, error) {
+
+	// controllo che l'username non sia già esistente
+	var exists bool
+	err := db.c.QueryRow("SELECT EXISTS(SELECT 1 FROM users WHERE username = ?)", username).Scan(&exists)
+	if err != nil {
+		return nil, err
+	}
+	if exists {
+		return nil, errors.New("username già esistente")
+	}
 
 	// preparazione della query
 	stmt, err := db.c.Prepare("UPDATE users SET username = ? WHERE id = ?;")
@@ -32,7 +24,6 @@ func (db *appdbimpl) SetMyUserName(id int, username string) (*User, error) {
 	}
 	defer stmt.Close()
 
-	// TODO: aggiungere controllo username già esistente
 	// esecuzione
 	res, err := stmt.Exec(username, id)
 	if err != nil {

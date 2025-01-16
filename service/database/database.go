@@ -59,7 +59,7 @@ type AppDatabase interface {
 	SaveImageToDB(imgData []byte, table string, field string, userId int) error
 
 	SearchUser(username string) (int, error)
-	DoLogin(username string, name string, surname string) (*int, error)
+	DoLogin(username string) (*int, error)
 
 	UserExist(idConv int, idUser int) (bool, error)
 	SeeAllMessages(idConv int, idUser int) (int, error)
@@ -146,8 +146,6 @@ func New(db *sql.DB) (AppDatabase, error) {
 			CREATE TABLE users (
 				id INTEGER PRIMARY KEY AUTOINCREMENT,       -- Unique identifier for the user
 				username TEXT NOT NULL,                     -- Username, must be unique (consider adding UNIQUE constraint)
-				name TEXT,                                  -- First name of the user
-				surname TEXT,                               -- Last name of the user
 				photo BLOB                                  -- Photo stored as a binary large object
 			)
 		`

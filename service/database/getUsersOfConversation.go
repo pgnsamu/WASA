@@ -4,7 +4,7 @@ import "errors"
 
 func (db *appdbimpl) GetUsersOfConversation(idConversation int, idUser int) (*[]User, error) {
 	// controllo se l'utente è presente in participate in collegamento con idConv
-	stringQuery := `SELECT u.id, u.username, u.name, u.surname, u.photo
+	stringQuery := `SELECT u.id, u.username, u.photo
 					FROM users AS u
 					JOIN participate AS p
 					ON p.userId = u.id
@@ -30,7 +30,7 @@ func (db *appdbimpl) GetUsersOfConversation(idConversation int, idUser int) (*[]
 	// Iterate over rows
 	for rows.Next() {
 		var user User
-		err := rows.Scan(&user.Id, &user.Username, &user.Name, &user.Surname, &user.Photo)
+		err := rows.Scan(&user.Id, &user.Username, &user.Photo)
 		if err != nil {
 			return nil, err
 		}

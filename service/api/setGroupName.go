@@ -58,11 +58,8 @@ func (rt *_router) setGroupName(w http.ResponseWriter, r *http.Request, ps httpr
 	defer r.Body.Close()
 
 	user, err := rt.db.SetGroupName(id, idConversation, data.Name)
-	if user == nil && err != nil && err.Error() == "userNotFound" {
-		http.Error(w, "Errore id non registrato", http.StatusBadRequest)
-		return
-	} else if user == nil && err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	if user == nil && err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
