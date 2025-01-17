@@ -7,10 +7,12 @@ import (
 // Handler returns an instance of httprouter.Router that handle APIs registered here
 func (rt *_router) Handler() http.Handler {
 
-	rt.router.GET("/users", rt.getUsers)                                                               // non sta nel doc
-	rt.router.GET("/users/:id/conversations/:conversationId/users", rt.getParticipants)                // non sta nel doc
-	rt.router.POST("/info", rt.getLoggedUserInfo)                                                      // non sta nel doc e non viene usata (per ora)
-	rt.router.GET("/users/:id/conversations/:conversationId/messages", rt.getMessagesFromConversation) // non sta nel doc
+	rt.router.GET("/users", rt.getUsers)                                                                                      // non sta nel doc
+	rt.router.GET("/users/:id/conversations/:conversationId/users", rt.getParticipants)                                       // non sta nel doc
+	rt.router.POST("/info", rt.getLoggedUserInfo)                                                                             // non sta nel doc e non viene usata (per ora)
+	rt.router.GET("/users/:id/conversations/:conversationId/messages", rt.getMessagesFromConversation)                        // non sta nel doc
+	rt.router.POST("/users/:id/conversations/:conversationId/messages/:messageId/reactions", rt.sendReaction)                 // non sta nel doc
+	rt.router.DELETE("/users/:id/conversations/:conversationId/messages/:messageId/reactions/:reactionId", rt.removeReaction) // non sta nel doc
 
 	rt.router.POST("/session", rt.doLogin)                                                                                    // sta nel doc // TODO: da cambiare nel doc
 	rt.router.GET("/users/:id", rt.getUserInfo)                                                                               // sta nel doc

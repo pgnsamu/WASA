@@ -6,11 +6,18 @@ type Message struct {
 	PhotoContent []byte `json:"photoContent,omitempty"` // Optional in JSON
 	SentAt       int    `json:"sentAt"`
 	// ConversationID int 	`json:"conversationId"`
-	AnswerTo       *int   `json:"answerTo,omitempty"` // Omit if nil
-	IsForwarded    bool   `json:"isForwarded"`
-	SenderID       int    `json:"senderId"`
-	SenderUsername string `json:"senderUsername"`
-	Status         int    `json:"status"`
+	AnswerTo       *int              `json:"answerTo,omitempty"` // Omit if nil
+	IsForwarded    bool              `json:"isForwarded"`
+	SenderID       int               `json:"senderId"`
+	SenderUsername string            `json:"senderUsername"`
+	Status         int               `json:"status"`
+	Reactions      *[]SimpleReaction `json:"reactions,omitempty"`
+}
+type SimpleReaction struct {
+	ID      int    `json:"id"`
+	Content string `json:"content"`
+	SentBy  string `json:"sentBy"`
+	SentAt  int    `json:"sentAt"`
 }
 
 // TODO: da scrivere l'endpoint
@@ -39,15 +46,33 @@ func (db *appdbimpl) GetMessagesFromConversation(conversationID int) (*[]Message
 		if err != nil {
 			return nil, err
 		}
-		/*
-			// Convert sql.NullInt64 to *int
-			if answerTo.Valid {
-				val := int(answerTo.Int64)
-				msg.AnswerTo = &val
-			} else {
-				msg.AnswerTo = nil
+		// Get reactions for the current message
+		reactionQuery := `
+			SELECT r.id, r.reaction, u.username, r.sentAt
+			FROM reactions as r, users u
+			WHERE r.messageId = ? AND r.userId = u.id
+		`
+		reactionRows, err := db.c.Query(reactionQuery, msg.ID)
+		if err != nil {
+			return nil, err
+		}
+		defer reactionRows.Close()
+
+		var reactions []SimpleReaction
+		for reactionRows.Next() {
+			var reaction SimpleReaction
+			err := reactionRows.Scan(&reaction.ID, &reaction.Content, &reaction.SentBy, &reaction.SentAt)
+			if err != nil {
+				return nil, err
 			}
-		*/
+			reactions = append(reactions, reaction)
+		}
+
+		if err := reactionRows.Err(); err != nil {
+			return nil, err
+		}
+
+		msg.Reactions = &reactions
 		messages = append(messages, msg)
 	}
 

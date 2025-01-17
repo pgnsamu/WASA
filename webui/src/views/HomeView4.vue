@@ -205,11 +205,21 @@
                                 <img :src="convertBlobToBase64(message.photoContent)" alt="photo" class="img-fluid" style="max-width: 100%; max-height: 300px;" />
                             </div>
                             <p v-html="formatContent(message.content)"></p>
+                            <div class="message-reactions mt-1">
+                                <span v-for="reaction in message.reactions" :key="reaction.id" class="me-2 hover-container" @mouseover="showTooltip" @mouseleave="hideTooltip">
+                                    {{ reaction.content }} 
+                                    <div class="hover-text" :class="{ visible: isTooltipVisible }">
+                                        <small>{{ reaction.sentBy }}</small>
+                                    </div>
+                                </span>
+                                <button class="btn btn-sm btn-light" @click="handleReactionButton(message, '👍')">👍</button>
+                                <button class="btn btn-sm btn-light" @click="handleReactionButton(message, '❤️')">❤️</button>
+                                <button class="btn btn-sm btn-light" @click="handleReactionButton(message, '😂')">😂</button>
+                            </div>
                             <div class="message-status mt-1">
                                 <small class="text-muted me-2">{{ convertUnixToTime(message.sentAt) }}</small>
-                                <i v-if="message.status === 0" class="bi bi-check text-secondary"></i> <!-- Sent -->
-                                <i v-if="message.status === 1" class="bi bi-check-all text-secondary"></i> <!-- Received -->
-                                <i v-if="message.status === 2" class="bi bi-check-all text-primary"></i> <!-- Read -->
+                                <i v-if="message.senderId == userId && message.status === 1" class="bi bi-check text-secondary"></i> <!-- Sent -->
+                                <i v-if="message.senderId == userId && message.status === 2" class="bi bi-check-all text-primary"></i> <!-- Read -->
                             </div>
                         </div>
 
@@ -300,6 +310,12 @@ export default {
             // fetchGroupMembers
             groupMembers: [],
 
+            // interval
+            interval: null,
+
+            // hovering
+            isTooltipVisible: false,
+
         }
     },
     async mounted() {
@@ -310,6 +326,13 @@ export default {
             await this.fetchChats();
             this.fetchUserData();
         }
+        this.interval = setInterval(() => {
+            if(this.selectedChat != null){
+                this.fetchMessages(this.selectedChat.id);
+            }
+            this.fetchChats();
+        }, 5000);
+        
     },
     watch: {
         messages() {
@@ -325,8 +348,34 @@ export default {
                 this.isGroup = false;
             }
         }
+        
     },
     methods: {
+        showTooltip() {
+            this.isTooltipVisible = true;
+        },
+        hideTooltip() {
+            this.isTooltipVisible = false;
+        },
+        handleReactionButton(message, content) {
+            if(message.reactions == null){
+                this.addReaction(message, content);
+                return;
+            }
+            const existingReaction = message.reactions.find(r => r.sentBy == this.userInfo.username);
+            console.log('existingReaction:', this.userInfo.username);
+            
+            if (existingReaction) {
+                if (existingReaction.content === content) {
+                    this.removeReaction(message, existingReaction);
+                } else {
+                    this.removeReaction(message, existingReaction);
+                    this.addReaction(message, content);
+                }
+            } else {
+                this.addReaction(message, content);
+            }
+        },
 
         getSnippet(message) {
             return message.content.length > 20 ? message.content.substring(0, 20) + '...' : message.content;
@@ -564,7 +613,7 @@ export default {
                 return;
             }
             if (this.isGroup && (this.groupReqInfo.name == '' || this.participants.length < 2 || this.groupReqInfo.photo == null)) {
-                alert('Please enter some data.');
+                alert('inserisci almeno un nome, 2 partecipanti e una foto');
                 return;
             }
             const token = localStorage.getItem('authToken');
@@ -730,6 +779,9 @@ export default {
                 this.changeToView(0);   
                 this.fetchGroupMembers();
             } catch (error) {
+                if (error.response.data == "user not found\n") {
+                    alert('utente non esistente');
+                }
                 console.error('Error fetching chat info:', error);
             }
         },
@@ -807,6 +859,36 @@ export default {
                 console.error('Error fetching chat info:', error);
             }
         },
+        async addReaction(message, reaction) {
+            const token = localStorage.getItem('authToken');
+            try {
+                const response = await this.$axios.post(`/users/${this.userId}/conversations/${this.selectedChat.id}/messages/${message.id}/reactions`, {
+                    content: reaction,
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+                console.log('Reaction added successfully:', response.data);
+                this.fetchMessages(this.selectedChat.id);
+            } catch (error) {
+                console.error('Error adding reaction:', error);
+            }
+        },
+        async removeReaction(message, reaction){
+            const token = localStorage.getItem('authToken');
+            try {
+                const response = await this.$axios.delete(`/users/${this.userId}/conversations/${this.selectedChat.id}/messages/${message.id}/reactions/${reaction.id}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+                console.log('Reaction removed successfully:', response.data);
+                this.fetchMessages(this.selectedChat.id);
+            } catch (error) {
+                console.error('Error removing reaction:', error);
+            }
+        },
 
     },
 };
@@ -862,4 +944,32 @@ button {
     color: #ff0000; /* Colore rosso personalizzato */
   }
 .bi-flip-vertical{ transform:scale(1, -1); }
+
+.hover-container {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.hover-text {
+    visibility: hidden;
+    width: 150px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 5px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 100%; /* Position above the element */
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.hover-container:hover .hover-text {
+    visibility: visible;
+    opacity: 1;
+}
 </style>

@@ -61,6 +61,8 @@ type AppDatabase interface {
 	SearchUser(username string) (int, error)
 	DoLogin(username string) (*int, error)
 
+	SendReaction(idConversation int, idUser int, content string, replyTo int) (*[]Reaction, error)
+	RemoveReaction(idConversation int, idUser int, idMessage int, idReaction int) (*[]Reaction, error)
 	UserExist(idConv int, idUser int) (bool, error)
 	SeeAllMessages(idConv int, idUser int) (int, error)
 	ReceiveAllMessages(idUser int) (int, error)

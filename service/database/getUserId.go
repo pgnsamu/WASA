@@ -20,8 +20,7 @@ func (db *appdbimpl) GetUserId(username string) (*int, error) {
 			return nil, err
 		}
 	} else {
-		errorUserNotFound := errors.New("user not found")
-		return nil, errorUserNotFound
+		return nil, errors.New("user not found")
 	}
 	// Check for errors that may have occurred during iteration
 	if err := rows.Err(); err != nil {

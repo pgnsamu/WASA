@@ -9,12 +9,19 @@ import (
 // TODO: togliere il previewContent dal doc
 // TODO: forse l'attributo replyTo su sendmessage è inutile
 func (db *appdbimpl) SendMessage(idConversation int, idUser int, content string, photoContent []byte, replyTo *int, isForwarded int) (*[]Message, error) {
-	resu, err := db.UserExist(idConversation, idUser)
-	if err != nil {
-		return nil, err
-	}
-	if !resu {
-		return nil, errors.New("utente non presente nella chat")
+	// Controlla se l'utente appartiene alla conversazione
+	var repl int
+	if replyTo != nil {
+		repl = *replyTo
+		ex, err := db.MessageBelongsToConversation(repl, idConversation)
+		if err != nil {
+			return nil, err
+		}
+		if !ex {
+			return nil, errors.New("il messaggio non appartiene a questa conversazione")
+		}
+	} else {
+		repl = -1
 	}
 
 	// Inizia una transazione
@@ -40,11 +47,6 @@ func (db *appdbimpl) SendMessage(idConversation int, idUser int, content string,
 
 	// Ottieni il timestamp corrente
 	sentAt := time.Now().UnixMilli()
-
-	repl := -1
-	if replyTo != nil {
-		repl = *replyTo
-	}
 
 	// Esegui la query
 	resul, err := stmt.Exec(content, photoContent, sentAt, idConversation, isForwarded, idUser, repl)
