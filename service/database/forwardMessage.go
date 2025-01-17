@@ -42,9 +42,9 @@ func (db *appdbimpl) ForwardMessage(idConversationSource int, idConversationDest
 	}
 
 	queryStr = `
-	SELECT content, photoContent
-	FROM messages
-	WHERE id = ?;
+		SELECT content, photoContent
+		FROM messages
+		WHERE id = ?;
 	`
 	stmt, err := db.c.Prepare(queryStr)
 	if err != nil {

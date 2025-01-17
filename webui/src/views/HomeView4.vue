@@ -186,8 +186,11 @@
                                 </div>
                             </button> <!--reply-->
                         </div>
-
+                        <!-- MESSAGGIO -->
                         <div :id="message.id" :class="['p-2', (selectedMessage != null && message.id == selectedMessage.id) ? (message.senderId == userId ? 'bg-green-light text-black rounded ms-2' : 'bg-green-light text-black rounded')  : (message.senderId == userId ? 'bg-blue-light text-white rounded ms-2' : 'bg-light rounded')]" style="max-width: 40%;">
+                            <div v-if="message.isForwarded" class="text-muted small">
+                                <i class="bi bi-arrow-right"></i> Inoltrato
+                            </div>
                             <div class="d-flex justify-content-between align-items-center">
                                 <strong>{{ message.senderUsername }}</strong>
                             </div>
