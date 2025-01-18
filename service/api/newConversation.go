@@ -74,7 +74,8 @@ func (rt *_router) newConversation(w http.ResponseWriter, r *http.Request, ps ht
 		http.Error(w, "Invalid number of participants", http.StatusBadRequest)
 		return
 	}
-	var partecipantsId []int
+
+	var partecipantsId = make([]int, 0, len(partecipantsStr))
 	for _, username := range partecipantsStr {
 		tempId, err := rt.db.GetUserId(username)
 		if err != nil {
