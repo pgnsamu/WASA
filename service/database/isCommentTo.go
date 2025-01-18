@@ -1,5 +1,7 @@
 package database
 
+// nessun errore ritornabile
+
 func (db *appdbimpl) IsCommentTo(idComment int, idMessage int, idConversation int) (bool, error) {
 
 	queryStr := "SELECT senderId FROM messages as m WHERE m.id = ? and m.conversationId = ? and m.answerTo = ?"
@@ -9,7 +11,6 @@ func (db *appdbimpl) IsCommentTo(idComment int, idMessage int, idConversation in
 	}
 	defer stmt.Close()
 
-	// Eseguire la query con un parametro
 	rows, err := stmt.Query(idComment, idConversation, idMessage)
 	if err != nil {
 		return false, err
@@ -19,7 +20,7 @@ func (db *appdbimpl) IsCommentTo(idComment int, idMessage int, idConversation in
 	if rows.Next() {
 		return true, nil
 	}
-	// Check for errors that may have occurred during iteration
+
 	if err := rows.Err(); err != nil {
 		return false, err
 	}

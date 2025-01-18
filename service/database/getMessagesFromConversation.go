@@ -20,7 +20,8 @@ type SimpleReaction struct {
 	SentAt  int    `json:"sentAt"`
 }
 
-// TODO: da scrivere l'endpoint
+// errori non ritornabili da GetMessagesFromConversation
+
 func (db *appdbimpl) GetMessagesFromConversation(conversationID int) (*[]Message, error) {
 	query := `
 		SELECT m.id, m.content, m.photoContent, m.sentAt, m.answerTo, m.isForwarded, m.senderId, u.username, MIN(r.status) as status
@@ -46,7 +47,7 @@ func (db *appdbimpl) GetMessagesFromConversation(conversationID int) (*[]Message
 		if err != nil {
 			return nil, err
 		}
-		// Get reactions for the current message
+		// Ottieni le reazioni per il messaggio corrente
 		reactionQuery := `
 			SELECT r.id, r.reaction, u.username, r.sentAt
 			FROM reactions as r, users u

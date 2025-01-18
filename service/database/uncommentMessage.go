@@ -2,6 +2,11 @@ package database
 
 import "errors"
 
+// errori ritornabili da UncommentMessage
+// gruppo non trovato
+// autore del messaggio sbagliato
+// messaggio non trovato
+
 func (db *appdbimpl) UncommentMessage(idConversation int, idUser int, idMessageToUncomment int) error {
 	exist, err := db.UserExist(idConversation, idUser)
 	if err != nil {

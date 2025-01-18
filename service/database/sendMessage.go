@@ -8,6 +8,10 @@ import (
 // TODO: messagetype per ora sul doc è enum invece di bool
 // TODO: togliere il previewContent dal doc
 // TODO: forse l'attributo replyTo su sendmessage è inutile
+
+// errori ritornabili da SendMessage
+// il messaggio non appartiene a questa conversazione
+
 func (db *appdbimpl) SendMessage(idConversation int, idUser int, content string, photoContent []byte, replyTo *int, isForwarded int) (*[]Message, error) {
 	// Controlla se l'utente appartiene alla conversazione
 	var repl int
@@ -84,8 +88,8 @@ func (db *appdbimpl) SendMessage(idConversation int, idUser int, content string,
 	}
 	defer stmt.Close()
 
-	// Execute the query with the conversation ID (e.g., 20)
-	rows, err := stmt.Query(idConversation) // Passing 20 as the conversationId
+	// Esegui la query con l'ID della conversazione (ad esempio, 20)
+	rows, err := stmt.Query(idConversation)
 	if err != nil {
 		err2 := tx.Rollback() // Rollback in caso di errore
 		if err2 != nil {
@@ -95,10 +99,10 @@ func (db *appdbimpl) SendMessage(idConversation int, idUser int, content string,
 	}
 	defer rows.Close()
 
-	// Declare a slice to hold the user IDs
+	// Dichiarare una slice per contenere gli ID degli utenti
 	var userIDs []int
 
-	// Iterate over the rows and append the user IDs to the slice
+	// Itera sulle righe e aggiungi gli ID degli utenti alla slice
 	for rows.Next() {
 		var userID int
 		err := rows.Scan(&userID)
@@ -109,10 +113,10 @@ func (db *appdbimpl) SendMessage(idConversation int, idUser int, content string,
 			}
 			return nil, err
 		}
-		userIDs = append(userIDs, userID) // Append the user ID to the slice
+		userIDs = append(userIDs, userID) // Aggiungi l'ID utente alla slice
 	}
 
-	// Check for any errors after iterating
+	// Controlla se ci sono errori dopo l'iterazione
 	if err := rows.Err(); err != nil {
 		err2 := tx.Rollback() // Rollback in caso di errore
 		if err2 != nil {
@@ -134,9 +138,8 @@ func (db *appdbimpl) SendMessage(idConversation int, idUser int, content string,
 
 	// per ogni utente appartenente alla conversation dove è stato inviato il messaggio aggiungere una riga di insert in received
 	for _, id := range userIDs {
-		// fmt.Println(id, idUser)
 		if id != idUser {
-			_, err := stmt.Exec(id, lastInsertId, 0) // TODO: cercare se nel programma ci sono ancora "delivered"
+			_, err := stmt.Exec(id, lastInsertId, 0) // 0 = non letto
 			if err != nil {
 				err2 := tx.Rollback() // Rollback in caso di errore
 				if err2 != nil {

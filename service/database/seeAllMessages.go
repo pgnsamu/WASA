@@ -1,5 +1,7 @@
 package database
 
+// nessun errore ritornabile
+
 func (db *appdbimpl) SeeAllMessages(idUser int, idConv int) (int, error) {
 	query := `
 		UPDATE received

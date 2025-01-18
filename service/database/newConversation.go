@@ -17,6 +17,11 @@ type Conversation struct {
 	LastMessage *string `json:"lastMessage,omitempty"`
 }
 
+// errori ritornabili da newConversation
+// utente non registrato
+// utente non trovato
+// TODO: forse si puo mettere tutto in uno e uno in tutti
+
 func (db *appdbimpl) NewConversation(userId int, name string, isGroup bool, photo *[]byte, description *string, partecipantsId []int) (*Conversation, error) {
 
 	// TODO: aggiungere sulla tabella participate collegamento utente conversation per ogni partecipantId+userId
@@ -26,7 +31,7 @@ func (db *appdbimpl) NewConversation(userId int, name string, isGroup bool, phot
 		// se è un gruppo riprepariamo
 		stmt, err := db.c.Prepare("INSERT INTO conversations (name, createdAt, isGroup, description, photo) VALUES (?, ?, ?, ?, ?);")
 		if err != nil {
-			return nil, fmt.Errorf("prepare statement: %w", err)
+			return nil, err
 		}
 		defer stmt.Close()
 
@@ -37,34 +42,34 @@ func (db *appdbimpl) NewConversation(userId int, name string, isGroup bool, phot
 
 		lastInsertID, err := result.LastInsertId()
 		if err != nil {
-			return nil, fmt.Errorf("getting last insert ID: %w", err)
+			return nil, err
 		}
 
 		tempParticipantsId := partecipantsId
 		tempParticipantsId = append(tempParticipantsId, userId) // Append userId to the slice before the loop
-		// fmt.Println(len(tempParticipantsId)) debug:
 
+		// aggiunta dei partecipanti a un gruppo nella tabella
 		for i := 0; i < len(tempParticipantsId); i++ { // TODO: è stato aggiunto un meno 1 ma non so se è giusto controllare (ora è stato tolto e funziona, non lo so )
+
 			stmt, err := db.c.Prepare("INSERT INTO participate (userId, conversationId) VALUES (?, ?);")
 			if err != nil {
-				return nil, fmt.Errorf("prepare statement: %w", err)
+				return nil, err
 			}
 			defer stmt.Close()
-			// fmt.Println(tempParticipantsId[i])
+
 			_, err = stmt.Exec(tempParticipantsId[i], lastInsertID)
 			if err != nil {
-				// fmt.Println(tempParticipantsId[i])
-				// fmt.Println(err.Error()) // errore qui UNIQUE constraint failed: participate.userId, participate.conversationId
 				return nil, err
 			}
 		}
 
 		conversation, err := db.GetConversationInfo(int(lastInsertID), userId)
 		if err != nil {
-			return nil, fmt.Errorf("getting last insert ID: %w", err)
+			return nil, err
 		}
 		return conversation, nil
 	} else {
+		// se è una chat privata riprepariamo
 		stmt, err := db.c.Prepare("INSERT INTO conversations (name, createdAt, isGroup) VALUES (?, ?, ?);")
 		if err != nil {
 			return nil, fmt.Errorf("prepare statement: %w", err)
@@ -78,16 +83,16 @@ func (db *appdbimpl) NewConversation(userId int, name string, isGroup bool, phot
 
 		lastInsertID, err := result.LastInsertId()
 		if err != nil {
-			return nil, fmt.Errorf("getting last insert ID: %w", err)
+			return nil, err
 		}
 
 		tempParticipantsId := partecipantsId
 		tempParticipantsId = append(tempParticipantsId, userId)
-		// log.Println(len(tempParticipantsId)) // TODO: vedere se è da controllare il numero <3
+		// TODO: vedere se è da controllare il numero <3
 		for i := 0; i < len(tempParticipantsId); i++ {
 			stmt, err := db.c.Prepare("INSERT INTO participate (userId, conversationId) VALUES (?, ?);")
 			if err != nil {
-				return nil, fmt.Errorf("prepare statement: %w", err)
+				return nil, err
 			}
 			defer stmt.Close()
 
@@ -99,7 +104,7 @@ func (db *appdbimpl) NewConversation(userId int, name string, isGroup bool, phot
 
 		conversation, err := db.GetConversationInfo(int(lastInsertID), userId)
 		if err != nil {
-			return nil, fmt.Errorf("getting last insert ID: %w", err)
+			return nil, err
 		}
 		return conversation, nil
 	}

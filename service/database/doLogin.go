@@ -2,7 +2,6 @@ package database
 
 import (
 	"database/sql"
-	"errors"
 )
 
 type User struct {
@@ -10,6 +9,8 @@ type User struct {
 	Username string  `json:"username"`
 	Photo    *[]byte `json:"photo,omitempty"`
 }
+
+// nessun errore ritornabile
 
 func (db *appdbimpl) DoLogin(username string) (*int, error) {
 	// ricerca se l'username è già nel DB
@@ -31,9 +32,8 @@ func (db *appdbimpl) DoLogin(username string) (*int, error) {
 
 	} else if resSearch == -1 && errore != nil { // se la ricerca ha trovato errori e quindi non ha trovato il record allora ritorno errore
 		return nil, errore
-
-	} else { // nel caso in cui il record già esiste ritorno utente già esistente TODO: probabile da eliminare
-		return &resSearch, errors.New("utente già registrato")
+	} else {
+		return &resSearch, nil
 	}
 }
 

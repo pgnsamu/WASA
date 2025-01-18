@@ -1,5 +1,7 @@
 package database
 
+// nessun errore ritornabile
+
 func (db *appdbimpl) GetConversationForUser(idUser int) (*[]Conversation, error) {
 
 	// TODO: capire se fare la stessa cosa anche con il nome
@@ -48,12 +50,11 @@ func (db *appdbimpl) GetConversationForUser(idUser int) (*[]Conversation, error)
 		JOIN users as u ON p.userId = u.id
 		WHERE p.userId = ?;`
 
-	// query := "SELECT id, name, createdAt, isGroup, photo, description FROM conversations as c, participate as p WHERE c.id = p.conversationId and userId = ?"
 	rows, err := db.c.Query(query2, idUser, idUser, idUser, idUser, idUser)
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close() // defer keyword is used to schedule a function call to be executed after the surrounding function has completed. Deferred functions are typically used for cleanup tasks
+	defer rows.Close()
 
 	var convFinale []Conversation
 	// scanning multiplo anche per ricercare una singola riga in modo da passare tutti i parametri
@@ -65,7 +66,7 @@ func (db *appdbimpl) GetConversationForUser(idUser int) (*[]Conversation, error)
 		}
 		convFinale = append(convFinale, conv)
 	}
-	// Check for errors that may have occurred during iteration
+	// Controlla se ci sono stati errori durante l'iterazione
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}

@@ -5,6 +5,9 @@ import (
 	"time"
 )
 
+// errori ritornabili da MessageBelongsToConversation
+// nessuno
+
 func (db *appdbimpl) MessageBelongsToConversation(idMessage int, idConversation int) (bool, error) {
 	queryStr := "SELECT EXISTS(SELECT 1 FROM messages WHERE id = ? AND conversationId = ?);"
 	var exists int
@@ -28,6 +31,10 @@ type Reaction struct {
 	Content   string `json:"content"`
 	SentAt    int64  `json:"sentAt,omitempty"`
 }
+
+// errori ritornabili da SendReaction
+// utente non presente nella chat
+// il messaggio non appartiene a questa conversazione
 
 func (db *appdbimpl) SendReaction(idConversation int, idUser int, content string, replyTo int) (*[]Reaction, error) {
 	resu, err := db.UserExist(idConversation, idUser)

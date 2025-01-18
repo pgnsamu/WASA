@@ -1,5 +1,7 @@
 package database
 
+// nessun errore ritornabile
+
 func (db *appdbimpl) UserExist(idConv int, idUser int) (bool, error) {
 
 	// controllo utente se è all'interno

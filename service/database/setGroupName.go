@@ -4,6 +4,12 @@ import (
 	"errors"
 )
 
+// errori ritornabili da SetGroupName
+// utente non registrato nel gruppo
+// troppe righe
+// utente non registrato
+// utente non trovato
+
 // ritornare la conversation aggiornata
 func (db *appdbimpl) SetGroupName(idUser int, idConversation int, name string) (*Conversation, error) {
 
@@ -51,18 +57,17 @@ func (db *appdbimpl) SetGroupName(idUser int, idConversation int, name string) (
 
 	// controllo righe interessate che in questo caso dovranno essere == 1
 	rowsAffected, err := res.RowsAffected()
-	if rowsAffected != 1 {
-		if err != nil {
-			return nil, err
-		} else {
-			return nil, errors.New("too much rows")
-		}
+	if err != nil {
+		return nil, err
 	}
-	var conv *Conversation
-	conv, err = db.GetConversationInfo(idConversation, idUser)
+	if rowsAffected != 1 {
+		return nil, errors.New("troppe righe")
+	}
+
+	conve, err := db.GetConversationInfo(idConversation, idUser)
 	if err != nil {
 		return nil, err
 	}
 
-	return conv, nil
+	return conve, nil
 }

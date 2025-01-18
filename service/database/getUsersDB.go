@@ -4,6 +4,8 @@ import (
 	"fmt"
 )
 
+// funzione di debugs
+
 func (db *appdbimpl) GetUsersDB() (*[]User, error) {
 	// Query to get all users
 	query := "SELECT id, username, photo FROM users"
@@ -20,14 +22,14 @@ func (db *appdbimpl) GetUsersDB() (*[]User, error) {
 	for rows.Next() {
 		var user User
 		if err := rows.Scan(&user.Id, &user.Username, &user.Photo); err != nil {
-			return nil, fmt.Errorf("failed to scan row: %w", err)
+			return nil, err
 		}
 		users = append(users, user)
 	}
 
 	// Check for errors after iterating over rows
 	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("error iterating rows: %w", err)
+		return nil, err
 	}
 
 	return &users, nil

@@ -1,7 +1,6 @@
 package api
 
 import (
-	"encoding/json"
 	"net/http"
 	"strconv"
 	"strings"
@@ -54,7 +53,7 @@ func (rt *_router) leaveGroup(w http.ResponseWriter, r *http.Request, ps httprou
 		return
 	}
 
-	users, err := rt.db.DeleteUserFromConv(idConv, idUser, idUser)
+	err = rt.db.DeleteUserFromConv(idConv, idUser, idUser)
 	if err != nil && err.Error() == "partecipanti non trovati" {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -62,15 +61,7 @@ func (rt *_router) leaveGroup(w http.ResponseWriter, r *http.Request, ps httprou
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	if users == nil {
-		w.WriteHeader(http.StatusNoContent)
-		return
-	}
-	w.Header().Set("content-type", "application/json")
-	err = json.NewEncoder(w).Encode(*users)
-	if err != nil {
-		http.Error(w, "Failed to encode users to JSON", http.StatusInternalServerError)
-		return
-	}
+
+	w.WriteHeader(http.StatusNoContent)
 
 }

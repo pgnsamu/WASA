@@ -4,13 +4,17 @@ import (
 	"errors"
 )
 
+// errori ritornabili da GetUserInfo
+// utente non trovato
+
 func (db *appdbimpl) GetUserInfo(id int) (*User, error) {
 	query := "SELECT id, username, photo FROM users WHERE id= ?"
 	rows, err := db.c.Query(query, id)
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close() // defer keyword is used to schedule a function call to be executed after the surrounding function has completed. Deferred functions are typically used for cleanup tasks
+	defer rows.Close()
+	// La parola chiave defer viene utilizzata per pianificare una chiamata di funzione da eseguire dopo che la funzione circostante è stata completata.
 
 	var user User
 	// scanning multiplo anche per ricercare una singola riga in modo da passare tutti i parametri
@@ -20,9 +24,9 @@ func (db *appdbimpl) GetUserInfo(id int) (*User, error) {
 			return nil, err
 		}
 	} else {
-		return nil, errors.New("user not found")
+		return nil, errors.New("utente non trovato")
 	}
-	// Check for errors that may have occurred during iteration
+	// Controlla se si sono verificati errori durante l'iterazione
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}

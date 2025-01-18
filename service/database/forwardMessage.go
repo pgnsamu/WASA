@@ -1,10 +1,13 @@
 package database
 
 import (
-	"database/sql"
 	"errors"
-	"fmt"
 )
+
+// errori ritornabili da ForwardMessage
+// utente non presente nella chat sorgente
+// utente non presente nella chat di destinazione
+// messaggio non trovato
 
 func (db *appdbimpl) ForwardMessage(idConversationSource int, idConversationDest int, idUser int, idMessage int) (*Conversation, error) {
 
@@ -18,13 +21,12 @@ func (db *appdbimpl) ForwardMessage(idConversationSource int, idConversationDest
 		return nil, errors.New("utente non presente nella chat sorgente")
 	}
 
-	// fmt.Println(idConversationDest, idUser)
 	// controllo se l'utente esiste nella conversazione di dest
-	resu, err = db.UserExist(idConversationDest, idUser)
+	res, err := db.UserExist(idConversationDest, idUser)
 	if err != nil {
 		return nil, err
 	}
-	if !resu {
+	if !res {
 		return nil, errors.New("utente non presente nella chat di destinazione")
 	}
 
@@ -56,9 +58,6 @@ func (db *appdbimpl) ForwardMessage(idConversationSource int, idConversationDest
 
 	err = stmt.QueryRow(idMessage).Scan(&content, &photoContent)
 	if err != nil {
-		if err == sql.ErrNoRows { // TODO: fix go-errorlint ./... comparing errors ERRORE
-			return nil, fmt.Errorf("no message found with id %d", idMessage)
-		}
 		return nil, err
 	}
 

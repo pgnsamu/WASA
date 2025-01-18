@@ -4,6 +4,10 @@ import (
 	"errors"
 )
 
+// errori ritornabili da SetMyUserName
+// username già esistente
+// utente non trovato
+
 // ritornare l'utente aggiornato
 func (db *appdbimpl) SetMyUserName(id int, username string) (*User, error) {
 
@@ -32,16 +36,14 @@ func (db *appdbimpl) SetMyUserName(id int, username string) (*User, error) {
 
 	// controllo righe interessate che in questo caso dovranno essere == 1
 	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return nil, err
+	}
 	if rowsAffected != 1 {
-		if err != nil {
-			return nil, err
-		} else {
-			return nil, errors.New("utente non trovato")
-		}
+		return nil, errors.New("utente non trovato")
 	}
 
-	var user *User
-	user, err = db.GetUserInfo(id)
+	user, err := db.GetUserInfo(id)
 	if err != nil {
 		return nil, err
 

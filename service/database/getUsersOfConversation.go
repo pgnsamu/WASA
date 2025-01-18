@@ -2,6 +2,9 @@ package database
 
 import "errors"
 
+// errori ritornabili da GetUsersOfConversation
+// partecipanti non trovati
+
 func (db *appdbimpl) GetUsersOfConversation(idConversation int, idUser int) (*[]User, error) {
 	// controllo se l'utente è presente in participate in collegamento con idConv
 	stringQuery := `SELECT u.id, u.username, u.photo
@@ -17,14 +20,14 @@ func (db *appdbimpl) GetUsersOfConversation(idConversation int, idUser int) (*[]
 							WHERE 
 								p2.userId = ?
 						);`
-	// Execute the query
+	// eseguo la query
 	rows, err := db.c.Query(stringQuery, idConversation, idUser)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	// Prepare a slice to hold the results
+	// array per contenere gli utenti risultanti
 	var users []User
 
 	// Iterate over rows

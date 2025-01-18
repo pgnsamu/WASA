@@ -4,9 +4,12 @@ import (
 	"errors"
 )
 
+// errori ritornabili da GetConversationInfo
+// utente non registrato
+// utente non trovato
+
 func (db *appdbimpl) GetConversationInfo(idConversation int, idUser int) (*Conversation, error) {
 
-	// TODO: cambiare struct conversation in modo che tenga anche i messaggi mandati
 	// controllo utente se è all'interno
 	resu, err := db.UserExist(idConversation, idUser)
 	if err != nil {
@@ -67,8 +70,7 @@ func (db *appdbimpl) GetConversationInfo(idConversation int, idUser int) (*Conve
 			return nil, err
 		}
 	} else {
-		errorUserNotFound := errors.New("user not found")
-		return nil, errorUserNotFound
+		return nil, errors.New("utente non trovato")
 	}
 	// TODO: capire se è qua il problema stessa cosa su getUserInfo riga 44
 	// Check for errors that may have occurred during iteration

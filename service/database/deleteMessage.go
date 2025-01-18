@@ -2,13 +2,18 @@ package database
 
 import "errors"
 
+// errori che possono essere ritornati da deleteMessage
+// utente non nel gruppo
+// autore del messaggio sbagliato
+// nessun messaggio trovato con quell'id
+
 func (db *appdbimpl) DeleteMessage(idConversation int, idUser int, idMessageToDelete int) error {
 	exist, err := db.UserExist(idConversation, idUser)
 	if err != nil {
 		return err
 	}
 	if !exist {
-		return errors.New("gruppo non trovato")
+		return errors.New("utente non nel gruppo")
 	}
 
 	// Inizia una transazione
@@ -45,8 +50,8 @@ func (db *appdbimpl) DeleteMessage(idConversation int, idUser int, idMessageToDe
 		return errors.New("autore del messaggio sbagliato")
 	}
 
-	queryStr = "DELETE FROM received WHERE messageId = ?"
-	stmt, err = tx.Prepare(queryStr)
+	queryStr2 := "DELETE FROM received WHERE messageId = ?"
+	stmt, err = tx.Prepare(queryStr2)
 	if err != nil {
 		err2 := tx.Rollback() // Rollback in caso di errore
 		if err2 != nil {
@@ -76,7 +81,7 @@ func (db *appdbimpl) DeleteMessage(idConversation int, idUser int, idMessageToDe
 		return err
 	}
 	if rowsAffected == 0 {
-		return errors.New("no message found with that id")
+		return errors.New("nessun messaggio trovato con quell'id")
 	}
 
 	// cancellazione di tutti i commenti collegati al messaggio da eliminare
@@ -132,7 +137,7 @@ func (db *appdbimpl) DeleteMessage(idConversation int, idUser int, idMessageToDe
 		return err
 	}
 	if rowsAffected == 0 {
-		return errors.New("no message found with that id")
+		return errors.New("nessun messaggio trovato con quell'id")
 	}
 
 	// Conferma la transazione
