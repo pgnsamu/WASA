@@ -18,8 +18,7 @@
                             <h2 v-if="selectedView == 4" class="mb-0">Inoltra a...</h2>
                         </div>
                         <button v-if="selectedView == 0" class="btn btn-sm ms-auto btn-primary" @click="changeToView(2)">nuovo gruppo</button>
-                    <button v-if="selectedView == 2 || selectedView == 3" class="btn btn-sm ms-auto btn-primary" @click="changeToView(0)">x</button>
-
+                        <button v-if="selectedView == 2 || selectedView == 3" class="btn btn-sm ms-auto btn-primary" @click="changeToView(0)">x</button>
                     </div>
                     <!--create conversation-->
                     <div v-if="this.selectedView == 0" class="d-flex align-items-center mt-3">
@@ -105,7 +104,7 @@
                             <input v-if="selectedChat.isGroup" type="file" id="chatPhoto" class="form-control" @change="handlePhotoUpload">
                         </div>
                         <div class="mb-2 mt-2 pt-2">
-                            <img v-if="chatInfo.photo != null":src="convertBlobToBase64(chatInfo.photo)" alt="chat photo" class="img-fluid" style="max-width: 100%; max-height: 300px;">
+                            <img v-if="chatInfo.photo != null" :src="convertBlobToBase64(chatInfo.photo)" alt="chat photo" class="img-fluid" style="max-width: 100%; max-height: 300px;">
                         </div>
                         <div class="mb-2 mt-2 pt-2">
                             <label for="chatName" class="form-label">Nome Chat</label>
