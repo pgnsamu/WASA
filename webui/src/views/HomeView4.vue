@@ -78,12 +78,14 @@
                         <label for="groupDescription" class="form-label">Descrizione Gruppo</label>
                         <textarea v-model="groupReqInfo.description" class="form-control" id="groupDescription" placeholder="Descrizione del gruppo"></textarea>
                     </div>
+                    <!--
                     <div class="mb-2 mt-2 pt-2">
                         <label for="addMember" class="form-label">Username membro da aggiungere</label>
                         <input type="text" v-model="newParticipant" class="form-control" id="addMember" placeholder="username dell'utente">
                     </div>
+                    -->
                     <div class="d-flex justify-content-between align-items-center">
-                        <button class="btn btn-secondary mb-3" @click="addParticipant">Aggiungi membro</button>
+                        <!--<button class="btn btn-secondary mb-3" @click="addParticipant">Aggiungi membro</button>-->
                         <button class="btn btn-primary mb-3" @click="newConversation">Crea Gruppo</button>
                     </div>
                     <ul class="list-group">
@@ -612,7 +614,7 @@ export default {
                 alert('Please enter a valid username.');
                 return;
             }
-            if (this.isGroup && (this.groupReqInfo.name == '' || this.participants.length < 2 || this.groupReqInfo.photo == null)) {
+            if (this.isGroup && (this.groupReqInfo.name == '' ||this.groupReqInfo.photo == null)) { // possiamo aggiungere anche controllo sui partecipanti " this.participants.length < 2 || "
                 alert('inserisci almeno un nome, 2 partecipanti e una foto');
                 return;
             }

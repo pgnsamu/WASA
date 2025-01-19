@@ -70,10 +70,11 @@ func (rt *_router) newConversation(w http.ResponseWriter, r *http.Request, ps ht
 			partecipantsId = append(partecipantsId, id)
 		}
 	*/
-	if !isGroup && len(partecipantsStr) != 1 {
-		http.Error(w, "Invalid number of participants", http.StatusBadRequest)
-		return
-	}
+	/*
+		if !isGroup && len(partecipantsStr) != 1 {
+			http.Error(w, "Invalid number of participants", http.StatusBadRequest)
+			return
+		}*/
 
 	var partecipantsId = make([]int, 0, len(partecipantsStr))
 	for _, username := range partecipantsStr {
