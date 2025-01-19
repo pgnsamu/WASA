@@ -357,6 +357,7 @@ export default {
             this.isTooltipVisible = false;
         },
         handleReactionButton(message, content) {
+            // probabile bug se vado a rimuovere una reazione e si crea concorrenza con il fetching automatico
             if(message.reactions == null){
                 this.addReaction(message, content);
                 return;

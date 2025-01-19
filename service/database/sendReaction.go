@@ -35,6 +35,7 @@ type Reaction struct {
 // errori ritornabili da SendReaction
 // utente non presente nella chat
 // il messaggio non appartiene a questa conversazione
+// l'utente ha già una reazione a questo messaggio
 
 func (db *appdbimpl) SendReaction(idConversation int, idUser int, content string, replyTo int) (*[]Reaction, error) {
 	resu, err := db.UserExist(idConversation, idUser)
@@ -52,6 +53,19 @@ func (db *appdbimpl) SendReaction(idConversation int, idUser int, content string
 	}
 	if !messageBelongs {
 		return nil, errors.New("il messaggio non appartiene a questa conversazione")
+	}
+
+	// Controlla se l'utente ha già una reazione a quel messaggio
+	q := "SELECT EXISTS(SELECT 1 FROM reactions WHERE messageId = ? AND userId = ? and reaction = ?);"
+	var reactionExists int
+
+	err = db.c.QueryRow(q, replyTo, idUser, content).Scan(&reactionExists)
+	if err != nil {
+		return nil, err
+	}
+
+	if reactionExists == 1 {
+		return nil, errors.New("l'utente ha già una reazione a questo messaggio")
 	}
 
 	queryStr := "INSERT INTO reactions (messageId, userId, reaction, sentAt) VALUES (?, ?, ?, ?)"

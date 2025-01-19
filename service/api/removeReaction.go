@@ -56,7 +56,7 @@ func (rt *_router) removeReaction(w http.ResponseWriter, r *http.Request, ps htt
 
 	_, err = rt.db.RemoveReaction(idConv, idUser, messageId, reactionId)
 	if err != nil {
-		http.Error(w, "Errore durante la rimozione della reazione", http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
