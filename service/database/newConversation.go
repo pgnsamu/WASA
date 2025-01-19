@@ -1,7 +1,8 @@
 package database
 
 import (
-	"fmt"
+	"database/sql"
+	"errors"
 	"time"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -20,6 +21,7 @@ type Conversation struct {
 // errori ritornabili da newConversation
 // utente non registrato
 // utente non trovato
+// chat già esistente
 // TODO: forse si puo mettere tutto in uno e uno in tutti
 
 func (db *appdbimpl) NewConversation(userId int, name string, isGroup bool, photo *[]byte, description *string, partecipantsId []int) (*Conversation, error) {
@@ -69,10 +71,25 @@ func (db *appdbimpl) NewConversation(userId int, name string, isGroup bool, phot
 		}
 		return conversation, nil
 	} else {
+		// controllo se l'utente ha già una chat privata con l'utente
+		var existingConversationId int
+		q := `SELECT c.id 
+			FROM conversations c 
+			JOIN participate p1 ON c.id = p1.conversationId 
+			JOIN participate p2 ON c.id = p2.conversationId 
+			WHERE p1.userId = ? AND p2.userId = ? AND c.isGroup = false
+		`
+		err := db.c.QueryRow(q, userId, partecipantsId[0]).Scan(&existingConversationId)
+		if err == nil {
+			return nil, errors.New("chat già esistente")
+		} else if err != sql.ErrNoRows {
+			return nil, err
+		}
+
 		// se è una chat privata riprepariamo
 		stmt, err := db.c.Prepare("INSERT INTO conversations (name, createdAt, isGroup) VALUES (?, ?, ?);")
 		if err != nil {
-			return nil, fmt.Errorf("prepare statement: %w", err)
+			return nil, err
 		}
 		defer stmt.Close()
 
