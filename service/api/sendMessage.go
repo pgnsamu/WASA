@@ -79,6 +79,11 @@ func (rt *_router) sendMessage(w http.ResponseWriter, r *http.Request, ps httpro
 		}
 	}
 
+	if (content == "" && !messageType) || (messageType && file == nil) {
+		http.Error(w, "content is empty", http.StatusBadRequest)
+		return
+	}
+
 	resu, err := rt.db.UserExist(idConv, idUser)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
