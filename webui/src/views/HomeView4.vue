@@ -23,7 +23,7 @@
                     <!--create conversation-->
                     <div v-if="this.selectedView == 0" class="d-flex align-items-center mt-3">
                         <input type="text" v-model="selectedUser" class="form-control me-2" placeholder="Username a cui scrivere"/>
-                        <button type="button" class="btn ms-auto btn-primary" style="border-radius: 0.4rem;" @click="newConversation(selectedUser)">vai</button>
+                        <button type="button" class="btn btn-sm ms-auto btn-primary" style="border-radius: 0.4rem;" @click="newConversation(selectedUser)">Crea Chat</button>
                     </div>
                 </div>
                 
@@ -196,8 +196,8 @@
                                 <strong>{{ message.senderUsername }}</strong>
                             </div>
                             <div v-if="message.answerTo != -1">
-                                <div class="bg-success text-white p-1 mb-2 rounded">
-                                    <button class="btn btn-link text-white p-0" @click="scrollToMessage(message.answerTo)" style="text-decoration: none;">
+                                <div class="bg-success text-white p-1 mb-2 rounded" @click="scrollToMessage(message.answerTo)">
+                                    <button class="btn btn-link text-white p-0" style="text-decoration: none;">
                                         <small>{{ messages.find(msg => msg.id === message.answerTo)?.content }}</small> <!-- TODO: mmettere nel caso in cui non esista content un'icona della foto-->
                                     </button>
                                 </div>
@@ -667,6 +667,9 @@ export default {
                 }
                 this.fetchChats();
             } catch (error) {
+                if(error.response.data == "utente non trovato\n"){
+                    alert('utente non esistente');
+                }
                 console.error('Error creating chat:', error);
             }
         },

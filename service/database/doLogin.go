@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"errors"
 )
 
 type User struct {
@@ -42,7 +43,7 @@ func (db *appdbimpl) SearchUser(username string) (int, error) {
 	var id int
 	err := db.c.QueryRow("SELECT id FROM users WHERE username = ?", username).Scan(&id)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			// No rows found
 			return -1, nil
 		}

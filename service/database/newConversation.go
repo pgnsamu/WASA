@@ -82,7 +82,7 @@ func (db *appdbimpl) NewConversation(userId int, name string, isGroup bool, phot
 		err := db.c.QueryRow(q, userId, partecipantsId[0]).Scan(&existingConversationId)
 		if err == nil {
 			return nil, errors.New("chat già esistente")
-		} else if err != sql.ErrNoRows {
+		} else if !errors.Is(err, sql.ErrNoRows) {
 			return nil, err
 		}
 
