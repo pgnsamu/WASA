@@ -3,7 +3,7 @@ package database
 // nessun errore ritornabile
 
 func (db *appdbimpl) GetConversationForUser(idUser int) (*[]Conversation, error) {
-
+	// TODO: sarebbe bello se le chat fossero in ordine cronologico inverso
 	// TODO: capire se fare la stessa cosa anche con il nome
 	query2 := `
 		SELECT c.id,
