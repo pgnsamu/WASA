@@ -795,7 +795,8 @@ export default {
                 this.changeToView(0);   
                 this.fetchGroupMembers();
             } catch (error) {
-                if (error.response.data == "user not found\n" || error.response.data == "utente non trovato") {
+                console.log(error.response.data);
+                if (error.response.data == "user not found\n" || error.response.data == "utente non trovato\n") {
                     alert('utente non esistente');
                 }
                 console.error('Error fetching chat info:', error);
