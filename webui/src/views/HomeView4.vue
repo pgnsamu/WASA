@@ -265,7 +265,7 @@
                         <input type="file" id="photo" class="form-control mt-2 w-100 me-2" @change="handlePhotoUpload">
                         <button v-if="selectedMessage != null" class="btn btn-success mt-2 w-100" @click="commentMessage">Rispondi a</button>
                         <!--<button v-else @click="sendMessage" class="btn btn-primary mt-2 w-100" :disabled="groupMembers.length <= 1">Invia</button>-->
-                        <button v-else @click="sendMessage" class="btn btn-primary mt-2 w-100" >Invia</button>
+                        <button v-else @click="sendMessage" class="btn btn-primary mt-2 w-100">Invia</button>
                     </div>
                 </div>
             </div>
@@ -795,7 +795,7 @@ export default {
                 this.changeToView(0);   
                 this.fetchGroupMembers();
             } catch (error) {
-                if (error.response.data == "user not found\n") {
+                if (error.response.data == "user not found\n" || error.response.data == "utente non trovato") {
                     alert('utente non esistente');
                 }
                 console.error('Error fetching chat info:', error);
