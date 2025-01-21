@@ -147,6 +147,15 @@ func (db *appdbimpl) SendMessage(idConversation int, idUser int, content string,
 				}
 				return nil, err
 			}
+		} else {
+			_, err := stmt.Exec(id, lastInsertId, 2) // 0 = non letto
+			if err != nil {
+				err2 := tx.Rollback() // Rollback in caso di errore
+				if err2 != nil {
+					return nil, err2
+				}
+				return nil, err
+			}
 		}
 	}
 

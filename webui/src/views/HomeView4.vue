@@ -249,12 +249,13 @@
                         </div>
                     </div>
                 </div>
-
+                <!--
                 <div v-if="(selectedChat != null) && (groupMembers.length <= 1) && groupMembers != null">
                     <div class="alert alert-warning" role="alert">
                         Questo gruppo è vuoto, aggiungi un membro per iniziare a chattare!
                     </div>
                 </div>
+                -->
                 
 
                 <!-- Chat Footer -->
@@ -263,7 +264,8 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <input type="file" id="photo" class="form-control mt-2 w-100 me-2" @change="handlePhotoUpload">
                         <button v-if="selectedMessage != null" class="btn btn-success mt-2 w-100" @click="commentMessage">Rispondi a</button>
-                        <button v-else @click="sendMessage" class="btn btn-primary mt-2 w-100" :disabled="groupMembers.length <= 1">Invia</button>
+                        <!--<button v-else @click="sendMessage" class="btn btn-primary mt-2 w-100" :disabled="groupMembers.length <= 1">Invia</button>-->
+                        <button v-else @click="sendMessage" class="btn btn-primary mt-2 w-100" >Invia</button>
                     </div>
                 </div>
             </div>
@@ -337,7 +339,7 @@ export default {
         this.interval = setInterval(() => {
             if(this.selectedChat != null){
                 this.fetchMessages(this.selectedChat.id);
-                this.fetchGroupMembers();
+                //this.fetchGroupMembers();
             }
             this.fetchChats();
         }, 5000);
