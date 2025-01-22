@@ -230,17 +230,6 @@
                         
                         <!--bottoni interni-->
                         <div v-if="message.senderId != userId" class="d-flex flex-column ms-2">
-                            <button class="btn btn-sm btn-secondary mb-2" @click="message.answerTo != -1 ? uncommentMessage(message) : deleteMessage(message)">
-                                <div v-if="message.answerTo == -1" class="position-relative" style="width: 20px; height: 20px;">
-                                    <i class="bi bi-trash text-red position-absolute" style="top: 50%; left: 50%; font-size: 15px; transform: translate(-50%, -50%);"></i>
-                                </div>
-                                <div v-else class="position-relative" style="width: 20px; height: 20px;">
-                                    <!-- Icona di sfondo -->
-                                    <i class="bi bi-reply text-white position-absolute" style="top: 50%; left: 50%; font-size: 20px; transform: translate(-50%, -50%);"></i>
-                                    <!-- Icona sovrapposta -->
-                                    <i class="bi bi-x text-red position-absolute" style="top: 55%; left: 50%; font-size: 30px; transform: translate(-50%, -50%);"></i>
-                                </div>
-                            </button> <!--delete-->
                             <button class="btn btn-sm btn-secondary" @click="selectMessage(message)">
                                 <div class="position-relative" style="width: 20px; height: 20px;">
                                     <i class="bi bi-reply text-white position-absolute" style="top: 50%; left: 50%; font-size: 20px; transform: translate(-50%, -50%);"></i>
@@ -265,7 +254,7 @@
                         <input type="file" id="photo" class="form-control mt-2 w-100 me-2" @change="handlePhotoUpload">
                         <button v-if="selectedMessage != null" class="btn btn-success mt-2 w-100" @click="commentMessage">Rispondi a</button>
                         <!--<button v-else @click="sendMessage" class="btn btn-primary mt-2 w-100" :disabled="groupMembers.length <= 1">Invia</button>-->
-                        <button v-else @click="sendMessage" class="btn btn-primary mt-2 w-100">Invia</button>
+                        <button v-else @click="sendMessage" class="btn btn-primary mt-2 w-100" :disabled="!newMessage.trim()">Invia</button>
                     </div>
                 </div>
             </div>
