@@ -255,6 +255,7 @@
                     <textarea v-model="newMessage" class="form-control w-100" placeholder="Type a message" rows="2"></textarea>
                     <div class="d-flex justify-content-between align-items-center">
                         <input type="file" id="photo" class="form-control mt-2 w-100 me-2" @change="handlePhotoUpload">
+                        <button v-if="selectedFile" class="btn btn-danger mt-2" @click="unselectFile">Rimuovi File</button>
                         <button v-if="selectedMessage != null" class="btn btn-success mt-2 w-100" @click="commentMessage" :disabled="(!newMessage.trim() && selectedFile == null )">Rispondi a</button>
                         <!--<button v-else @click="sendMessage" class="btn btn-primary mt-2 w-100" :disabled="groupMembers.length <= 1">Invia</button>-->
                     <button v-else @click="sendMessage" class="btn btn-primary mt-2 w-100" :disabled="(!newMessage.trim() && selectedFile == null ) ">Invia</button>
@@ -348,6 +349,7 @@ export default {
         selectedChat() {
             this.fetchGroupMembers();
             this.scrollToBottom();
+            this.unselectFile();
         },
         selectedView(){
             if(this.selectedView == 2){
@@ -359,6 +361,13 @@ export default {
         
     },
     methods: {
+        unselectFile() {
+            this.selectedFile = null;
+            const fileInput = document.getElementById('photo');
+            if (fileInput) {
+                fileInput.value = '';
+            }
+        },
         showTooltip() {
             this.isTooltipVisible = true;
         },
