@@ -60,6 +60,9 @@
                                 <button type="submit" class="btn btn-primary btn-sm"
                                     style="height: 35px; font-size: 0.8rem;" @click="putUsername">Save </button>
                             </div>
+                            <div class="d-flex justify-content-start mt-4">
+                                <button class="btn btn-danger btn-sm" @click="logout">Logout</button>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -252,9 +255,9 @@
                     <textarea v-model="newMessage" class="form-control w-100" placeholder="Type a message" rows="2"></textarea>
                     <div class="d-flex justify-content-between align-items-center">
                         <input type="file" id="photo" class="form-control mt-2 w-100 me-2" @change="handlePhotoUpload">
-                        <button v-if="selectedMessage != null" class="btn btn-success mt-2 w-100" @click="commentMessage">Rispondi a</button>
+                        <button v-if="selectedMessage != null" class="btn btn-success mt-2 w-100" @click="commentMessage" :disabled="(!newMessage.trim() && selectedFile == null )">Rispondi a</button>
                         <!--<button v-else @click="sendMessage" class="btn btn-primary mt-2 w-100" :disabled="groupMembers.length <= 1">Invia</button>-->
-                        <button v-else @click="sendMessage" class="btn btn-primary mt-2 w-100" :disabled="!newMessage.trim()">Invia</button>
+                    <button v-else @click="sendMessage" class="btn btn-primary mt-2 w-100" :disabled="(!newMessage.trim() && selectedFile == null ) ">Invia</button>
                     </div>
                 </div>
             </div>
@@ -326,7 +329,12 @@ export default {
             this.fetchUserData();
         }
         this.interval = setInterval(() => {
-            if(this.selectedChat != null){
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                clearInterval(this.interval);
+                return;
+            }
+            if (this.selectedChat != null) {
                 this.fetchMessages(this.selectedChat.id);
                 //this.fetchGroupMembers();
             }
@@ -528,6 +536,9 @@ export default {
                 });
                 this.userInfo = response.data;
             } catch (error) {
+                if(error.response.data == "username già esistente\n"){
+                    alert('username già in uso');
+                }
                 console.error('Error updating username:', error);
             }
         },
@@ -895,6 +906,17 @@ export default {
                 console.error('Error removing reaction:', error);
             }
         },
+        async logout() {
+            try {
+                // Clear the token from localStorage
+                localStorage.removeItem('authToken');
+                
+                // Redirect to the login page
+                this.$router.push('/');
+            } catch (error) {
+                console.error('Error during logout:', error);
+            }
+        }
 
     },
 };
