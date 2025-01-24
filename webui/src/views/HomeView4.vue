@@ -318,23 +318,22 @@ export default {
             // hovering
             isTooltipVisible: false,
 
+            token: localStorage.getItem('authToken'),
+
         }
     },
     async mounted() {
         this.userId = this.$route.params.userId;
         const token = localStorage.getItem('authToken'); // Retrieve token from localStorage
-        console.log('userId:', this.userId, 'token:', token);
+        // console.log('userId:', this.userId, 'token:', token);
         if (this.userId && token) {
             await this.fetchChats();
             this.fetchUserData();
         }
         this.interval = setInterval(() => {
             const token = localStorage.getItem('authToken');
-            if (!token) {
-                clearInterval(this.interval);
-                return;
-            }
             if (this.selectedChat != null) {
+                // console.log(this.userId, this.selectedChat.id);
                 this.fetchMessages(this.selectedChat.id);
                 //this.fetchGroupMembers();
             }
@@ -910,7 +909,7 @@ export default {
             try {
                 // Clear the token from localStorage
                 localStorage.removeItem('authToken');
-                
+                clearInterval(this.interval);
                 // Redirect to the login page
                 this.$router.push('/');
             } catch (error) {
