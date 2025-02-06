@@ -21,7 +21,7 @@
                         <button v-if="selectedView == 2 || selectedView == 3" class="btn btn-sm ms-auto btn-primary" @click="changeToView(0)">x</button>
                     </div>
                     <!--create conversation-->
-                    <div v-if="this.selectedView == 0" class="d-flex align-items-center mt-3">
+                    <div v-if="this.selectedView == 0 || this.selectedView == 4" class="d-flex align-items-center mt-3">
                         <input type="text" v-model="selectedUser" class="form-control me-2" placeholder="Username a cui scrivere"/>
                         <button type="button" class="btn btn-sm ms-auto btn-primary" style="border-radius: 0.4rem;" @click="newConversation(selectedUser)">Crea Chat</button>
                     </div>
