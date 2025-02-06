@@ -26,6 +26,10 @@ export default {
             errorMessage: ''
         };
     },
+    async mounted() {
+        this.userId = this.$route.params.userId;
+        localStorage.removeItem('authToken');
+    },
     methods: {
         handleLogin() {
             // Placeholder for backend link

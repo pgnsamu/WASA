@@ -201,7 +201,7 @@
                             <div v-if="message.answerTo != -1">
                                 <div class="bg-success text-white p-1 mb-2 rounded" @click="scrollToMessage(message.answerTo)">
                                     <button class="btn btn-link text-white p-0" style="text-decoration: none;">
-                                        <small>{{ messages.find(msg => msg.id === message.answerTo)?.content }}</small> <!-- TODO: mmettere nel caso in cui non esista content un'icona della foto-->
+                                        <small>{{ getSnippet(messages.find(msg => msg.id === message.answerTo)) }}</small> <!-- TODO: mmettere nel caso in cui non esista content un'icona della foto-->
                                     </button>
                                 </div>
                             </div>
@@ -334,9 +334,9 @@ export default {
         this.interval = setInterval(() => {
             const token = localStorage.getItem('authToken');
             if (this.selectedChat != null) {
-                // console.log(this.userId, this.selectedChat.id);
-                this.fetchMessages(this.selectedChat.id);
-                //this.fetchGroupMembers();
+            // console.log(this.userId, this.selectedChat.id);
+            this.fetchMessages(this.selectedChat.id);
+            //this.fetchGroupMembers();
             }
             this.fetchChats();
         }, 5000);
@@ -634,7 +634,7 @@ export default {
                 return;
             }
             if (this.isGroup && (this.groupReqInfo.name == '' ||this.groupReqInfo.photo == null)) { // possiamo aggiungere anche controllo sui partecipanti " this.participants.length < 2 || "
-                alert('inserisci almeno un nome, 2 partecipanti e una foto');
+                alert('inserisci almeno un nome e una foto');
                 return;
             }
             const token = localStorage.getItem('authToken');
