@@ -86,62 +86,30 @@ func New(db *sql.DB) (AppDatabase, error) {
 	// Check if table exists. If not, the database is empty, and we need to create the structure
 	var tableName string
 
-	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='participate';`).Scan(&tableName)
-	if errors.Is(err, sql.ErrNoRows) {
-		query := `
-			CREATE TABLE participate (
-				userId INTEGER NOT NULL,                -- Foreign key to the user table
-				conversationId INTEGER NOT NULL,        -- Foreign key to the conversation table
-				PRIMARY KEY (userId, conversationId),   -- Composite primary key
-				FOREIGN KEY (userId) REFERENCES users(id),
-				FOREIGN KEY (conversationId) REFERENCES conversations(id)
-			)`
-		_, err = db.Exec(query)
-		if err != nil {
-			return nil, fmt.Errorf("error creating database structure: %w", err)
-		}
-	}
-
-	err = db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='received';`).Scan(&tableName)
-	if errors.Is(err, sql.ErrNoRows) {
-		query := `
-			CREATE TABLE received (
-			userId INTEGER NOT NULL,
-			messageId INTEGER NOT NULL,
-			status INTEGER NOT NULL,
-			CHECK (status IN (0, 1, 2)),
-			PRIMARY KEY (userId, messageId),
-			FOREIGN KEY (userId) REFERENCES users(id),
-			FOREIGN KEY (messageId) REFERENCES messages(id)
-		)`
-		_, err = db.Exec(query)
-		if err != nil {
-			return nil, fmt.Errorf("error creating database structure: %w", err)
-		}
-	}
-
-	err = db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='conversations';`).Scan(&tableName)
+	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='conversations';`).Scan(&tableName)
 	if errors.Is(err, sql.ErrNoRows) {
 		query := `
 			CREATE TABLE conversations (
-			id INTEGER PRIMARY KEY AUTOINCREMENT,       -- Unique identifier for the conversation
-			name TEXT NOT NULL,                         -- Conversation name (e.g., group chat name)
-			createdAt INTEGER NOT NULL,                 -- Timestamp of when the conversation was created (Unix time)
-			isGroup BOOLEAN NOT NULL,                   -- Indicates if it's a group chat
-			photo BLOB,                                 -- Photo for the conversation (e.g., group avatar)
-			description TEXT                            -- Optional description field
-			CHECK (
-				( isGroup = TRUE and description is not null and photo is not null )
-				or 
-				( isGroup = FALSE and description is null and photo is null)
-			
+				id INTEGER PRIMARY KEY AUTOINCREMENT,       -- Unique identifier for the conversation
+				name TEXT NOT NULL,                         -- Conversation name (e.g., group chat name)
+				createdAt INTEGER NOT NULL,                 -- Timestamp of when the conversation was created (Unix time)
+				isGroup BOOLEAN NOT NULL,                   -- Indicates if it's a group chat
+				photo BLOB,                                 -- Photo for the conversation (e.g., group avatar)
+				description TEXT                            -- Optional description field
+				CHECK (
+					( isGroup = TRUE and description is not null and photo is not null )
+					or 
+					( isGroup = FALSE and description is null and photo is null)
+				
+				)
 			)
-		)`
+		`
 		_, err = db.Exec(query)
 		if err != nil {
 			return nil, fmt.Errorf("error creating database structure: %w", err)
 		}
 	}
+
 	err = db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='users';`).Scan(&tableName)
 	if errors.Is(err, sql.ErrNoRows) {
 		query := `
@@ -157,10 +125,29 @@ func New(db *sql.DB) (AppDatabase, error) {
 		}
 	}
 
+	err = db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='reactions';`).Scan(&tableName)
+	if errors.Is(err, sql.ErrNoRows) {
+		query := `
+				CREATE TABLE reactions (
+					id INTEGER PRIMARY KEY AUTOINCREMENT,
+					messageId INTEGER NOT NULL,
+					userId INTEGER NOT NULL,
+					reaction TEXT NOT NULL,
+					sentAt INTEGER NOT NULL,
+					FOREIGN KEY (messageId) REFERENCES messages(id),
+					FOREIGN KEY (userId) REFERENCES users(id)
+				)
+			`
+		_, err = db.Exec(query)
+		if err != nil {
+			return nil, fmt.Errorf("error creating database structure: %w", err)
+		}
+	}
+
 	err = db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='messages';`).Scan(&tableName)
 	if errors.Is(err, sql.ErrNoRows) {
 		query := `
-			CREATE TABLE "messages" (
+			CREATE TABLE messages (
 				id INTEGER PRIMARY KEY AUTOINCREMENT,
 				content TEXT,
 				photoContent BLOB,
@@ -173,8 +160,44 @@ func New(db *sql.DB) (AppDatabase, error) {
 				FOREIGN KEY (answerTo) REFERENCES messages(id),
 				FOREIGN KEY (conversationId) REFERENCES conversations(id),
 				FOREIGN KEY (senderId) REFERENCES users(id)
-				)
-			`
+			)
+		`
+		_, err = db.Exec(query)
+		if err != nil {
+			return nil, fmt.Errorf("error creating database structure: %w", err)
+		}
+	}
+
+	err = db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='participate';`).Scan(&tableName)
+	if errors.Is(err, sql.ErrNoRows) {
+		query := `
+			CREATE TABLE participate (
+				userId INTEGER NOT NULL,                -- Foreign key to the user table
+				conversationId INTEGER NOT NULL,        -- Foreign key to the conversation table
+				PRIMARY KEY (userId, conversationId),   -- Composite primary key
+				FOREIGN KEY (userId) REFERENCES users(id),
+				FOREIGN KEY (conversationId) REFERENCES conversations(id)
+			)
+		`
+		_, err = db.Exec(query)
+		if err != nil {
+			return nil, fmt.Errorf("error creating database structure: %w", err)
+		}
+	}
+
+	err = db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='received';`).Scan(&tableName)
+	if errors.Is(err, sql.ErrNoRows) {
+		query := `
+			CREATE TABLE received (
+				userId INTEGER NOT NULL,
+				messageId INTEGER NOT NULL,
+				status INTEGER NOT NULL,
+				CHECK (status IN (0, 1, 2)),
+				PRIMARY KEY (userId, messageId),
+				FOREIGN KEY (userId) REFERENCES users(id),
+				FOREIGN KEY (messageId) REFERENCES messages(id)
+			)
+		`
 		_, err = db.Exec(query)
 		if err != nil {
 			return nil, fmt.Errorf("error creating database structure: %w", err)
