@@ -38,7 +38,8 @@ func (db *appdbimpl) GetConversationForUser(idUser int) (*[]Conversation, error)
 				)
 				ELSE c.photo
 			END as photo, 
-			c.description, (
+			c.description, 
+			(
 				SELECT m.content
 				FROM messages m
 				WHERE m.conversationId = c.id
@@ -48,7 +49,13 @@ func (db *appdbimpl) GetConversationForUser(idUser int) (*[]Conversation, error)
 		FROM conversations as c
 		JOIN participate as p ON c.id = p.conversationId
 		JOIN users as u ON p.userId = u.id
-		WHERE p.userId = ?;`
+		WHERE p.userId = ?
+		ORDER BY 
+			COALESCE(
+				(SELECT m.sentAt FROM messages m WHERE m.conversationId = c.id ORDER BY m.sentAt DESC LIMIT 1),
+				c.createdAt
+			) 
+		DESC;`
 
 	rows, err := db.c.Query(query2, idUser, idUser, idUser, idUser, idUser)
 	if err != nil {

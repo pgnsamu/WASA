@@ -158,7 +158,7 @@
             </div>
 
             <!-- Main Chat Area -->
-            <div class="col-md-9 col-lg-9 d-flex flex-column">
+            <div class="col-md-9 col-lg-9 chat-container">
                 <div v-if="selectedChat"
                     class="chat-header border-bottom py-3 d-flex justify-content-between align-items-center">
                     <h5>{{ selectedChat.name }}</h5>
@@ -166,7 +166,7 @@
                 </div>
 
                 <!-- Chat Body -->
-                <div v-if="selectedChat" class="chat-body p-3 flex-grow-1" style="overflow-y: auto; max-height: 75vh;" ref="chatBody">
+                <div v-if="selectedChat" class="chat-body p-3" style="overflow-y: auto;" ref="chatBody">
                     <div v-for="message in messages" :key="message.id" class="mb-3 d-flex align-items-start">
                         
                         <button v-if="message.senderId != userId" class="btn btn-sm btn-secondary me-2" @click="selectMessageToForward(message)">
@@ -1007,5 +1007,28 @@ button {
 .hover-container:hover .hover-text {
     visibility: visible;
     opacity: 1;
+}
+
+/* Contenitore principale che include chat-header, chat-body e chat-footer */
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* oppure un’altezza relativa a ciò che ti serve */
+}
+
+/* Se vuoi che l'header abbia una dimensione fissa */
+.chat-header {
+  flex: 0 0 auto; /* oppure imposta un'altezza fissa, ad esempio height: 60px; */
+}
+
+/* Chat-body prende il 75% dello spazio residuo */
+.chat-body {
+  flex: 6;
+  overflow-y: auto; /* in modo da gestire lo scroll */
+}
+
+/* Chat-footer prende il 25% dello spazio residuo */
+.chat-footer {
+  flex: 1;
 }
 </style>
