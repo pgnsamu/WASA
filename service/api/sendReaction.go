@@ -9,6 +9,12 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
+// errori ritornabili da sendReaction
+// utente non presente nella chat
+// il messaggio non appartiene a questa conversazione
+// l'utente ha già una reazione a questo messaggio
+// ritorna nulla
+
 func (rt *_router) sendReaction(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 	authHeader := r.Header.Get("Authorization")
@@ -60,12 +66,14 @@ func (rt *_router) sendReaction(w http.ResponseWriter, r *http.Request, ps httpr
 	}
 
 	_, err = rt.db.SendReaction(idConv, idUser, reaction.Content, messageId)
-	if err != nil {
+	if err != nil && (err.Error() == "utente non presente nella chat" || err.Error() == "il messaggio non appartiene a questa conversazione" || err.Error() == "l'utente ha già una reazione a questo messaggio") {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	} else if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
-	// w.Write([]byte("Reazione inviata con successo"))
+	w.WriteHeader(http.StatusNoContent)
 
 }

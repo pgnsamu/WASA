@@ -2,13 +2,16 @@ package api
 
 import (
 	"io"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
 
 	"github.com/julienschmidt/httprouter"
 )
+
+// errori ritornabili da setGroupPhoto
+// id non trovato
+// ritorna nulla
 
 func (rt *_router) setGroupPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
@@ -75,20 +78,14 @@ func (rt *_router) setGroupPhoto(w http.ResponseWriter, r *http.Request, ps http
 
 	err = rt.db.SaveImageToDB(imgData, "conversations", "photo", idConv)
 	if err != nil {
-		if err.Error() == "id not found" {
-			http.Error(w, "id not found", http.StatusBadRequest)
+		if err.Error() == "id non trovato" {
+			http.Error(w, err.Error(), http.StatusBadRequest)
 		} else {
-			// fmt.Println(err.Error())
-			http.Error(w, "Unable to save the image in the Database", http.StatusInternalServerError)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 		return
 	}
 
-	_, err = io.WriteString(w, "File uploaded successfully")
-	if err != nil {
-		http.Error(w, "Unable to write response", http.StatusInternalServerError)
-		return
-	}
+	w.WriteHeader(http.StatusNoContent)
 
-	log.Println("File uploaded successfully")
 }

@@ -8,6 +8,12 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
+// errori che possono essere ritornati da deleteMessage
+// utente non nel gruppo
+// autore del messaggio sbagliato
+// nessun messaggio trovato con quell'id
+// ritorna nulla
+
 func (rt *_router) deleteMessage(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	authHeader := r.Header.Get("Authorization")
 	if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
@@ -50,8 +56,13 @@ func (rt *_router) deleteMessage(w http.ResponseWriter, r *http.Request, ps http
 	}
 
 	err = rt.db.DeleteMessage(idConv, idUser, idToDelete)
-	if err != nil {
+	if err != nil && (err.Error() == "utente non nel gruppo" ||
+		err.Error() == "autore del messaggio sbagliato" ||
+		err.Error() == "nessun messaggio trovato con quell'id") {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	} else if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)

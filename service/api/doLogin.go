@@ -12,14 +12,10 @@ type requestBody struct {
 	Username string `json:"username"`
 }
 
-func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	/*
-		var username string
-		decoder := json.NewDecoder(r.Body)
+// non ritorna errori
+// non ritorna valori
 
-		err := decoder.Decode(&username)
-		fmt.Printf("Decoded name: %s\n", username)
-	*/
+func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 	// Leggo il body della request
 	body, err := io.ReadAll(r.Body)
@@ -34,30 +30,19 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 		return
 	}
 
-	token := ""
-
 	id, err := rt.db.DoLogin(reqBody.Username)
 	if err != nil {
-		if err.Error() == "utente già registrato" {
-			tok, erro := GenerateJWT(reqBody.Username, *id)
-			if erro != nil {
-				http.Error(w, erro.Error(), http.StatusInternalServerError)
-				return
-			}
-			token = tok
-		} else {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-	} else {
-		// Genero il token
-		tok, erro := GenerateJWT(reqBody.Username, *id)
-		if erro != nil {
-			http.Error(w, erro.Error(), http.StatusInternalServerError)
-			return
-		}
-		token = tok
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
+	var token string
+	// Genero il token
+	tok, erro := GenerateJWT(reqBody.Username, *id)
+	if erro != nil {
+		http.Error(w, erro.Error(), http.StatusInternalServerError)
+		return
+	}
+	token = tok
 
 	claims, err := ValidateJWT(token)
 	if err != nil {
@@ -90,10 +75,9 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 		return
 	}
 
-	// TODO: capire dove metterla
 	_, err = rt.db.ReceiveAllMessages(idF)
 	if err != nil {
-		return // Errore non handleato perché nel caso in cui non riesco a ricevere i messaggi, non è un problema per il client
+		return //non è un problema
 	}
 
 }

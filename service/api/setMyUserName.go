@@ -13,6 +13,11 @@ type usernameData struct {
 	Username string `json:"username"`
 }
 
+// errori ritornabili da setMyUserName
+// username già esistente
+// utente non trovato
+// ritorna User
+
 func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 	authHeader := r.Header.Get("Authorization")
@@ -52,8 +57,8 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 	defer r.Body.Close()
 
 	user, err := rt.db.SetMyUserName(id, data.Username)
-	if user == nil && err != nil && err.Error() == "userNotFound" {
-		http.Error(w, "Errore id non registrato", http.StatusBadRequest)
+	if user == nil && err != nil && (err.Error() == "utente non trovato" || err.Error() == "username già esistente") {
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	} else if user == nil && err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

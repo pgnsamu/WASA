@@ -22,7 +22,6 @@ type Conversation struct {
 // utente non registrato
 // utente non trovato
 // chat già esistente
-// TODO: forse si puo mettere tutto in uno e uno in tutti
 
 func (db *appdbimpl) NewConversation(userId int, name string, isGroup bool, photo *[]byte, description *string, partecipantsId []int) (*Conversation, error) {
 

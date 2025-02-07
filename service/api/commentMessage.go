@@ -9,6 +9,10 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
+// errori ritornabili da SendMessage
+// il messaggio non appartiene a questa conversazione
+// ritorna nulla
+
 // TODO: è useful usare messagetype?
 func (rt *_router) commentMessage(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
@@ -93,15 +97,18 @@ func (rt *_router) commentMessage(w http.ResponseWriter, r *http.Request, ps htt
 	}
 
 	if !resu {
-		http.Error(w, "user not in the group", http.StatusBadRequest)
+		http.Error(w, "utente non presente nel gruppo", http.StatusBadRequest)
 		return
 	}
 
 	_, err = rt.db.SendMessage(idConv, idUser, content, imgData, &replyTo, 0)
-	if err != nil {
+	if err != nil && err.Error() == "il messaggio non appartiene a questa conversazione" {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	} else if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	// TODO: write a response
+	w.WriteHeader(http.StatusNoContent)
 }

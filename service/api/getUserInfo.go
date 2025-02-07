@@ -9,6 +9,10 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
+// errori ritornabili da GetUserInfo
+// utente non trovato
+// ritorna User
+
 func (rt *_router) getUserInfo(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	authHeader := r.Header.Get("Authorization")
 	if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
@@ -40,10 +44,10 @@ func (rt *_router) getUserInfo(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	user, err := rt.db.GetUserInfo(id)
-	if user == nil && err.Error() == "user not found" {
-		http.Error(w, "Errore id non registrato", http.StatusBadRequest)
+	if err != nil && err.Error() == "utente non trovato" {
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
-	} else if user == nil && err != nil {
+	} else if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

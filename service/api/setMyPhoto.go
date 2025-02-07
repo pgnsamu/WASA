@@ -10,6 +10,11 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
+// errori ritornabili da setMyPhoto
+// id non trovato
+// utente non trovato
+// ritorna foto blob
+
 func (rt *_router) setMyPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 	authHeader := r.Header.Get("Authorization")
@@ -61,34 +66,20 @@ func (rt *_router) setMyPhoto(w http.ResponseWriter, r *http.Request, ps httprou
 
 	err = rt.db.SaveImageToDB(imgData, "users", "photo", id)
 	if err != nil {
-		if err.Error() == "id not found" {
-			http.Error(w, "id not found", http.StatusBadRequest)
+		if err.Error() == "id non trovato" {
+			http.Error(w, err.Error(), http.StatusBadRequest)
 		} else {
-			// fmt.Println(err.Error())
-			http.Error(w, "Unable to save the image in the Database", http.StatusInternalServerError)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 		return
 	}
 
-	/*
-		// Create a new file to save the uploaded image
-		outFile, err := os.Create("uploaded_image.jpg") // Save the file as uploaded_image.jpg
-		if err != nil {
-			http.Error(w, "Unable to save file", http.StatusInternalServerError)
-			return
-		}
-		defer outFile.Close()
-
-		// Copy the uploaded file to the new file
-		_, err = io.Copy(outFile, file)
-		if err != nil {
-			http.Error(w, "Error while copying the file", http.StatusInternalServerError)
-			return
-		}
-	*/
 	ph, err := rt.db.GetProfilePhoto(id)
-	if err != nil {
-		http.Error(w, "Unable to encode response", http.StatusInternalServerError)
+	if err != nil && err.Error() == "utente non trovato" {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	} else if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -104,20 +95,4 @@ func (rt *_router) setMyPhoto(w http.ResponseWriter, r *http.Request, ps httprou
 		http.Error(w, "Unable to encode response", http.StatusInternalServerError)
 		return
 	}
-	/*
-		w.Header().Set("Content-Type", "image/jpeg")
-		w.WriteHeader(http.StatusOK)
-		_, err = w.Write(imgData)
-		if err != nil {
-			http.Error(w, "Unable to write image data to response", http.StatusInternalServerError)
-			return
-		}
-
-			_, err = io.WriteString(w, "File uploaded successfully")
-			if err != nil {
-				http.Error(w, "Unable to write response", http.StatusInternalServerError)
-				return
-			}
-	*/
-	// fmt.Fprintf(w, "File uploaded successfully")
 }

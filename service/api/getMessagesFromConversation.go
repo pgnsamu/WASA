@@ -9,6 +9,10 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
+// errori ritornabili da getMessagesFromConversation
+// utente non autorizzato
+// ritorna insieme di Message
+
 func (rt *_router) getMessagesFromConversation(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	authHeader := r.Header.Get("Authorization")
 	if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
@@ -55,7 +59,7 @@ func (rt *_router) getMessagesFromConversation(w http.ResponseWriter, r *http.Re
 
 	messages, err := rt.db.GetMessagesFromConversation(conversationId)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 

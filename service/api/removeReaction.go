@@ -8,6 +8,12 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
+// errori ritornabili da removeReaction
+// utente non presente nella chat
+// il messaggio non appartiene a questa conversazione
+// reazione non trovata
+// ritorna nulla
+
 func (rt *_router) removeReaction(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 	authHeader := r.Header.Get("Authorization")
@@ -55,11 +61,13 @@ func (rt *_router) removeReaction(w http.ResponseWriter, r *http.Request, ps htt
 	}
 
 	_, err = rt.db.RemoveReaction(idConv, idUser, messageId, reactionId)
-	if err != nil {
+	if err != nil && (err.Error() == "utente non presente nella chat" || err.Error() == "il messaggio non appartiene a questa conversazione" || err.Error() == "reazione non trovata") {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	} else if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
-	// w.Write([]byte("Reazione rimossa con successo"))
+	w.WriteHeader(http.StatusNoContent)
 }

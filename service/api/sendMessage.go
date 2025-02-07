@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"io"
 	"net/http"
 	"strconv"
@@ -8,6 +9,10 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 )
+
+// errori ritornabili da sendMessage
+// il messaggio non appartiene a questa conversazione
+// ritorna []Message lista messaggi della convo
 
 // TODO: è useful usare messagetype?
 func (rt *_router) sendMessage(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -95,11 +100,19 @@ func (rt *_router) sendMessage(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-	_, err = rt.db.SendMessage(idConv, idUser, content, imgData, nil, 0)
-	if err != nil {
+	res, err := rt.db.SendMessage(idConv, idUser, content, imgData, nil, 0)
+	if err != nil && err.Error() == "il messaggio non appartiene a questa conversazione" {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	} else if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	// TODO: write a response
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(res)
+	if err != nil {
+		http.Error(w, "Failed to encode users to JSON", http.StatusInternalServerError)
+		return
+	}
 }

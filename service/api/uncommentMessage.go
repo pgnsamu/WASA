@@ -8,6 +8,12 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
+// errori ritornabili da uncommentMessage
+// gruppo non trovato
+// autore del messaggio sbagliato
+// messaggio non trovato
+// ritorna nulla
+
 func (rt *_router) uncommentMessage(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	authHeader := r.Header.Get("Authorization")
 	if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
@@ -58,17 +64,20 @@ func (rt *_router) uncommentMessage(w http.ResponseWriter, r *http.Request, ps h
 
 	isComment, err := rt.db.IsCommentTo(idComment, idMessage, idConv)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	if !isComment {
 		http.Error(w, "Il messaggio non è un commento", http.StatusBadRequest)
 		return
 	}
-	// TODO: capire se aggiungere il controllo di è un commento
+
 	err = rt.db.UncommentMessage(idConv, idUser, idComment)
-	if err != nil {
+	if err != nil && (err.Error() == "gruppo non trovato" || err.Error() == "autore del messaggio sbagliato" || err.Error() == "messaggio non trovato") {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	} else if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)

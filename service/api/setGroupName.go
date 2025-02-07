@@ -13,6 +13,13 @@ type groupData struct {
 	Name string `json:"name"`
 }
 
+// errori ritornabili da setGroupName
+// utente non registrato nel gruppo
+// troppe righe
+// utente non registrato
+// utente non trovato
+// ritorna Conversation
+
 // TODO: forse da gestire il fatto che puoi cambiargli nome solo se è un gruppo
 func (rt *_router) setGroupName(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	authHeader := r.Header.Get("Authorization")
@@ -57,17 +64,21 @@ func (rt *_router) setGroupName(w http.ResponseWriter, r *http.Request, ps httpr
 	}
 	defer r.Body.Close()
 
-	user, err := rt.db.SetGroupName(id, idConversation, data.Name)
-	if user == nil && err != nil {
+	convo, err := rt.db.SetGroupName(id, idConversation, data.Name)
+	if err != nil && (err.Error() == "troppe righe" || err.Error() == "utente non registrato" || err.Error() == "utente non trovato") {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	} else if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	err = json.NewEncoder(w).Encode(user)
+	err = json.NewEncoder(w).Encode(convo)
 	if err != nil {
 		http.Error(w, "Failed to encode users to JSON", http.StatusInternalServerError)
 		return
 	}
+
 }

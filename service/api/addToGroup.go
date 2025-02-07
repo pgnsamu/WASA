@@ -10,6 +10,13 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
+// errori ritornabili da addtogroup
+// utente non trovato
+// partecipanti non trovati
+// chat piena
+// utente da aggiungere già presente
+// ritorna insieme di User
+
 // Define a struct to match the incoming JSON
 type requestBodyId struct {
 	Username string `json:"username"`
@@ -76,7 +83,11 @@ func (rt *_router) addToGroup(w http.ResponseWriter, r *http.Request, ps httprou
 		return
 	}
 	users, err := rt.db.AddToGroup(idConv, idUser, *finalId)
-	if err != nil && (err.Error() == "chat piena" || err.Error() == "utente da aggiungere già presente") {
+	if err != nil &&
+		(err.Error() == "chat piena" ||
+			err.Error() == "utente da aggiungere già presente" ||
+			err.Error() == "utente non trovato" ||
+			err.Error() == "partecipanti non trovati") {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	} else if err != nil {

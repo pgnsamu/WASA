@@ -9,6 +9,10 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
+// errori ritornabili da GetParticipants
+// partecipanti non trovati
+// ritorna insieme di User partecipanti alla conversazione
+
 func (rt *_router) getParticipants(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	authHeader := r.Header.Get("Authorization")
 	if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {

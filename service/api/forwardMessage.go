@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"strconv"
@@ -15,7 +14,12 @@ type targetB struct {
 	Id int `json:"targetConversationId"`
 }
 
-// TODO: errori non gestiti perfetti
+// errori ritornabili da ForwardMessage
+// utente non presente nella chat sorgente
+// utente non presente nella chat di destinazione
+// messaggio non trovato
+// non ritorna nulla
+
 func (rt *_router) forwardMessage(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	authHeader := r.Header.Get("Authorization")
 	if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
@@ -75,10 +79,13 @@ func (rt *_router) forwardMessage(w http.ResponseWriter, r *http.Request, ps htt
 
 	// fmt.Println(idConv, requestData.Id, idUser, idMessage)
 	_, err = rt.db.ForwardMessage(idConv, requestData.Id, idUser, idMessage)
-	if err != nil {
+	if err != nil && (err.Error() == "utente non presente nella chat sorgente" || err.Error() == "utente non presente nella chat di destinazione" || err.Error() == "messaggio non trovato") {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	} else if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	fmt.Fprintf(w, "File uploaded successfully")
+	w.WriteHeader(http.StatusNoContent)
 }

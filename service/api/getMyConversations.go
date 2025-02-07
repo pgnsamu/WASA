@@ -9,6 +9,10 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
+// errori ritornabili da GetMyConversations
+// nessun errore
+// ritorna insieme di conversazioni dell'utente Conversation
+
 func (rt *_router) getMyConversations(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	authHeader := r.Header.Get("Authorization")
 	if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
@@ -39,14 +43,14 @@ func (rt *_router) getMyConversations(w http.ResponseWriter, r *http.Request, ps
 		return
 	}
 
-	user, err := rt.db.GetConversationForUser(id)
-	if user == nil && err != nil {
+	convo, err := rt.db.GetConversationForUser(id)
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	err = json.NewEncoder(w).Encode(user)
+	err = json.NewEncoder(w).Encode(convo)
 	if err != nil {
 		http.Error(w, "Failed to encode users to JSON", http.StatusInternalServerError)
 		return
