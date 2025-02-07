@@ -22,8 +22,10 @@
                     </div>
                     <!--create conversation-->
                     <div v-if="this.selectedView == 0 || this.selectedView == 4" class="d-flex align-items-center mt-3">
-                        <input type="text" v-model="selectedUser" class="form-control me-2" placeholder="Username a cui scrivere"/>
-                        <button type="button" class="btn btn-sm ms-auto btn-primary" style="border-radius: 0.4rem;" @click="newConversation(selectedUser)">Crea Chat</button>
+                        <input v-if="selectedForward == null" type="text" v-model="selectedUser" class="form-control me-2" placeholder="Username a cui scrivere"/>
+                        <input v-if="selectedForward != null" type="text" v-model="selectedUser" class="form-control me-2" placeholder="Username a cui scrivere"/>
+                        <button v-if="selectedForward == null" type="button" class="btn btn-sm ms-auto btn-primary" style="border-radius: 0.4rem;" @click="newConversation(selectedUser)">Crea Chat</button>
+                        <button v-if="selectedForward != null" type="button" class="btn btn-sm ms-auto btn-success" style="border-radius: 0.4rem;" @click="forwardToNewUser(selectedUser)">Inoltra</button>
                     </div>
                 </div>
                 
@@ -171,7 +173,7 @@
                         
                         <button v-if="message.senderId != userId" class="btn btn-sm btn-secondary me-2" @click="selectMessageToForward(message)">
                             <i class="bi bi-send" ></i>
-                        </button> 
+                        </button> <!--forward-->
                         
                         <!--bottoni interni-->
                         <div v-if="message.senderId == userId" class="d-flex flex-column ms-auto">
@@ -191,7 +193,7 @@
                             </button> <!--reply-->
                         </div>
                         <!-- MESSAGGIO -->
-                        <div :id="message.id" :class="['p-2', (selectedMessage != null && message.id == selectedMessage.id) ? (message.senderId == userId ? 'bg-green-light text-black rounded ms-2' : 'bg-green-light text-black rounded')  : (message.senderId == userId ? 'bg-blue-light text-white rounded ms-2' : 'bg-light rounded')]" style="max-width: 40%;">
+                        <div :id="message.id" :class="['p-2', ((selectedMessage != null && message.id == selectedMessage.id) || (selectedForward != null && message.id == selectedForward.id)) ? (message.senderId == userId ? 'bg-green-light text-black rounded ms-2' : 'bg-green-light text-black rounded')  : (message.senderId == userId ? 'bg-blue-light text-white rounded ms-2' : 'bg-light rounded')]" style="max-width: 40%;">
                             <div v-if="message.isForwarded" class="text-muted small">
                                 <i class="bi bi-arrow-right"></i> Inoltrato
                             </div>
@@ -222,14 +224,14 @@
                             </div>
                             <div class="message-status mt-1">
                                 <small class="text-muted me-2">{{ convertUnixToTime(message.sentAt) }}</small>
-                                <i v-if="message.senderId == userId && message.status === 1" class="bi bi-check text-secondary"></i> <!-- Sent -->
+                                <i v-if="message.senderId == userId && message.status === 0" class="bi bi-check text-secondary"></i> <!-- Sent -->
                                 <i v-if="message.senderId == userId && message.status === 2" class="bi bi-check-all text-primary"></i> <!-- Read -->
                             </div>
                         </div>
 
                         <button v-if="message.senderId == userId" class="btn btn-sm btn-secondary ms-2" @click="selectMessageToForward(message)">
                             <i class="bi bi-send"></i>
-                        </button> <!--icona profilo?-->
+                        </button> <!--forward-->
                         
                         <!--bottoni interni-->
                         <div v-if="message.senderId != userId" class="d-flex flex-column ms-2">
@@ -256,7 +258,7 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <button v-if="selectedFile" class="btn btn-danger mt-2 me-2" @click="unselectFile">Rimuovi File</button>
                         <input type="file" id="photo" class="form-control mt-2 w-100 me-2" @change="handlePhotoUpload">
-                        <button v-if="selectedMessage != null" class="btn btn-success mt-2 w-100" @click="commentMessage" :disabled="(!newMessage.trim() && selectedFile == null )">Rispondi a</button>
+                        <button v-if="selectedMessage != null && selectedForward == null" class="btn btn-success mt-2 w-100" @click="commentMessage" :disabled="(!newMessage.trim() && selectedFile == null )">Rispondi a</button>
                         <!--<button v-else @click="sendMessage" class="btn btn-primary mt-2 w-100" :disabled="groupMembers.length <= 1">Invia</button>-->
                     <button v-else @click="sendMessage" class="btn btn-primary mt-2 w-100" :disabled="(!newMessage.trim() && selectedFile == null ) ">Invia</button>
                     </div>
@@ -320,7 +322,9 @@ export default {
             isTooltipVisible: false,
 
             token: localStorage.getItem('authToken'),
-
+            
+            // forward
+            selectedForward: null,
         }
     },
     async mounted() {
@@ -414,20 +418,25 @@ export default {
         },
         selectMessage(message){
             if(this.replyToMode && this.selectedMessage == message){
+                this.selectedView=0;
                 this.replyToMode=false;
                 this.selectedMessage=null;
+                this.selectedForward=null;
             }else{
+                this.selectedView=0;
                 this.replyToMode=true;
-                this.selectedMessage=message
+                this.selectedMessage=message;
+                this.selectedForward=null;
             }
         },
         selectMessageToForward(message){
-            if(this.selectedView == 4 && this.selectedMessage == message){
+            if(this.selectedView == 4 && this.selectedForward == message ){
                 this.selectedView=0;
-                this.selectedMessage=null;
+                this.selectedForward=null;
             }else{
                 this.selectedView=4;
-                this.selectedMessage=message
+                this.selectedForward=message;
+                this.selectedMessage=null;
             }
         },
         handleGroupPhotoUpload(event) {
@@ -439,7 +448,8 @@ export default {
                 this.selectedView = tmpView;
             }else{
                 this.selectedView = 0;
-                selectedMessage = null;
+                this.selectedMessage = null;
+                this.selectedForward = null;
             }
         },
         addParticipant() {
@@ -583,6 +593,21 @@ export default {
                 console.error('Error uploading file:', error);
             }
         },
+        async forwardToNewUser(userId) {
+            try {
+                // Crea la nuova conversazione e attendi la sua creazione
+                const newChat = await this.newConversation(userId);
+                
+                if (newChat && newChat.id) {
+                    // Dopo che la conversazione è stata creata, inoltra il messaggio
+                    await this.forwardMessage(newChat);
+                } else {
+                    console.error("Errore: la nuova conversazione non è stata creata correttamente.");
+                }
+            } catch (error) {
+                console.error("Errore in forwardToNewUser:", error);
+            }
+        },
         async sendMessage() {
             const token = localStorage.getItem('authToken');
             const messageData = {
@@ -688,6 +713,7 @@ export default {
                     this.participants = [];
                 }
                 this.fetchChats();
+                return response.data;
             } catch (error) {
                 if(error.response.data == "utente non trovato\n"){
                     alert('utente non esistente');
@@ -862,29 +888,31 @@ export default {
                 console.error('Error fetching chat info:', error);
             }
         },
-        selectChatToForward(chat) {
-            if (this.selectedMessage) {
-                this.forwardMessage(chat);
-            } else {
-                alert('Please select a message to forward.');
-            }
-        },
         async forwardMessage(chat) {
             const token = localStorage.getItem('authToken');
             try {
-                const response = await this.$axios.post(`/users/${this.userId}/conversations/${this.selectedChat.id}/messages/${this.selectedMessage.id}`, {
+                const response = await this.$axios.post(`/users/${this.userId}/conversations/${this.selectedChat.id}/messages/${this.selectedForward.id}`, {
                     targetConversationId: chat.id,
                 }, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                     },
                 });
-                this.fetchChats();
+                this.selectChat(chat);
+                this.selectedForward = null;
                 this.selectedMessage = null;
+                
                 this.changeToView(0);
 
             } catch (error) {
                 console.error('Error fetching chat info:', error);
+            }
+        },
+        selectChatToForward(chat) {
+            if (this.selectedForward) {
+                this.forwardMessage(chat);
+            } else {
+                alert('Please select a message to forward.');
             }
         },
         async addReaction(message, reaction) {
@@ -1016,21 +1044,19 @@ button {
 .chat-container {
   display: flex;
   flex-direction: column;
-  height: 100vh; /* oppure un’altezza relativa a ciò che ti serve */
+  height: 100vh; 
 }
 
-/* Se vuoi che l'header abbia una dimensione fissa */
+
 .chat-header {
-  flex: 0 0 auto; /* oppure imposta un'altezza fissa, ad esempio height: 60px; */
+  flex: 0 0 auto;
 }
 
-/* Chat-body prende il 75% dello spazio residuo */
 .chat-body {
   flex: 6;
   overflow-y: auto; /* in modo da gestire lo scroll */
 }
 
-/* Chat-footer prende il 25% dello spazio residuo */
 .chat-footer {
   flex: 1;
 }
