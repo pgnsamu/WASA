@@ -550,7 +550,7 @@ paths:
         "401":
           description: User have to Auth itself to set a photo
         "403":
-          description: User is not authorized to remove this reaction
+          description: User is not authorized
         "404": 
           description: User not found
         '500':
@@ -585,7 +585,7 @@ paths:
         "401":
           description: User have to Auth itself to see the Conversations
         "403":
-          description: User is not authorized to remove this reaction
+          description: User is not authorized
         '500':
           description: Internal server error
     post: 
@@ -645,7 +645,7 @@ paths:
         "401":
           description: User have to Auth itself to see the Conversations
         "403":
-          description: User is not authorized to remove this reaction
+          description: User is not authorized
         "404":
           description: User not found
         '500':
@@ -758,7 +758,7 @@ paths:
         "401":
           description: User must authenticate to retrieve messages
         "403":
-          description: User is not authorized to remove this reaction
+          description: User is not authorized
         '500':
           description: Internal server error
   /users/{id}/conversations/{conversationId}/messages/{messageId}:
@@ -879,7 +879,7 @@ paths:
         "401":
           description: User must authenticate to add a comment
         "403":
-          description: User is not authorized to remove this reaction
+          description: User is not authorized
         "404":
           description: Conversation or message not found
         '500':
@@ -979,7 +979,7 @@ paths:
         "401":
           description: User has to authenticate to send the reaction
         "403":
-          description: User is not authorized to remove this reaction
+          description: User is not authorized
         "404":
           description: Conversation or message not found
         '500':
@@ -1033,6 +1033,6 @@ paths:
         "404":
           description: Conversation, message, or reaction not found
         "403":
-          description: User is not authorized to remove this reaction
+          description: User is not authorized
         '500':
           description: Internal server error
