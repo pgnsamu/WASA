@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"strconv"
@@ -68,7 +69,7 @@ func (rt *_router) newConversation(w http.ResponseWriter, r *http.Request, ps ht
 	var partecipantsId = make([]int, 0, len(partecipantsStr))
 	for _, username := range partecipantsStr {
 		tempId, err := rt.db.GetUserId(username)
-		if err != nil && err.Error() == "utente non trovato" {
+		if err != nil && errors.Is(err, ErrUserNotFound) {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		} else if err != nil {
@@ -98,7 +99,7 @@ func (rt *_router) newConversation(w http.ResponseWriter, r *http.Request, ps ht
 	}
 
 	result, err := rt.db.NewConversation(id, name, isGroup, &imgData, &description, partecipantsId)
-	if err != nil && (err.Error() == "utente non registrato" || err.Error() == "utente non trovato" || err.Error() == "chat già esistente") {
+	if err != nil && (err.Error() == "utente non registrato" || errors.Is(err, ErrUserNotFound) || err.Error() == "chat già esistente") {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	} else if err != nil {

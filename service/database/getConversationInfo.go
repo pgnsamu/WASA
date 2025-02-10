@@ -70,7 +70,7 @@ func (db *appdbimpl) GetConversationInfo(idConversation int, idUser int) (*Conve
 			return nil, err
 		}
 	} else {
-		return nil, errors.New("utente non trovato")
+		return nil, ErrUserNotFound
 	}
 	// TODO: capire se è qua il problema stessa cosa su getUserInfo riga 44
 	// Check for errors that may have occurred during iteration

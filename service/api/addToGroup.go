@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"strconv"
@@ -86,7 +87,7 @@ func (rt *_router) addToGroup(w http.ResponseWriter, r *http.Request, ps httprou
 	if err != nil &&
 		(err.Error() == "chat piena" ||
 			err.Error() == "utente da aggiungere già presente" ||
-			err.Error() == "utente non trovato" ||
+			errors.Is(err, ErrUserNotFound) ||
 			err.Error() == "partecipanti non trovati") {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return

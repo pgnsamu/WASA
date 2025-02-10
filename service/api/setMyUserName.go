@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strconv"
 	"strings"
@@ -57,7 +58,7 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 	defer r.Body.Close()
 
 	user, err := rt.db.SetMyUserName(id, data.Username)
-	if user == nil && err != nil && (err.Error() == "utente non trovato" || err.Error() == "username già esistente") {
+	if user == nil && err != nil && (errors.Is(err, ErrUserNotFound) || err.Error() == "username già esistente") {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	} else if user == nil && err != nil {

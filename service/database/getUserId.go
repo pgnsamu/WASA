@@ -1,9 +1,5 @@
 package database
 
-import (
-	"errors"
-)
-
 // errrori ritornabili da GetUserId
 // utente non trovato
 
@@ -23,7 +19,7 @@ func (db *appdbimpl) GetUserId(username string) (*int, error) {
 			return nil, err
 		}
 	} else {
-		return nil, errors.New("utente non trovato")
+		return nil, ErrUserNotFound
 	}
 	// Controlla se ci sono errori che possono essersi verificati durante l'iterazione
 	if err := rows.Err(); err != nil {

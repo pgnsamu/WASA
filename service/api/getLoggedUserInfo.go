@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strings"
 
@@ -35,7 +36,7 @@ func (rt *_router) getLoggedUserInfo(w http.ResponseWriter, r *http.Request, ps 
 	}
 
 	user, err := rt.db.GetUserInfo(id)
-	if err != nil && err.Error() == "utente non trovato" {
+	if err != nil && errors.Is(err, ErrUserNotFound) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	} else if err != nil {

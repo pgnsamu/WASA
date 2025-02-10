@@ -40,7 +40,7 @@ func (db *appdbimpl) SetMyUserName(id int, username string) (*User, error) {
 		return nil, err
 	}
 	if rowsAffected != 1 {
-		return nil, errors.New("utente non trovato")
+		return nil, ErrUserNotFound
 	}
 
 	user, err := db.GetUserInfo(id)

@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"strconv"
@@ -75,7 +76,7 @@ func (rt *_router) setMyPhoto(w http.ResponseWriter, r *http.Request, ps httprou
 	}
 
 	ph, err := rt.db.GetProfilePhoto(id)
-	if err != nil && err.Error() == "utente non trovato" {
+	if err != nil && errors.Is(err, ErrUserNotFound) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	} else if err != nil {

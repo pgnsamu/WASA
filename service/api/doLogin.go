@@ -77,7 +77,7 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 
 	_, err = rt.db.ReceiveAllMessages(idF)
 	if err != nil {
-		return //non è un problema
+		return
 	}
 
 }

@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strconv"
 	"strings"
@@ -65,7 +66,7 @@ func (rt *_router) setGroupName(w http.ResponseWriter, r *http.Request, ps httpr
 	defer r.Body.Close()
 
 	convo, err := rt.db.SetGroupName(id, idConversation, data.Name)
-	if err != nil && (err.Error() == "troppe righe" || err.Error() == "utente non registrato" || err.Error() == "utente non trovato") {
+	if err != nil && (err.Error() == "troppe righe" || err.Error() == "utente non registrato" || errors.Is(err, ErrUserNotFound)) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	} else if err != nil {

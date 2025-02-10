@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strconv"
 	"strings"
@@ -51,7 +52,7 @@ func (rt *_router) getConversation(w http.ResponseWriter, r *http.Request, ps ht
 	}
 
 	user, err := rt.db.GetConversationInfo(idConv, idUser)
-	if err != nil && (err.Error() == "utente non registrato" || err.Error() == "utente non trovato") {
+	if err != nil && (err.Error() == "utente non registrato" || errors.Is(err, ErrUserNotFound)) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	} else if err != nil {

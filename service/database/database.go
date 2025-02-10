@@ -36,6 +36,8 @@ import (
 	"fmt"
 )
 
+var ErrUserNotFound = errors.New("utente non trovato")
+
 // AppDatabase is the high level interface for the DB
 type AppDatabase interface {
 	// GetName() (string, error)
