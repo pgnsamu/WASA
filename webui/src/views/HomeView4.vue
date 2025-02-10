@@ -480,11 +480,6 @@ export default {
         },
         fetchUserData() {
             const token = localStorage.getItem('authToken');
-            // Call toggleView to switch the view before fetching the user data
-
-            //if(!firstTime){
-            //    this.toggleView();
-            //} 
 
             // Make the API request with Authorization header
             this.$axios.get(`/users/${this.userId}`, {
