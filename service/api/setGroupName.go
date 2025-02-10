@@ -21,7 +21,6 @@ type groupData struct {
 // utente non trovato
 // ritorna Conversation
 
-// TODO: forse da gestire il fatto che puoi cambiargli nome solo se è un gruppo
 func (rt *_router) setGroupName(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	authHeader := r.Header.Get("Authorization")
 	if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {

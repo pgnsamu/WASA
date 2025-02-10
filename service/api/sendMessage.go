@@ -14,7 +14,6 @@ import (
 // il messaggio non appartiene a questa conversazione
 // ritorna []Message lista messaggi della convo
 
-// TODO: è useful usare messagetype?
 func (rt *_router) sendMessage(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 	authHeader := r.Header.Get("Authorization")

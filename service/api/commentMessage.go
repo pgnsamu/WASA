@@ -13,7 +13,6 @@ import (
 // il messaggio non appartiene a questa conversazione
 // ritorna nulla
 
-// TODO: è useful usare messagetype?
 func (rt *_router) commentMessage(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 	authHeader := r.Header.Get("Authorization")

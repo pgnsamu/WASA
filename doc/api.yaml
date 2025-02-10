@@ -23,18 +23,36 @@ components:
           pattern: "^[a-zA-Z0-9_.]+$"
           minLength: 3
           maxLength: 16
-        profileImage:
+        photo:
           description: Image that represent the user
           format: binary
           type: string
           minLength: 0
           maxLength: 10000000
-        realName:
-          description: Real name of the user
+    Reactions:
+      title: Reactions
+      description: Reactions to a message
+      type: object
+      properties:
+        id: 
+          description: Unique identifier of a reaction to a message
+          type: integer
+          minimum: 0
+          readOnly: true
+        content:
+          description: Content of the reaction
           type: string
-          pattern: "^[a-zA-Z]+$"
-          minLength: 3
-          maxLength: 16
+          pattern: ".*"
+          minLength: 1
+          maxLength: 8000
+        sentAt:
+          description: Unix timestamp of the time when the user sent the reaction
+          type: integer
+          minimum: 0
+        sentBy:
+          description: Id of the user that have sent the reaction
+          type: integer
+          minimum: 0
     Message:
       title: Message
       description: Text or image data sent from a user to another
@@ -44,45 +62,50 @@ components:
           description: Unique identifier of a message in the chat
           type: integer 
           readOnly: true
-        messageType:
-          description: Identifier of the type of the message
-          type: string
-          pattern: "^[a-zA-Z]+$"
-          enum: ["image", "text"]
-          minLength: 4
-          maxLength: 5
         content: 
           description: Content of the message
           type: string
           pattern: ".*"
           minLength: 1
           maxLength: 8000
-        previewContent: 
-          description: content
+        photoContent:
+          description: Image that represent the message
+          format: binary
           type: string
-          pattern: ".*"
-          minLength: 1
-          maxLength: 32
-        sender:
-          description: username of the user that have sent the message
+          minLength: 0
+          maxLength: 10000000
+        senderId:
+          description: Id of the user that have sent the message
+          type: integer
+          minimum: 0
+        sentAt:
+          description: Unix timestamp of the time when the user sent the message
+          type: integer
+          minimum: 0
+        status: 
+          description: Show if the user have received the message or not
+          type: integer
+          enum: [0, 1, 2]
+        answerTo:
+          description: id of the message who this message reply
+          type: integer
+          minimum: 0
+        senderUsername:
+          description: username of the sender
           type: string
           pattern: "^[a-zA-Z0-9_.]+$"
           minLength: 3
           maxLength: 16
-        timestamp:
-          description: Unix timestamp of the time when the user sent the message
-          type: integer
-        status: 
-          description: Show if the user have received the message or not
-          type: string
-          pattern: "^[a-zA-Z]+$"
-          enum: ["sent", "received", "not_sent"]
-          minLength: 4
-          maxLength: 8
-        replyTo:
-          description: id of the message who this message reply
-          type: integer
-          minimum: 0
+        isforwarded:
+          description: boolean that show if the message is forwarded
+          type: boolean
+        reactions:
+          description: list of reactions to the message
+          type: array
+          items:
+            $ref: '#/components/schemas/Reactions'
+          minItems: 0
+          maxItems: 100
     Chat:
       title: Chat
       description: Conversations between 2 or more users
@@ -92,28 +115,34 @@ components:
           description: Unique identifier of the chat from an user
           type: integer
           minimum: 0
-        messageList:
-          description: Message list in the chat
-          type: array
-          items:
-            $ref: '#/components/schemas/Message'
-          minItems: 1
-          maxItems: 1000000
-        partecipantsId:
-          description: list of users ID who take part of the chat
-          type: array
-          items:
-            description: user id
-            type: integer
-            minimum: 0
-          minItems: 2
-          maxItems: 100
-        photo: 
-          description: Photo of the chat if is a group
+        name:
+          description: Name of the chat
           type: string
+          pattern: "^[a-zA-Z0-9_.]+$"
+          minLength: 3
+          maxLength: 16
+        isGroup:
+          description: Boolean that show if the chat is a group
+          type: boolean
+        createdAt:
+          description: Unix timestamp of the time when the chat was created
+          type: integer
+          minimum: 0
+        description:
+          description: Description of the group chat
+          type: string
+          pattern: "^[a-zA-Z0-9_.]+$"
+          minLength: 0
+          maxLength: 200
+        photo:
+          description: Image that represent the chat
           format: binary
+          type: string
           minLength: 0
           maxLength: 10000000
+        lastMessage:
+          description: Last message sent in the chat
+          $ref: '#/components/schemas/Message'
   securitySchemes:
     BearerAuth: 
       type: http 
@@ -165,10 +194,30 @@ paths:
                 description: User identifier object
                 type: object
                 properties:
-                  identifier:
+                  token:
                     description: user identifier
                     type: integer
                     minimum: 0
+                  user_id:
+                    description: user identifier
+                    type: integer
+                    minimum: 0
+                  username:
+                    description: username of the user
+                    type: string
+                    pattern: "^[a-zA-Z0-9_.]+$"
+                    minLength: 3
+                    maxLength: 16  
+        '400':
+          description: Invalid input
+        '401':
+          description: User must authenticate to log in
+        '403':
+          description: User is not authorized
+        '404':
+          description: User not found
+        '500':
+          description: Internal server error
   /users/{id}:
     parameters:
       - name: id
@@ -195,8 +244,12 @@ paths:
           description: Invalid input 
         "401":
           description: User has to authenticate to get info about a user
+        "403":
+          description: User is not authorized
         "404":
           description: User not found
+        '500':
+          description: Internal server error      
   /users/{id}/username:
     parameters:
       - name: id
@@ -238,8 +291,12 @@ paths:
           description: Invalid input (e.g. username already used)
         "401":
           description: User has to authenticate to change the username
+        "403":
+          description: User is not authorized
         "404":
-          description: User not found
+          description: utente non trovato
+        '500':
+          description: Internal server error
   /users/{id}/photo:
     parameters:
       - name: id
@@ -276,13 +333,24 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
+                type: object
+                properties:
+                  photo:
+                    type: string
+                    format: binary
+                    description: The photo file
+                    minLength: 0
+                    maxLength: 10000000
         "400":
           description: Invalid input
         "401":
           description: User have to Auth itself to set a photo
+        "403":
+          description: User is not authorized
         "404": 
-          description: User not found
+          description: User non trovato 
+        '500':
+          description: Internal server error
   /users/{id}/conversations/{conversationId}/users:
     parameters:
       - name: id
@@ -300,6 +368,32 @@ paths:
           description: ID of the chat
           type: integer
         required: true
+    get:
+      tags: ["Conversation Based"]
+      summary: Retrieve participants of a conversation
+      description: Retrieve the list of participants in a specific conversation
+      operationId: getParticipants
+      responses:
+        '200':
+          description: List of participants retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+                minItems: 0
+                maxItems: 100
+        "400":
+          description: Invalid input
+        "401":
+          description: User must authenticate to retrieve participants
+        "403":
+          description: User is not authorized 
+        "404":
+          description: Users not found
+        '500':
+          description: Internal server error
     post:
       tags: ["Groupchat Management"]
       summary: Add a user to a group chat (Chat)
@@ -323,17 +417,22 @@ paths:
           content:
             application/json:
               schema:
+                description: List of users in the group chat
                 type: array
                 items:
                   $ref: '#/components/schemas/User'
+                minItems: 0
+                maxItems: 100
         "400":
           description: Invalid input (e.g. invalid user ID)
         "401":
           description: User must authenticate to add someone to a group
         "403":
-          description: User does not have permission to add users to this group
+          description: User is not authorized
         "404":
           description: group chat or user not found
+        '500':
+          description: Internal server error
     delete:
       tags: ["Groupchat Management"]
       summary: Leave a group chat (Chat)
@@ -346,10 +445,12 @@ paths:
           description: Invalid input (e.g. user not part of the conversation)
         "401":
           description: User must authenticate to leave the group
-        #"403": non so se metterla
-        #  description: User is not authorized to leave the group
+        "403":
+          description: User is not authorized
         "404":
           description: Conversation not found or user is not a participant
+        '500':
+          description: Internal server error
   /users/{id}/conversations/{conversationId}/group:
     parameters:
       - name: id
@@ -398,8 +499,12 @@ paths:
           description: Invalid input (e.g. Group name already used)
         "401":
           description: User have to Auth itself to change a Group name
+        "403":
+          description: User is not authorized
         "404": 
-          description: Group (Chat) not found       
+          description: user not found
+        '500':
+          description: Internal server error       
   /users/{id}/conversations/{conversationId}/photo:
     parameters:
       - name: id
@@ -438,18 +543,18 @@ paths:
                   maxLength: 10000000
         required: true
       responses:
-        "200":
-          description: photo updated successfully
-          content:
-            application/json:
-              schema: 
-                $ref: "#/components/schemas/Chat"
+        "204":
+          description: Group photo updated successfully
         "400":
           description: Invalid input
         "401":
           description: User have to Auth itself to set a photo
+        "403":
+          description: User is not authorized to remove this reaction
         "404": 
           description: User not found
+        '500':
+          description: Internal server error
   /users/{id}/conversations:
     parameters:
       - name: id
@@ -479,6 +584,10 @@ paths:
                 maxItems: 1000000
         "401":
           description: User have to Auth itself to see the Conversations
+        "403":
+          description: User is not authorized to remove this reaction
+        '500':
+          description: Internal server error
     post: 
       tags: ["Conversation Based"]
       summary: Create a new conversation
@@ -535,6 +644,12 @@ paths:
                 $ref: '#/components/schemas/Chat'
         "401":
           description: User have to Auth itself to see the Conversations
+        "403":
+          description: User is not authorized to remove this reaction
+        "404":
+          description: User not found
+        '500':
+          description: Internal server error
   /users/{id}/conversations/{conversationId}:
     get:
       tags: ["Conversation Based"]
@@ -570,28 +685,31 @@ paths:
           description: User does not have access rights to the content
         "404":
           description: Conversation not found
+        '500':
+          description: Internal server error
   /users/{id}/conversations/{conversationId}/messages:
+    parameters:
+      - name: id
+        in: path
+        description: The ID of the user 
+        schema:
+          description: The ID of the user 
+          type: integer
+          minimum: 0
+        required: true
+      - name: conversationId
+        in: path
+        description: The ID of the conversation to send the message to
+        schema:
+          description: ID of the conversation
+          type: integer
+          minimum: 0
+        required: true
     post:
       tags: ["Conversation Based"]
       summary: Send a message in a conversation
       description: Send a new message to a specific conversation identified by conversationId
       operationId: sendMessage
-      parameters:
-        - name: id
-          in: path
-          description: The ID of the user 
-          schema:
-            description: The ID of the user 
-            type: integer
-            minimum: 0
-          required: true
-        - name: conversationId
-          in: path
-          description: The ID of the conversation to send the message to
-          schema:
-            description: ID of the conversation
-            type: integer
-          required: true
       requestBody:
         description: The message details to send
         content:
@@ -604,8 +722,13 @@ paths:
           description: Message sent successfully
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/Chat'
+                schema:
+                  description: Conversation where the message is sent
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Chat'
+                  minItems: 0
+                  maxItems: 1000000
         "400":
           description: Invalid input
         "401":
@@ -614,6 +737,30 @@ paths:
           description: User does not have access rights to the content
         "404":
           description: Conversation not found
+        '500':
+          description: Internal server error
+    get:
+      tags: ["Conversation Based"]
+      summary: Retrieve messages from a conversation
+      description: Retrieve all messages from a specific conversation
+      operationId: getMessagesFromConversation
+      responses:
+        '200':
+          description: List of messages retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Message'
+                minItems: 0
+                maxItems: 1000
+        "401":
+          description: User must authenticate to retrieve messages
+        "403":
+          description: User is not authorized to remove this reaction
+        '500':
+          description: Internal server error
   /users/{id}/conversations/{conversationId}/messages/{messageId}:
     parameters:
           - name: id
@@ -658,12 +805,8 @@ paths:
                 - targetConversationId
         required: true
       responses:
-        '201':
+        '204':
           description: Message forwarded successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Chat'
         "400":
           description: Invalid input
         "401":
@@ -672,6 +815,8 @@ paths:
           description: User does not have access rights to the content
         "404":
           description: Conversation or message not found
+        '500':
+          description: Internal server error
     delete:
       tags: ["Conversation Based"]
       summary: Delete a message from the conversation
@@ -688,6 +833,8 @@ paths:
           description: User is not authorized to delete this message
         "404":
           description: Conversation or message not found
+        '500':
+          description: Internal server error
   /users/{id}/conversations/{conversationId}/messages/{messageId}/comments:
     parameters:
       - name: id
@@ -725,20 +872,18 @@ paths:
               $ref: '#/components/schemas/Message'
         required: true
       responses:
-        '201':
+        '204':
           description: Comment added successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Chat'
         "400":
           description: Invalid input
         "401":
           description: User must authenticate to add a comment
         "403":
-          description: User does not have access rights to the content
+          description: User is not authorized to remove this reaction
         "404":
           description: Conversation or message not found
+        '500':
+          description: Internal server error
   /users/{id}/conversations/{conversationId}/messages/{messageId}/comments/{commentId}:
     parameters:
       - name: id
@@ -786,3 +931,108 @@ paths:
           description: User is not authorized to delete this comment
         "404":
           description: Conversation or comment not found
+        '500':
+          description: Internal server error
+  /users/{id}/conversations/{conversationId}/messages/{messageId}/reactions:
+    parameters:
+      - name: id
+        in: path
+        description: The ID of the user
+        schema:
+          description: The ID of the user
+          type: integer
+          minimum: 0
+        required: true
+      - name: conversationId
+        in: path
+        description: The ID of the conversation containing the message to react to
+        schema:
+          description: The ID of the conversation
+          type: integer
+          minimum: 0
+        required: true
+      - name: messageId
+        in: path
+        description: The ID of the message to react to
+        schema:
+          description: The ID of the message
+          type: integer
+          minimum: 0
+        required: true
+    post:
+      tags: ["Conversation Based"]
+      summary: Send a reaction to a message
+      description: Send a new reaction to a specific message within a conversation
+      operationId: sendReaction
+      requestBody:
+        description: The reaction details to send
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Reactions'
+        required: true
+      responses:
+        '204':
+          description: Reaction sent successfully
+        "400":
+          description: Invalid input
+        "401":
+          description: User has to authenticate to send the reaction
+        "403":
+          description: User is not authorized to remove this reaction
+        "404":
+          description: Conversation or message not found
+        '500':
+          description: Internal server error
+  /users/{id}/conversations/{conversationId}/messages/{messageId}/reactions/{reactionId}:
+    parameters:
+      - name: id
+        in: path
+        description: The ID of the user
+        schema:
+          description: The ID of the user
+          type: integer
+          minimum: 0
+        required: true
+      - name: conversationId
+        in: path
+        description: The ID of the conversation containing the message with the reaction
+        schema:
+          description: The ID of the conversation
+          type: integer
+          minimum: 0
+        required: true
+      - name: messageId
+        in: path
+        description: The ID of the message with the reaction
+        schema:
+          description: The ID of the message
+          type: integer
+          minimum: 0
+        required: true
+      - name: reactionId
+        in: path
+        description: The ID of the reaction to remove
+        schema:
+          description: The ID of the reaction
+          type: integer
+          minimum: 0
+        required: true
+    delete:
+      tags: ["Conversation Based"]
+      summary: Remove a reaction from a message
+      description: Deletes a specific reaction from a message within a conversation
+      operationId: removeReaction
+      responses:
+        '204':
+          description: Reaction removed successfully
+        "400":
+          description: Invalid input
+        "401":
+          description: User must authenticate to remove the reaction
+        "404":
+          description: Conversation, message, or reaction not found
+        "403":
+          description: User is not authorized to remove this reaction
+        '500':
+          description: Internal server error
