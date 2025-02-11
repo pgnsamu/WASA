@@ -141,7 +141,6 @@ components:
           minLength: 0
           maxLength: 10000000
         lastMessage:
-          description: Last message sent in the chat
           $ref: '#/components/schemas/Message'
   securitySchemes:
     BearerAuth: 
@@ -333,6 +332,7 @@ paths:
           content:
             application/json:
               schema:
+                description: Photo of the user
                 type: object
                 properties:
                   photo:
@@ -379,6 +379,7 @@ paths:
           content:
             application/json:
               schema:
+                description: List of users in the conversation
                 type: array
                 items:
                   $ref: '#/components/schemas/User'
@@ -478,8 +479,8 @@ paths:
         content:
           application/json: 
             schema:
-              type: object
               description: New GroupChat name 
+              type: object
               properties:
                 groupName: 
                   description: String representing the new GroupChat name
@@ -576,8 +577,8 @@ paths:
           content:
             application/json:
               schema:
-                type: array
                 description: Array of the conversation retrieved for the user sent
+                type: array
                 items:
                   $ref: '#/components/schemas/Chat'
                 minItems: 0
@@ -750,6 +751,7 @@ paths:
           content:
             application/json:
               schema:
+                description: List of messages in the conversation
                 type: array
                 items:
                   $ref: '#/components/schemas/Message'
