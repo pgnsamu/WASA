@@ -1,12 +1,12 @@
 
 ###### Frontend build log:
 
-    FROM node:lts AS builder
-    WORKDIR /src/
-    COPY webui/package*.json ./webui/
-    WORKDIR /src/webui
-    RUN npm ci
-    COPY webui .
-    RUN npm run build-prod
-    FROM nginx:1.21.3
-    COPY --from=builder /src/webui/dist /usr/share/nginx/html
+FROM node:lts AS builder
+WORKDIR /src/
+COPY webui/package*.json ./webui/
+WORKDIR /src/webui
+RUN npm ci
+COPY webui .
+RUN npm run build-prod
+FROM nginx:1.21.3
+COPY --from=builder /src/webui/dist /usr/share/nginx/html
