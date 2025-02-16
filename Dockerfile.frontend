@@ -1,12 +1,17 @@
 
-###### Frontend build log:
-
 FROM node:lts AS builder
-WORKDIR /src/
-COPY webui/package*.json ./webui/
-WORKDIR /src/webui
-RUN npm ci
+WORKDIR /app
+
+# Copy only package.json and yarn.lock first for better caching
+COPY webui/package.json webui/yarn.lock ./webui/
+
+WORKDIR /app/webui
+
+# Copy the rest of your code
 COPY webui .
-RUN npm run build-prod
+
+# Run your production build
+RUN yarn run build-prod
+
 FROM nginx:stable
-COPY --from=builder /src/webui/dist /usr/share/nginx/html
+COPY --from=builder /app/webui/dist /usr/share/nginx/html
