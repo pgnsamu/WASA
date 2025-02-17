@@ -246,7 +246,7 @@
                         <input type="file" id="photo" class="form-control mt-2 w-100 me-2" @change="handlePhotoUpload">
                         <button v-if="selectedMessage != null && selectedForward == null" class="btn btn-success mt-2 w-100" @click="commentMessage" :disabled="(!newMessage.trim() && selectedFile == null )">Rispondi a</button>
                         <!--<button v-else @click="sendMessage" class="btn btn-primary mt-2 w-100" :disabled="groupMembers.length <= 1">Invia</button>-->
-                    <button v-else @click="sendMessage" class="btn btn-primary mt-2 w-100" :disabled="((!newMessage.trim() && (selectedFile == null)) || (selectedFile != null && selectedView == 3)) ">Invia</button>
+                    <button v-else @click="sendMessage" class="btn btn-primary mt-2 w-100" :disabled="((!newMessage.trim() && (selectedFile == null)) || (selectedFile != null && (selectedView == 3 || selectedView == 1))) ">Invia</button>
                     </div>
                 </div>
             </div>
