@@ -82,12 +82,6 @@
                         <label for="groupDescription" class="form-label">Descrizione Gruppo</label>
                         <textarea v-model="groupReqInfo.description" class="form-control" id="groupDescription" placeholder="Descrizione del gruppo"></textarea>
                     </div>
-                    <!--
-                    <div class="mb-2 mt-2 pt-2">
-                        <label for="addMember" class="form-label">Username membro da aggiungere</label>
-                        <input type="text" v-model="newParticipant" class="form-control" id="addMember" placeholder="username dell'utente">
-                    </div>
-                    -->
                     <div class="d-flex justify-content-between align-items-center">
                         <!--<button class="btn btn-secondary mb-3" @click="addParticipant">Aggiungi membro</button>-->
                         <button class="btn btn-primary mb-3" @click="newConversation">Crea Gruppo</button>
@@ -242,24 +236,17 @@
                         </div>
                     </div>
                 </div>
-                <!--
-                <div v-if="(selectedChat != null) && (groupMembers.length <= 1) && groupMembers != null">
-                    <div class="alert alert-warning" role="alert">
-                        Questo gruppo è vuoto, aggiungi un membro per iniziare a chattare!
-                    </div>
-                </div>
-                -->
                 
 
                 <!-- Chat Footer -->
                 <div v-if="selectedChat" class="chat-footer border-top p-3">
                     <textarea v-model="newMessage" class="form-control w-100" placeholder="Type a message" rows="2"></textarea>
                     <div class="d-flex justify-content-between align-items-center">
-                        <button v-if="selectedFile" class="btn btn-danger mt-2 me-2" @click="unselectFile">Rimuovi File</button>
+                        <button v-if="selectedFile && selectedView != 3" class="btn btn-danger mt-2 me-2" @click="unselectFile">Rimuovi File</button>
                         <input type="file" id="photo" class="form-control mt-2 w-100 me-2" @change="handlePhotoUpload">
                         <button v-if="selectedMessage != null && selectedForward == null" class="btn btn-success mt-2 w-100" @click="commentMessage" :disabled="(!newMessage.trim() && selectedFile == null )">Rispondi a</button>
                         <!--<button v-else @click="sendMessage" class="btn btn-primary mt-2 w-100" :disabled="groupMembers.length <= 1">Invia</button>-->
-                    <button v-else @click="sendMessage" class="btn btn-primary mt-2 w-100" :disabled="(!newMessage.trim() && selectedFile == null ) ">Invia</button>
+                    <button v-else @click="sendMessage" class="btn btn-primary mt-2 w-100" :disabled="((!newMessage.trim() && (selectedFile == null)) || (selectedFile != null && selectedView == 3)) ">Invia</button>
                     </div>
                 </div>
             </div>
@@ -337,9 +324,7 @@ export default {
         this.interval = setInterval(() => {
             const token = localStorage.getItem('authToken');
             if (this.selectedChat != null) {
-            // console.log(this.userId, this.selectedChat.id);
-            this.fetchMessages(this.selectedChat.id);
-            //this.fetchGroupMembers();
+                this.fetchMessages(this.selectedChat.id);
             }
             this.fetchChats();
         }, 5000);
@@ -381,33 +366,35 @@ export default {
             this.isTooltipVisible = false;
         },
         handleReactionButton(message, content) {
-            // probabile bug se vado a rimuovere una reazione e si crea concorrenza con il fetching automatico
+            // gestione reazioni non potendo mettere più reazioni
             if(message.reactions == null){
                 this.addReaction(message, content);
                 return;
             }
+            // ricerca se esiste già una reaction dello stesso utente
             const existingReaction = message.reactions.find(r => r.sentBy == this.userInfo.username);
-            console.log('existingReaction:', this.userInfo.username);
             
             if (existingReaction) {
+                // se esiste e viene premuta la stessa reazione, la reazione viene rimossa
                 if (existingReaction.content === content) {
                     this.removeReaction(message, existingReaction);
                 } else {
+                    // se esiste e viene premuta una reazione diversa, la reazione viene rimossa e sostituita con la nuova
                     this.removeReaction(message, existingReaction);
                     this.addReaction(message, content);
                 }
             } else {
+                // se non esiste viene messa la nuova reazione
                 this.addReaction(message, content);
             }
         },
-
         getSnippet(message) {
             return message.content.length > 20 ? message.content.substring(0, 20) + '...' : message.content;
-             
         },
         scrollToMessage(messageId) {
             const messageElement = document.getElementById(messageId);
             if (messageElement) {
+                // fino a dove si scorre
                 const offset = messageElement.offsetTop - (this.$refs.chatBody.clientHeight / 2) + (messageElement.clientHeight / 2);
                 this.$refs.chatBody.scrollTo({
                     top: offset,
@@ -416,6 +403,7 @@ export default {
             }
         },
         selectMessage(message){
+            // usata in caso in qualunque caso (non inoltra)
             if(this.replyToMode && this.selectedMessage == message){
                 this.selectedView=0;
                 this.replyToMode=false;
@@ -429,6 +417,7 @@ export default {
             }
         },
         selectMessageToForward(message){
+            // usato per inoltrare
             if(this.selectedView == 4 && this.selectedForward == message ){
                 this.selectedView=0;
                 this.selectedForward=null;
@@ -442,7 +431,7 @@ export default {
             this.groupReqInfo.photo = event.target.files[0];
         },
         changeToView(tmpView){
-            console.log(tmpView)
+            // cambio view e reset selectedMessage selectedForward
             if(this.selectedView != tmpView){
                 this.selectedView = tmpView;
             }else{
@@ -452,8 +441,9 @@ export default {
             }
         },
         addParticipant() {
+            // Aggiungi un partecipante alla chat  
             if (this.newParticipant.trim() !== '') {
-                if (!this.participants.includes(this.newParticipant.trim())) { // forse far uscire un feedback a schermo
+                if (!this.participants.includes(this.newParticipant.trim())){
                     this.participants.push(this.newParticipant.trim()); 
                     this.newParticipant = '';
                 }
@@ -463,6 +453,7 @@ export default {
             this.participants.splice(index, 1);
         },
         scrollToBottom() {
+            // in modo che quando viene aperta una chat si veda sempre l'ultimo messaggio
             this.$nextTick(() => {
                 const chatBody = this.$refs.chatBody;
                 if (chatBody) {
@@ -470,31 +461,31 @@ export default {
                         top: chatBody.scrollHeight,
                         behavior: 'smooth'
                     });
-                    // chatBody.scrollTop = chatBody.scrollHeight; alternative senza animazione
                 }
             });
         },
         formatContent(content) {
+            // sostituisce i \n con <br> per andare a capo usata nella visualizzazione dei messaggi
             return content.replace(/\n/g, '<br>');
         },
         fetchUserData() {
+            // prende i dati dell'utente loggato
             const token = localStorage.getItem('authToken');
 
-            // Make the API request with Authorization header
             this.$axios.get(`/users/${this.userId}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
             })
-                .then(response => {
-                    this.userInfo = response.data; // Set user info data
-                    console.log('User info:', this.userInfo);
-                })
-                .catch(error => {
-                    console.error("There was an error fetching user data:", error);
-                });
+            .then(response => {
+                this.userInfo = response.data; 
+            })
+            .catch(error => {
+                console.error("There was an error fetching user data:", error);
+            });
         },
         toggleView() {
+            // usata per andare nelle impostazioni del profilo
             if(this.selectedView != 0){
                 this.selectedView = 0;
             } else {
@@ -502,6 +493,7 @@ export default {
             }
         },
         convertBlobToBase64(blob) {
+            // convertitore per vedere le immagini salvate in db
             return "data:image/jpeg;base64," + blob;
         },
         convertUnixToTime(unixTime) {
@@ -509,9 +501,10 @@ export default {
             const date = new Date(unixTime);
 
             // Format the date as a human-readable string
-            return date.toLocaleString(); // Example: "1/9/2025, 12:00:00 PM"
+            return date.toLocaleString();
         },
         async fetchChats() {
+            // prende le chat dell'utente loggato
             const token = localStorage.getItem('authToken');
             try {
                 const response = await this.$axios.get(`/users/${this.userId}/conversations`, {
@@ -525,6 +518,7 @@ export default {
             }
         },
         async fetchMessages(chatId) {
+            // prende i messaggi della chat selezionata
             const token = localStorage.getItem('authToken');
             try {
                 const response = await this.$axios.get(`/users/${this.userId}/conversations/${chatId}/messages`, {
@@ -533,12 +527,13 @@ export default {
                     },
                 });
                 this.messages = response.data;
-                console.log('Messages:', this.messages);
+                // console.log('Messages:', this.messages);
             } catch (error) {
                 console.error('Error fetching messages:', error);
             }
         },
         async putUsername(event) {
+            // cambia il nome utente
             event.preventDefault();  // Prevent the form from submitting
             try {
                 const token = localStorage.getItem('authToken');
@@ -565,6 +560,7 @@ export default {
             this.selectedFile = event.target.files[0];
         },
         async setMyPhoto(event) {
+            // carica la foto del profilo
             event.preventDefault();  // Prevent the form from submitting
             if (!this.selectedFile) {
                 alert('Please select a file first.');
@@ -604,6 +600,7 @@ export default {
         },
         async sendMessage() {
             const token = localStorage.getItem('authToken');
+            // creo pacchetto dati per inviare il messaggio
             const messageData = {
                 content: this.newMessage,
                 isPhoto: this.selectedFile != null ? true : false,
@@ -619,7 +616,7 @@ export default {
                         'Authorization': `Bearer ${token}`,
                     }
                 });
-                console.log('Message sent successfully:', response.data);
+                // console.log('Message sent successfully:', response.data);
                 this.newMessage = '';
 
                 // Clear the file input
@@ -684,7 +681,7 @@ export default {
             } else {
                 formData.append('partecipantsUsername', username);
             }
-            console.log('formData:', formData.get('name'), formData.get('isGroup'), formData.get('photo'), formData.get('description'), formData.getAll('partecipantsUsername[]'));
+            // console.log('formData:', formData.get('name'), formData.get('isGroup'), formData.get('photo'), formData.get('description'), formData.getAll('partecipantsUsername[]'));
 
 
             try {
@@ -698,6 +695,7 @@ export default {
                 this.selectedView = 0;
                 this.selectedUser = ''
                 if (this.isGroup) {
+                    // reset group data
                     this.groupReqInfo = {
                         id: null,
                         name: null,
@@ -755,7 +753,7 @@ export default {
                         'Authorization': `Bearer ${token}`,
                     },
                 });
-                console.log('Message deleted successfully:', response.data);
+                // console.log('Message deleted successfully:', response.data);
                 this.fetchMessages(this.selectedChat.id);
             } catch (error) {
                 console.error('Error deleting message:', error);
@@ -776,7 +774,7 @@ export default {
                 this.chatInfo = response.data;
                 this.fetchGroupMembers();
                 this.changeToView(3);
-                console.log('Chat info:', this.chatInfo);
+                // console.log('Chat info:', this.chatInfo);
             } catch (error) {
                 console.error('Error fetching chat info:', error);
             }
@@ -837,9 +835,7 @@ export default {
             if(this.chatInfo.name != this.selectedChat.name){
                 this.setGroupName();
             }
-            if(this.chatInfo.description != this.selectedChat.description){
-                
-            }
+            // if(this.chatInfo.description != this.selectedChat.description){}
             if(this.selectedFile != null){
                 this.setGroupPhoto();
             }
@@ -856,6 +852,7 @@ export default {
                 });
                 const updatedChat = this.chats.find(chat => chat.id === response.data.id);
                 if (updatedChat) {
+                    this.selectedChat.name = response.data.name;
                     updatedChat.name = response.data.name;
                 }
                 this.changeToView(0);
@@ -877,7 +874,8 @@ export default {
                 });
                 this.changeToView(0);
                 this.fetchChats();
-                console.log('Chat info:', response.data);
+                this.selectedFile = null;
+                // console.log('Chat info:', response.data);
             } catch (error) {
                 console.error('Error fetching chat info:', error);
             }
