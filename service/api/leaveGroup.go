@@ -15,7 +15,6 @@ import (
 // troppi utenti trovati
 // ritorna nulla
 
-// TODO: sistemare il Doc delle api perché è stato implementato in modo che utente x possa eliminare qualunque utente y nello stesso gruppo
 func (rt *_router) leaveGroup(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	authHeader := r.Header.Get("Authorization")
 	if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {

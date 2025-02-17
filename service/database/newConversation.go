@@ -25,9 +25,6 @@ type Conversation struct {
 
 func (db *appdbimpl) NewConversation(userId int, name string, isGroup bool, photo *[]byte, description *string, partecipantsId []int) (*Conversation, error) {
 
-	// TODO: aggiungere sulla tabella participate collegamento utente conversation per ogni partecipantId+userId
-	// TODO: mancante nel db il check value del fatto che se isGroup allora partecipantsId == 1
-
 	if isGroup {
 		// se è un gruppo riprepariamo
 		stmt, err := db.c.Prepare("INSERT INTO conversations (name, createdAt, isGroup, description, photo) VALUES (?, ?, ?, ?, ?);")
@@ -50,7 +47,7 @@ func (db *appdbimpl) NewConversation(userId int, name string, isGroup bool, phot
 		tempParticipantsId = append(tempParticipantsId, userId) // Append userId to the slice before the loop
 
 		// aggiunta dei partecipanti a un gruppo nella tabella
-		for i := 0; i < len(tempParticipantsId); i++ { // TODO: è stato aggiunto un meno 1 ma non so se è giusto controllare (ora è stato tolto e funziona, non lo so )
+		for i := 0; i < len(tempParticipantsId); i++ {
 
 			stmt, err := db.c.Prepare("INSERT INTO participate (userId, conversationId) VALUES (?, ?);")
 			if err != nil {
@@ -104,7 +101,6 @@ func (db *appdbimpl) NewConversation(userId int, name string, isGroup bool, phot
 
 		tempParticipantsId := partecipantsId
 		tempParticipantsId = append(tempParticipantsId, userId)
-		// TODO: vedere se è da controllare il numero <3
 		for i := 0; i < len(tempParticipantsId); i++ {
 			stmt, err := db.c.Prepare("INSERT INTO participate (userId, conversationId) VALUES (?, ?);")
 			if err != nil {

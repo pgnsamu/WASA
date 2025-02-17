@@ -69,7 +69,6 @@
                     </form>
                 </div>
                 
-                <!--TODO: aggiungere controlli new conversation--> 
                 <div v-if="selectedView == 2" class="flex-grow-1 mb-2">
                     <div class="mb-2 mt-2 pt-2">
                         <label for="groupPhoto" class="form-label">Foto del Gruppo</label>
@@ -164,7 +163,7 @@
                 <div v-if="selectedChat"
                     class="chat-header border-bottom py-3 d-flex justify-content-between align-items-center">
                     <h5>{{ selectedChat.name }}</h5>
-                    <button class="btn btn-sm btn-primary" @click="fetchChatInfo">Settings</button> <!--TODO: icona ingranaggio?-->
+                    <button class="btn btn-sm btn-primary" @click="fetchChatInfo">Settings</button> 
                 </div>
 
                 <!-- Chat Body -->
@@ -203,7 +202,7 @@
                             <div v-if="message.answerTo != -1">
                                 <div class="bg-success text-white p-1 mb-2 rounded" @click="scrollToMessage(message.answerTo)">
                                     <button class="btn btn-link text-white p-0" style="text-decoration: none;">
-                                        <small>{{ getSnippet(messages.find(msg => msg.id === message.answerTo)) }}</small> <!-- TODO: mmettere nel caso in cui non esista content un'icona della foto-->
+                                        <small>{{ getSnippet(messages.find(msg => msg.id === message.answerTo)) }}</small> 
                                     </button>
                                 </div>
                             </div>
@@ -278,7 +277,7 @@ export default {
             chats: [],
 
             // newMessage variables
-            answerTo: null, // TODO: servirebbe per cambiare il bottone finale nel caso viene scelta una chat a cui rispondere
+            answerTo: null, 
             messages: [],
             newMessage: '', // Model for the new message input
             selectedFile: null,
@@ -404,7 +403,7 @@ export default {
 
         getSnippet(message) {
             return message.content.length > 20 ? message.content.substring(0, 20) + '...' : message.content;
-            // TODO: cambiare nel caso sia solo foto 
+             
         },
         scrollToMessage(messageId) {
             const messageElement = document.getElementById(messageId);

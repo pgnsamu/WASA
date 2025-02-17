@@ -26,7 +26,7 @@ func (db *appdbimpl) AddToGroup(idConversation int, idUser int, idUserToAdd int)
 		return nil, err
 	}
 
-	found := false        // TODO: potrebbe essere sovrascritta?
+	found := false
 	valueOfUser := *users // unwrapping puntatore
 	for i := 0; i < len(valueOfUser); i++ {
 		if idUserToAdd == valueOfUser[i].Id {

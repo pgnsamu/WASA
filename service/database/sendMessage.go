@@ -5,10 +5,6 @@ import (
 	"time"
 )
 
-// TODO: messagetype per ora sul doc è enum invece di bool
-// TODO: togliere il previewContent dal doc
-// TODO: forse l'attributo replyTo su sendmessage è inutile
-
 // errori ritornabili da SendMessage
 // il messaggio non appartiene a questa conversazione
 

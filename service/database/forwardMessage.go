@@ -11,7 +11,6 @@ import (
 
 func (db *appdbimpl) ForwardMessage(idConversationSource int, idConversationDest int, idUser int, idMessage int) (*Conversation, error) {
 
-	// TODO: capire se da errore anche se non esiste la conversazione nel db
 	// controllo se l'utente che vuole mandare sta nella chat sorgente
 	resu, err := db.UserExist(idConversationSource, idUser)
 	if err != nil {

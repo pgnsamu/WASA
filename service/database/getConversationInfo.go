@@ -72,7 +72,6 @@ func (db *appdbimpl) GetConversationInfo(idConversation int, idUser int) (*Conve
 	} else {
 		return nil, ErrUserNotFound
 	}
-	// TODO: capire se è qua il problema stessa cosa su getUserInfo riga 44
 	// Check for errors that may have occurred during iteration
 	if err := rows.Err(); err != nil {
 		return nil, err
