@@ -185,7 +185,7 @@
                                 </div>
                             </button> <!--reply-->
                         </div>
-                        <!-- MESSAGGIO -->
+                        <!-- MESSAGGIO + gestione messaggi di diversi colori a seconda dell'utente o operazione -->
                         <div :id="message.id" :class="['p-2', ((selectedMessage != null && message.id == selectedMessage.id) || (selectedForward != null && message.id == selectedForward.id)) ? (message.senderId == userId ? 'bg-green-light text-black rounded ms-2' : 'bg-green-light text-black rounded')  : (message.senderId == userId ? 'bg-blue-light text-white rounded ms-2' : 'bg-light rounded')]" style="max-width: 40%;">
                             <div v-if="message.isForwarded" class="text-muted small">
                                 <i class="bi bi-arrow-right"></i> Inoltrato
