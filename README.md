@@ -110,6 +110,26 @@ yarn run build-prod
 yarn run preview
 ```
 
+## Docker commands
+### building backend
+```shell
+docker build -t backend:latest -f Dockerfile.backend .
+```
+### building frontend
+```shell
+docker build -t frontend:latest -f Dockerfile.frontend .
+```
+### running backend
+```shell
+docker run -it --rm -p 3000:3000 backend:latest            
+```
+### running frontend
+```shell
+docker run -it --rm -p 8080:80 frontend:latest        
+```
+
+ 
+
 ## License
 
 See [LICENSE](LICENSE).
