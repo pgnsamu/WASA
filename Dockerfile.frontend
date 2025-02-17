@@ -2,15 +2,10 @@
 FROM node:lts AS builder
 WORKDIR /app
 
-# Copy only package.json and yarn.lock first for better caching
-COPY webui/package.json webui/yarn.lock ./webui/
+COPY webui webui
 
 WORKDIR /app/webui
 
-# Copy the rest of your code
-COPY webui .
-
-# Run your production build
 RUN yarn run build-prod
 
 FROM nginx:stable
