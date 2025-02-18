@@ -1,10 +1,26 @@
-
+# Utilizza l'immagine di Node.js LTS come builder
 FROM node:lts AS builder
+
+# Imposta la directory di lavoro a /src/
 WORKDIR /src/
+
+# Copia i file package.json e package-lock.json dalla directory webui
 COPY webui/package*.json ./webui/
+
+# Cambia la directory di lavoro a /src/webui
 WORKDIR /src/webui
+
+# Installa le dipendenze utilizzando npm ci
 RUN npm ci
+
+# Copia tutti i file dalla directory webui
 COPY webui .
+
+# Esegue il build dell'applicazione in modalità produzione
 RUN npm run build-prod
+
+# Utilizza l'immagine di Nginx stabile
 FROM nginx:stable
+
+# Copia i file buildati dalla fase builder alla directory di Nginx
 COPY --from=builder /src/webui/dist /usr/share/nginx/html

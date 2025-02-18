@@ -1,10 +1,26 @@
-
+# Utilizza l'immagine di Golang versione 1.22.0 come builder
 FROM golang:1.22.0 AS builder
+
+# Imposta la directory di lavoro
 WORKDIR /src/
+
+# Copia tutti i file dal contesto di build alla directory di lavoro
 COPY . .
+
+# Compila il progetto Go e genera l'eseguibile nella directory /app
 RUN go build -o /app/webapi ./cmd/webapi
+
+# Utilizza l'immagine di Debian Bookworm
 FROM debian:bookworm
+
+# Espone la porta 3000
 EXPOSE 3000
+
+# Imposta la directory di lavoro
 WORKDIR /app/
+
+# Copia l'eseguibile compilato dal builder alla directory di lavoro
 COPY --from=builder /app/webapi ./
+
+# Comando per eseguire l'applicazione
 CMD ["/app/webapi"]
