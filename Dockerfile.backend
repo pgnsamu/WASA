@@ -1,6 +1,4 @@
 
-###### Backend build log:
-
 FROM golang:1.22.0 AS builder
 WORKDIR /src/
 COPY . .

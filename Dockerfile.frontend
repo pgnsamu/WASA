@@ -1,6 +1,4 @@
 
-###### Frontend build log:
-
 FROM node:lts AS builder
 WORKDIR /src/
 COPY webui/package*.json ./webui/
