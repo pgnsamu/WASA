@@ -1,10 +1,26 @@
-
+# Utilizza l'immagine di Golang versione 1.22.0 come builder
 FROM golang:1.22.0 AS builder
+
+# Imposta la directory di lavoro all'interno del container
 WORKDIR /src/
+
+# Copia tutti i file dal contesto di build alla directory di lavoro nel container
 COPY . .
+
+# Compila il progetto Go e genera un eseguibile chiamato webapi nella directory /app/
 RUN go build -o /app/webapi ./cmd/webapi
+
+# Utilizza l'immagine base di Debian Bookworm
 FROM debian:bookworm
+
+# Espone la porta 3000
 EXPOSE 3000
+
+# Imposta la directory di lavoro all'interno del container
 WORKDIR /app/
+
+# Copia l'eseguibile webapi dal builder alla directory di lavoro nel container
 COPY --from=builder /app/webapi ./
+
+# Definisce il comando di avvio del container che andrà ad eseguire l'eseguibile creato dal builder
 CMD ["/app/webapi"]
